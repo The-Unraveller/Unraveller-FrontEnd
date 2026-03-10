@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #00ff41;
+  --bg: #0a0a0a;
+  --error: #ff0000;
+  --accent: #00d8ff;
+}
+
+body {
+  background-color: var(--bg);
+  color: #fff;
+  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+}
+
+.hacker-border {
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+.glitch-text {
+  text-shadow: 2px 2px var(--error), -2px -2px var(--accent);
+}
