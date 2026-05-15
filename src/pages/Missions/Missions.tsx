@@ -1,112 +1,233 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Lock, Unlock, Play, ChevronRight, User, Terminal, Database, Shield } from 'lucide-react';
-import { Button } from '../../components/common/Button';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  FileText, Star, BookOpen, Flame, ShoppingBag, HelpCircle, Users, Lock, Play,
+} from 'lucide-react';
+import Layout from '../../components/layout/Layout';
 
-const missions = [
-  { id: 1, title: 'The Gatekeeper', desc: 'Thuyết phục bảo vệ cho bạn vào tòa nhà bí mật.', status: 'available', level: 1 },
-  { id: 2, title: 'Data Extraction', desc: 'Hỏi thông tin mật khẩu từ nhân viên thực tập.', status: 'locked', level: 2 },
-  { id: 3, title: 'The Double Agent', desc: 'Nhận biết và đối phó với kẻ phản bội.', status: 'locked', level: 3 },
-  { id: 4, title: 'Final Unravelling', desc: 'Giải mã bí mật cuối cùng của tổ chức.', status: 'locked', level: 4 },
+const sidebarItems = [
+  { icon: FileText, label: 'Report', to: '#' },
+  { icon: Star, label: 'Score', to: '#' },
+  { icon: BookOpen, label: 'Scenario', to: '/courses' },
+  { icon: Flame, label: 'Streak', to: '#' },
+  { icon: ShoppingBag, label: 'Market', to: '#' },
+  { icon: HelpCircle, label: 'Guide', to: '#' },
+  { icon: Users, label: 'Friends', to: '#' },
 ];
+
+const courses = [
+  {
+    id: 1,
+    stage: 'Stage 1',
+    title: 'Coffee Shop Conversations',
+    desc: 'Practice ordering, small talk, and social English in a café setting.',
+    img: '/scenario_coffee.png',
+    locked: false,
+    stars: 3,
+  },
+  {
+    id: 2,
+    stage: 'Stage 2',
+    title: 'Following Instructions',
+    desc: 'Listen carefully, understand tasks, and execute with precision.',
+    img: '/scenario_classroom.png',
+    locked: false,
+    stars: 2,
+  },
+  {
+    id: 3,
+    stage: 'Stage 3',
+    title: 'Debate & Negotiation',
+    desc: 'Practice arguing your point and reaching agreements in English.',
+    img: '',
+    locked: true,
+    stars: 0,
+  },
+  {
+    id: 4,
+    stage: 'Stage 4',
+    title: 'Storytelling',
+    desc: 'Tell compelling stories in English with rich vocabulary.',
+    img: '',
+    locked: true,
+    stars: 0,
+  },
+  {
+    id: 5,
+    stage: 'Stage 5',
+    title: 'Detective Writing',
+    desc: 'Describe scenes and solve mysteries in written English.',
+    img: '/scenario_detective.png',
+    locked: false,
+    stars: 0,
+  },
+  {
+    id: 6,
+    stage: 'Stage 6',
+    title: 'Advanced Roleplay',
+    desc: 'Complex multi-character scenarios with layered objectives.',
+    img: '',
+    locked: true,
+    stars: 0,
+  },
+];
+
+const CourseCard = ({
+  course,
+  featured,
+  onClick,
+}: {
+  course: typeof courses[0];
+  featured?: boolean;
+  onClick: () => void;
+}) => (
+  <div
+    onClick={onClick}
+    id={`course-card-${course.id}`}
+    className={`ur-card rounded-2xl overflow-hidden flex flex-col transition-all ${
+      course.locked
+        ? 'opacity-50 cursor-not-allowed'
+        : 'cursor-pointer ur-card-hover'
+    } ${featured ? 'shadow-[0_8px_32px_rgba(124,58,237,0.3)]' : ''}`}
+  >
+    {/* Image */}
+    <div className={`relative overflow-hidden flex-shrink-0 ${featured ? 'h-44' : 'h-32'}`}>
+      {course.img && !course.locked ? (
+        <>
+          <img
+            src={course.img}
+            alt={course.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {!course.locked && (
+            <div className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <Play size={14} className="text-white ml-0.5" fill="white" />
+            </div>
+          )}
+        </>
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{ background: 'rgba(45,10,110,0.6)' }}
+        >
+          {course.locked ? (
+            <Lock size={22} className="text-white/20" />
+          ) : (
+            <BookOpen size={22} className="text-white/20" />
+          )}
+        </div>
+      )}
+      {/* Stage label */}
+      <span className="absolute top-2 left-2 text-xs font-black text-[#f5c842] bg-black/30 px-2 py-0.5 rounded-full backdrop-blur-sm">
+        {course.stage}
+      </span>
+    </div>
+
+    {/* Content */}
+    <div className="p-3 flex-1 flex flex-col gap-1">
+      <h3 className="text-white text-xs font-bold leading-snug line-clamp-2">{course.title}</h3>
+      {featured && <p className="text-white/50 text-xs leading-relaxed line-clamp-2">{course.desc}</p>}
+      {course.stars > 0 && (
+        <div className="flex gap-0.5 mt-1">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <span key={i} className={`text-sm ${i < course.stars ? 'text-[#f5c842]' : 'text-white/15'}`}>★</span>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 const Missions = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-spy-black text-spy-green font-mono p-8 md:p-12 overflow-x-hidden">
-      {/* Side decoration */}
-      <div className="fixed left-0 top-0 bottom-0 w-1 bg-spy-green/30 opacity-50" />
-      <div className="fixed right-0 top-0 bottom-0 w-1 bg-spy-green/30 opacity-50" />
+    <Layout isLoggedIn username="USERNAME">
+      <div className="max-w-screen-xl mx-auto px-4 py-5">
+        <div className="flex gap-5">
+          {/* ── Sidebar ── */}
+          <aside className="hidden md:flex flex-col w-20 flex-shrink-0 gap-4">
+            <div className="ur-card rounded-2xl p-2.5 flex flex-col items-center gap-0.5">
+              {/* Avatar */}
+              <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center mb-2">
+                <Users size={16} className="text-white/50" />
+              </div>
+              <div className="w-full h-px bg-white/10 mb-1" />
+              {sidebarItems.map(({ icon: Icon, label, to }) => (
+                <Link
+                  key={label}
+                  to={to}
+                  id={`sidebar-${label.toLowerCase()}`}
+                  className="flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl hover:bg-white/8 transition-colors w-full text-center group"
+                >
+                  <Icon size={15} className="text-white/45 group-hover:text-white/80 transition-colors" />
+                  <span className="text-white/40 text-[10px] group-hover:text-white/70 transition-colors leading-none">
+                    {label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            {/* Mini logo */}
+            <div className="flex justify-center">
+              <img src="/logo.png" alt="UR" className="h-12 object-contain opacity-70" />
+            </div>
+          </aside>
 
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">MISSION CONTROL // HQ</h1>
-          <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest">
-            <Database size={12} /> SECURE LINK ESTABLISHED // DATA UPDATED: {new Date().toLocaleDateString()}
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-6 border-l border-spy-green/20 pl-8">
-          <div className="text-right">
-            <p className="text-[10px] text-gray-500 uppercase font-bold">AGENT_NAME: <span className="text-spy-green">KHOA_TUAN_07</span></p>
-            <p className="text-[10px] text-gray-500 uppercase font-bold">STATUS: <span className="text-spy-blue italic animate-pulse">ACTIVE_DUTY</span></p>
-            <p className="text-[10px] text-gray-500 uppercase font-bold">XP: <span className="text-white">1,250 / 5,000</span></p>
-          </div>
-          <div className="w-14 h-14 border border-spy-green rounded-sm flex items-center justify-center bg-spy-green/5 shadow-[0_0_15px_rgba(0,255,65,0.1)]">
-            <User className="w-8 h-8" />
-          </div>
-        </div>
-      </header>
+          {/* ── Main content ── */}
+          <div className="flex-1 min-w-0">
+            {/* Top row */}
+            <div className="flex flex-col md:flex-row items-start gap-5 mb-5">
+              <div className="flex-shrink-0 pt-2">
+                <h1 className="text-white text-3xl font-black leading-tight">
+                  Many<br />levels<br />have<br />appeared.
+                </h1>
+                <p className="text-white/40 text-xs mt-2 leading-relaxed max-w-[130px]">
+                  Choose a stage to begin your journey.
+                </p>
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-3">
+                {courses.slice(0, 2).map((c) => (
+                  <CourseCard
+                    key={c.id}
+                    course={c}
+                    featured
+                    onClick={() => !c.locked && navigate(`/game/${c.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
 
-      <div className="max-w-7xl mx-auto space-y-12">
-        <section>
-          <h2 className="text-xl font-bold uppercase mb-10 flex items-center gap-4 text-white">
-            <span className="bg-white text-black px-2 py-1 text-sm font-black">CH-1</span> SELECT OPERATIONAL OBJECTIVE
-          </h2>
+            {/* Wide locked card */}
+            <div className="ur-card rounded-xl p-4 mb-4 opacity-50 flex items-center gap-4">
+              <Lock size={18} className="text-white/30 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-white/60 text-xs font-bold">{courses[2].stage} — {courses[2].title}</p>
+                <p className="text-white/35 text-xs truncate">{courses[2].desc}</p>
+              </div>
+              <span className="text-white/20 text-xs font-semibold flex-shrink-0">Locked</span>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            {missions.map((mission) => (
-              <MissionCard 
-                key={mission.id} 
-                mission={mission} 
-                onClick={() => mission.status === 'available' && navigate(`/game/${mission.id}`)}
+            {/* Bottom row */}
+            <div className="grid grid-cols-3 gap-3 items-start">
+              <CourseCard
+                course={courses[3]}
+                onClick={() => {}}
               />
-            ))}
+              <div className="flex items-center justify-center py-4 px-2 text-center">
+                <h2 className="text-white text-xl font-black leading-tight">
+                  Join the<br />course<br />now!
+                </h2>
+              </div>
+              <CourseCard
+                course={courses[4]}
+                onClick={() => !courses[4].locked && navigate(`/game/${courses[4].id}`)}
+              />
+            </div>
           </div>
-        </section>
-
-        <section className="mt-16 pt-16 border-t border-spy-green/10 grid grid-cols-1 lg:grid-cols-3 gap-8 opacity-60">
-           <div className="p-6 border border-spy-green/10 bg-spy-black/40">
-              <h3 className="text-xs font-black uppercase text-gray-500 mb-4 flex items-center gap-2"><Shield size={14} /> SECURITY PROTOCOL</h3>
-              <p className="text-[10px] leading-relaxed uppercase text-gray-700 font-bold">Always maintain proper grammar. Mistakes increase suspicion levels. If suspicion exceeds 100%, mission is terminated.</p>
-           </div>
-           <div className="p-6 border border-spy-green/10 bg-spy-black/40">
-              <h3 className="text-xs font-black uppercase text-gray-500 mb-4 flex items-center gap-2"><Terminal size={14} /> RECENT LOGS</h3>
-              <p className="text-[10px] leading-relaxed uppercase text-gray-700 font-bold">Mission 01 completed with 85% score. New encryption techniques unlocked.</p>
-           </div>
-        </section>
-      </div>
-    </div>
-  );
-};
-
-const MissionCard = ({ mission, onClick }: any) => {
-  const isLocked = mission.status === 'locked';
-  
-  return (
-    <div 
-      onClick={onClick}
-      className={`group relative p-8 border-2 transition-all cursor-pointer overflow-hidden ${isLocked ? 'border-gray-900 bg-black/50 grayscale' : 'border-spy-green/20 bg-spy-black hover:border-spy-green hover:shadow-[0_0_30px_rgba(0,255,65,0.15)]'}`}
-    >
-      <div className="mb-6 flex justify-between items-start">
-        <div className="space-y-1">
-          <span className={`text-[10px] font-black uppercase tracking-widest ${isLocked ? 'text-gray-700' : 'text-spy-green/50'}`}>CHAPTER 0{mission.id}</span>
-          <h3 className={`text-xl font-black uppercase leading-tight ${isLocked ? 'text-gray-700' : 'text-spy-green'}`}>
-            {mission.title}
-          </h3>
         </div>
-        {isLocked ? <Lock className="w-5 h-5 text-gray-800" /> : <Unlock className="w-5 h-5 text-spy-green animate-pulse" />}
       </div>
-      
-      <p className={`text-[10px] uppercase font-bold mb-12 h-14 overflow-hidden leading-relaxed ${isLocked ? 'text-gray-800' : 'text-gray-500'}`}>
-        {mission.desc}
-      </p>
-
-      {!isLocked && (
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-[10px] font-black px-3 py-1 bg-spy-green/10 border border-spy-green/40 text-spy-green uppercase">LVL: {mission.level}</span>
-          <Play className="w-5 h-5 fill-spy-green transition-transform group-hover:scale-125" />
-        </div>
-      )}
-
-      {/* Grid background effect */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none grid grid-cols-4 grid-rows-4">
-        {Array.from({ length: 16 }).map((_, i) => (
-          <div key={i} className="border border-spy-green/20" />
-        ))}
-      </div>
-    </div>
+    </Layout>
   );
 };
 

@@ -1,87 +1,115 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Github, Cpu, Users, Globe } from 'lucide-react';
-import { Button } from '../../components/common/Button';
+import Layout from '../../components/layout/Layout';
+import { Users } from 'lucide-react';
+
+const teamMembers = [
+  { name: 'Anh Khoa', role: 'Introduction / Lead' },
+  { name: 'Dinh Quang Huy', role: 'Strategy / Design' },
+  { name: 'Pham Viet Dung', role: 'Customer Insight' },
+  { name: 'Nguyen Khanh Le', role: 'Solution Architect' },
+  { name: 'Tuan Khoa', role: 'Execution / Dev' },
+];
+
+const coreValues = [
+  {
+    title: 'Simulation-Based Learning',
+    desc: 'Learners experience English through real-life simulations: social interactions, job interviews, travel, and everyday problem-solving.',
+  },
+  {
+    title: 'Story-driven + Gamification',
+    desc: 'Unlock new storylines, characters, and challenges as you progress — building long-term motivation instead of mindless drilling.',
+  },
+  {
+    title: 'Micro-learning',
+    desc: 'Designed for Gen Z habits: short, flexible sessions you can complete on the go — during a commute or a break.',
+  },
+];
 
 const About = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-spy-black text-spy-green font-mono p-12 md:p-24 relative overflow-hidden">
-      {/* HUD Lines Decoration */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 w-24 h-24 border-t-2 border-l-2 border-spy-green" />
-        <div className="absolute bottom-10 right-10 w-24 h-24 border-b-2 border-r-2 border-spy-green" />
-      </div>
-
-      <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-spy-green/20 pb-8">
-        <div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase mb-4">PROJECT DOSSIER // UNRAVELLER</h1>
-          <p className="text-xs uppercase text-gray-500 tracking-[0.5em] font-bold italic">Top Secret Information // Classified Level 7</p>
+    <Layout isLoggedIn={false}>
+      <div className="max-w-screen-lg mx-auto px-6 py-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <img src="/logo.png" alt="Unraveller" className="h-36 md:h-44 object-contain drop-shadow-2xl" />
         </div>
-        <Button onClick={() => navigate('/')} variant="outline" className="px-8 py-3">
-          <ChevronLeft size={16} /> RETURN_TO_EXT_NET
-        </Button>
-      </header>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
-        <section className="space-y-12">
-          <div className="space-y-4">
-             <h2 className="text-xl font-black uppercase text-white flex items-center gap-3"><Globe size={20} /> MISSION OBJECTIVE</h2>
-             <p className="text-sm leading-relaxed uppercase text-gray-500 font-bold italic">Biến việc học Tiếng Anh trở thành một nội dung giải trí/ phiêu lưu thông qua AI. Giúp người học ghi nhớ lâu hơn thông qua cảm xúc hưng phấn và các kịch bản thực tế không bị gò bó bởi lập trình cứng.</p>
-          </div>
+        <div className="ur-divider mb-8" />
 
-          <div className="space-y-4">
-             <h2 className="text-xl font-black uppercase text-white flex items-center gap-3"><Cpu size={20} /> OPERATIONAL TECH</h2>
-             <div className="grid grid-cols-2 gap-4">
-                <TechBadge label="FRONTEND: REACT + TAILWIND" />
-                <TechBadge label="BACKEND: .NET 9 CORE" />
-                <TechBadge label="LOGIC: AI NEURAL NETS" />
-                <TechBadge label="DB: SQLITE + EF CORE" />
-             </div>
+        {/* What is The Unraveller */}
+        <section className="mb-10 text-center">
+          <h2 className="text-white text-2xl font-bold mb-5">What is The Unraveller?</h2>
+          <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
+            <p className="text-white/70 text-sm leading-relaxed">
+              The Unraveller is an English learning app built on <strong className="text-white">simulation-based learning</strong> —
+              designed exclusively for Gen Z in Vietnam. Instead of approaching language through
+              grammar exercises and isolated vocabulary, The Unraveller places users inside vivid,
+              real-world scenarios that make language learning feel natural and exciting.
+            </p>
           </div>
         </section>
 
-        <section className="space-y-12">
-          <div className="space-y-6">
-             <h2 className="text-xl font-black uppercase text-white flex items-center gap-3"><Users size={20} /> AGENT DIRECTORY (TEAM)</h2>
-             <div className="space-y-4 border-l-2 border-spy-green/20 pl-8">
-                <AgentName role="Introduction / Lead" name="Anh Khoa" />
-                <AgentName role="Strategy / Design" name="Đinh Quang Huy" />
-                <AgentName role="Customer Insight" name="Phạm Việt Dũng" />
-                <AgentName role="Solution Architect" name="Nguyễn Khánh Lê" />
-                <AgentName role="Execution / Dev" name="Tuấn Khoa" />
-             </div>
+        {/* Core Values */}
+        <section className="mb-10">
+          <h2 className="text-white text-2xl font-bold text-center mb-6">Core Values</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {coreValues.map((v, i) => (
+              <div
+                key={i}
+                id={`value-card-${i}`}
+                className="ur-card p-5 rounded-2xl border-purple-600/40 hover:border-purple-400/60 transition-all"
+              >
+                <div className="w-8 h-8 rounded-lg bg-purple-700/50 flex items-center justify-center mb-3">
+                  <span className="text-[#f5c842] text-sm font-black">{i + 1}</span>
+                </div>
+                <h3 className="text-[#f5c842] font-bold text-sm mb-2">{v.title}</h3>
+                <p className="text-white/60 text-xs leading-relaxed">{v.desc}</p>
+              </div>
+            ))}
           </div>
+        </section>
 
-          <div className="p-8 bg-spy-green/5 border border-spy-green/20">
-             <h3 className="text-xs font-black uppercase mb-4 text-spy-green tracking-[0.3em]">SECURE_STORAGE_ACCESS</h3>
-             <p className="text-[10px] uppercase text-gray-700 font-black mb-6">Source code is managed under encrypted repositories. Regular backups performed by HQ servers.</p>
-             <a href="#" className="text-xs font-black uppercase text-spy-blue hover:text-white flex items-center gap-2 transition-all group">
-                <Github size={16} className="group-hover:rotate-12" /> VIEW_ON_GITHUB // NO_ACCESS
-             </a>
+        {/* How to use */}
+        <section className="mb-10">
+          <h2 className="text-white text-2xl font-bold text-center mb-5">How It Works</h2>
+          <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
+            <p className="text-white/68 text-sm leading-relaxed">
+              The platform is designed like a simulation world where you take on the role of a
+              character navigating life in English. After signing in, a virtual mentor guides
+              you through daily missions. Each lesson is a challenge — listening, speaking, or
+              writing — that earns you XP, unlocks new levels, and builds your skills over time.
+            </p>
+          </div>
+        </section>
+
+        {/* The Team */}
+        <section className="pb-4">
+          <h2 className="text-white text-2xl font-bold text-center mb-1">The Team</h2>
+          <p className="text-[#f5c842] text-sm italic text-center mb-1 font-medium">Dai Nao Thien Cung Team</p>
+          <p className="text-white/50 text-sm text-center mb-7">
+            We are a group of 5 students from FPT University
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            {teamMembers.map((member, i) => (
+              <div
+                key={i}
+                id={`team-member-${i}`}
+                className="flex flex-col items-center gap-2 group"
+              >
+                <div className="w-24 h-24 md:w-28 md:h-28 bg-gradient-to-br from-purple-900/60 to-purple-800/30 rounded-2xl border border-purple-700/30 group-hover:border-purple-500/60 transition-all flex items-center justify-center">
+                  <Users size={26} className="text-white/25" />
+                </div>
+                <div className="text-center">
+                  <p className="text-white text-sm font-semibold">{member.name}</p>
+                  <p className="text-white/45 text-xs">{member.role}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>
-
-      <footer className="mt-24 text-center text-[10px] text-gray-800 font-black uppercase tracking-[1em]">
-        END OF DOSSIER // VERSION 1.0.0_BETA
-      </footer>
-    </div>
+    </Layout>
   );
 };
-
-const TechBadge = ({ label }: any) => (
-  <div className="p-3 border border-spy-green/10 bg-spy-green/5 text-[10px] font-black uppercase text-spy-green/60 text-center">
-    {label}
-  </div>
-);
-
-const AgentName = ({ role, name }: any) => (
-  <div className="flex flex-col">
-    <span className="text-[10px] text-gray-700 font-black uppercase">{role}</span>
-    <span className="text-spy-green font-black uppercase tracking-widest">{name}</span>
-  </div>
-);
 
 export default About;

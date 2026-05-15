@@ -1,88 +1,242 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
-import { Trophy, XCircle, ChevronLeft, RotateCcw, Award, CheckCircle, AlertTriangle } from 'lucide-react';
-import { Button } from '../../components/common/Button';
+import { Zap, Award, RotateCcw, Home, TrendingUp } from 'lucide-react';
+import Layout from '../../components/layout/Layout';
+import { XPBar } from '../../components/common/GameStats';
+
+/* ─── Medal data ─── */
+const medals: Record<string, { name: string; desc: string; color: string; emoji: string }> = {
+  '1': {
+    name: '"First Victory Medal"',
+    emoji: '🏅',
+    desc: 'Awarded for completing your very first stage. This marks the beginning of your journey — courage, curiosity, and the willingness to start. Every great learner begins somewhere.',
+    color: '#f5c842',
+  },
+  '2': {
+    name: '"Master Listener"',
+    emoji: '🎧',
+    desc: 'Awarded for successfully following all instructions with precision. Your listening skills are a true asset in any English-speaking environment.',
+    color: '#a78bfa',
+  },
+  '5': {
+    name: '"Sharp Eye Detective"',
+    emoji: '🔍',
+    desc: 'Awarded for completing the Detective Writing stage. Your observation and writing have unraveled the mystery with style.',
+    color: '#60a5fa',
+  },
+};
+
+/* ─── Leaderboard mock ─── */
+const leaderboard = [
+  { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑' },
+  { rank: 2, name: 'Lan Anh',   xp: 3950, badge: '🥈' },
+  { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉' },
+  { rank: 4, name: 'You',       xp: 1250, badge: '⚡', isYou: true },
+];
+
+/* ─── SVG Medal ─── */
+const MedalSVG = ({ color }: { color: string }) => (
+  <svg width="90" height="108" viewBox="0 0 90 108" fill="none">
+    <rect x="28" y="60" width="12" height="46" rx="3" fill="#dc2626" transform="rotate(-7 28 60)" />
+    <rect x="50" y="60" width="12" height="46" rx="3" fill="#dc2626" transform="rotate(7 50 60)" />
+    <ellipse cx="45" cy="52" rx="26" ry="5" fill="rgba(0,0,0,0.2)" />
+    <polygon points="45,6 76,23 76,57 45,74 14,57 14,23" fill={color} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" />
+    <polygon points="45,14 68,27 68,53 45,66 22,53 22,27" fill={color} opacity="0.45" />
+    <defs>
+      <linearGradient id="mShine" x1="14" y1="6" x2="76" y2="60">
+        <stop stopColor="white" stopOpacity="0.5" />
+        <stop offset="1" stopColor="white" stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    <polygon points="45,14 68,27 68,53 45,66 22,53 22,27" fill="url(#mShine)" />
+    <text x="45" y="47" textAnchor="middle" fontSize="22" fill="white" fontWeight="bold">★</text>
+    <circle cx="68" cy="20" r="3" fill="white" opacity="0.65" />
+    <circle cx="60" cy="12" r="1.5" fill="white" opacity="0.4" />
+  </svg>
+);
+
+/* ─── Star ─── */
+const StarSVG = ({ size = 56 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 60 60">
+    <polygon points="30,5 36,22 54,22 40,34 46,52 30,41 14,52 20,34 6,22 24,22" fill="#f5c842" stroke="#e0a800" strokeWidth="1" />
+    <polygon points="30,12 34,22 45,22 37,29 40,40 30,34 20,40 23,29 15,22 26,22" fill="#fde68a" opacity="0.5" />
+  </svg>
+);
 
 const Result = () => {
   const [searchParams] = useSearchParams();
   const { id } = useParams();
   const navigate = useNavigate();
-  const status = searchParams.get('status');
+
+  const status  = searchParams.get('status');
+  const earnedXP = parseInt(searchParams.get('xp') || '0', 10) || 150;
   const isSuccess = status === 'success';
+  const medal = medals[id || '1'] || medals['1'];
 
+  const [starsShown, setStarsShown] = useState([false, false, false]);
+  const [xpAnimated, setXpAnimated] = useState(0);
+  const [showLeader, setShowLeader] = useState(false);
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    // Stars
+    [0, 1, 2].forEach(i => setTimeout(() => setStarsShown(p => { const n = [...p]; n[i] = true; return n; }), 200 + i * 280));
+    // XP counter animation
+    let current = 0;
+    const step = Math.ceil(earnedXP / 30);
+    const timer = setInterval(() => {
+      current = Math.min(current + step, earnedXP);
+      setXpAnimated(current);
+      if (current >= earnedXP) { clearInterval(timer); setTimeout(() => setShowLeader(true), 400); }
+    }, 40);
+    return () => clearInterval(timer);
+  }, [isSuccess, earnedXP]);
+
+  /* ── FAILURE ── */
+  if (!isSuccess) {
+    return (
+      <Layout isLoggedIn username="USERNAME">
+        <div className="max-w-screen-sm mx-auto px-4 py-10">
+          <div className="ur-card rounded-3xl p-8 text-center">
+            <div className="w-20 h-20 rounded-full bg-danger/15 border border-danger/30 flex items-center justify-center mx-auto mb-5 text-4xl">
+              😰
+            </div>
+            <h1 className="font-heading font-black text-3xl text-white mb-2">Busted!</h1>
+            <p className="text-white/55 text-sm leading-relaxed mb-3 max-w-xs mx-auto">
+              Your suspicion hit 100%. Try speaking in longer, more natural sentences next time.
+            </p>
+            <div className="badge badge-danger mx-auto mb-7 inline-flex">SUSPICION 100%</div>
+
+            <div className="flex justify-center gap-4 flex-wrap">
+              <button onClick={() => navigate(`/game/${id}`)} className="btn btn-primary" id="result-retry">
+                <RotateCcw size={16} /> Try Again
+              </button>
+              <button onClick={() => navigate('/courses')} className="btn btn-outline" id="result-courses">
+                <Home size={16} /> All Courses
+              </button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  /* ── SUCCESS ── */
   return (
-    <div className="min-h-screen bg-spy-black text-spy-green font-mono flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Matrix Pattern */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none select-none text-[8px] leading-tight">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div key={i}>{Math.random().toString(36).substring(2).repeat(10)}</div>
-        ))}
-      </div>
-
-      <div className={`w-full max-w-4xl border-2 p-12 bg-spy-black relative shadow-2xl ${isSuccess ? 'border-spy-green shadow-spy-green/10' : 'border-spy-red shadow-spy-red/10'}`}>
-        <header className="text-center mb-16">
-          <div className="flex justify-center mb-8 scale-150">
-            {isSuccess ? <Trophy className="text-spy-green w-16 h-16 animate-bounce" /> : <XCircle className="text-spy-red w-16 h-16 animate-pulse" />}
-          </div>
-          <h1 className={`text-6xl font-black mb-4 uppercase tracking-tighter ${isSuccess ? 'text-spy-green' : 'text-spy-red'}`}>
-            MISSION {isSuccess ? 'SUCCESSFUL' : 'TERMINATED'}
+    <Layout isLoggedIn username="USERNAME">
+      <div className="max-w-screen-sm mx-auto px-4 py-6">
+        <div className="ur-card rounded-3xl p-6 md:p-8 animate-fade-in">
+          {/* Title */}
+          <h1 className="font-heading font-black text-3xl text-white text-center mb-5">
+            Congratulations! 🎉
           </h1>
-          <p className="text-xs font-bold uppercase tracking-[0.4em] text-gray-500 opacity-80">
-            Operation ID: UNRAV_CH0{id}_A / Security Level: Confidential
+
+          {/* Stars */}
+          <div className="flex justify-center items-end gap-2 mb-4">
+            {[{ d: 0, s: 52 }, { d: 280, s: 64 }, { d: 560, s: 52 }].map((cfg, i) => (
+              <div
+                key={i}
+                className={cfg.s === 64 ? 'mb-[-6px]' : ''}
+                style={{
+                  opacity: starsShown[i] ? 1 : 0,
+                  animation: starsShown[i] ? 'starPop 0.5s ease forwards' : 'none',
+                  animationDelay: `${cfg.d}ms`,
+                }}
+              >
+                <StarSVG size={cfg.s} />
+              </div>
+            ))}
+          </div>
+
+          <p className="text-white/65 text-sm text-center mb-5">
+            You have completed the course — here is your reward!
           </p>
-        </header>
 
-        <main className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          <div className="space-y-8">
-            <h2 className="text-sm font-black uppercase text-white flex items-center gap-3 border-b border-spy-green/20 pb-2">
-              <Award className="text-spy-green" /> PERFORMANCE LOG
-            </h2>
-            <div className="space-y-4">
-              <StatItem label="LANGUAGE_ACCURACY" value={isSuccess ? "85%" : "32%"} />
-              <StatItem label="SOCIAL_ENGINEERING" value={isSuccess ? "A+" : "D-"} />
-              <StatItem label="SUSPICION_LEVEL" value={isSuccess ? "LOW" : "MAXIMUM"} />
-              <StatItem label="XP_EARNED" value={isSuccess ? "+250 XP" : "+50 XP"} />
+          {/* ── XP gained ── */}
+          <div
+            className="flex items-center justify-center gap-3 p-4 rounded-2xl mb-5 animate-bounce-in"
+            style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)' }}
+          >
+            <Zap size={28} className="text-xp-orange" />
+            <div>
+              <div className="font-heading font-black text-3xl text-gradient-gold">+{xpAnimated} XP</div>
+              <div className="text-white/50 text-xs">Experience earned this session</div>
             </div>
           </div>
 
-          <div className="space-y-8">
-            <h2 className="text-sm font-black uppercase text-white flex items-center gap-3 border-b border-spy-green/20 pb-2">
-              <AlertTriangle className="text-spy-red" /> LINGUISTIC FEEDBACK
-            </h2>
-            <div className="space-y-4 p-6 bg-spy-green/5 border border-spy-green/10">
-              {isSuccess ? (
-                <div className="space-y-4">
-                  <div className="text-[10px] text-spy-green flex items-center gap-2"><CheckCircle size={14} /> EXCELLENT_CONTROL</div>
-                  <p className="text-[10px] leading-relaxed uppercase text-gray-500 italic">Your use of formal English successfully bypasses the AI's internal sensors. Target objective has been completed without raising alarms.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-[10px] text-spy-red flex items-center gap-2"><AlertTriangle size={14} /> ERROR_DETECTED</div>
-                  <p className="text-[10px] leading-relaxed uppercase text-gray-500 italic">Incorrect verb usage and missing articles detected in transmission. Security units were alerted due to erratic speech patterns. Suggested: Study chapter 2 of linguistic protocol.</p>
-                </div>
-              )}
+          {/* XP to next level */}
+          <div className="mb-5">
+            <XPBar current={1250 + earnedXP} max={2000} />
+            <p className="text-white/35 text-xs text-center mt-1">
+              {2000 - 1250 - earnedXP > 0 ? `${(2000 - 1250 - earnedXP).toLocaleString()} XP to Level 4` : '🎊 Level Up!'}
+            </p>
+          </div>
+
+          {/* ── Medal ── */}
+          <div
+            className="flex items-start gap-4 rounded-2xl p-5 mb-5"
+            style={{ background: 'rgba(46,42,93,0.6)', border: '1px solid rgba(124,58,237,0.3)' }}
+          >
+            <div className="badge-shine flex-shrink-0">
+              <MedalSVG color={medal.color} />
+            </div>
+            <div className="flex-1 min-w-0 pt-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">{medal.emoji}</span>
+                <Award size={14} className="text-gold" />
+                <span className="badge badge-xp text-[10px]">NEW!</span>
+              </div>
+              <h3 className="font-heading font-bold text-white text-sm mb-1.5">{medal.name}</h3>
+              <p className="text-white/60 text-xs leading-relaxed">{medal.desc}</p>
             </div>
           </div>
-        </main>
 
-        <footer className="flex flex-col md:flex-row gap-6 justify-center">
-          <Button onClick={() => navigate(`/game/${id}`)} variant="outline" className="px-12 py-5 border-spy-blue text-spy-blue hover:bg-spy-blue">
-            <RotateCcw size={16} /> RETRY_OP
-          </Button>
-          <Button onClick={() => navigate('/missions')} variant="primary" className="px-12 py-5">
-            <ChevronLeft size={16} /> RETURN_TO_HQ
-          </Button>
-        </footer>
+          {/* ── Mini Leaderboard ── */}
+          {showLeader && (
+            <div className="mb-6 animate-slide-up">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp size={15} className="text-cyan-brand" />
+                <h3 className="font-heading font-semibold text-white text-sm">Leaderboard</h3>
+              </div>
+              <div className="space-y-2">
+                {leaderboard.map(player => (
+                  <div
+                    key={player.rank}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                      player.isYou
+                        ? 'bg-purple-brand/25 border border-purple-brand/40'
+                        : 'bg-white/4'
+                    }`}
+                  >
+                    <span className="text-base w-6 text-center">{player.badge}</span>
+                    <span className={`flex-1 text-sm font-semibold ${player.isYou ? 'text-purple-soft' : 'text-white/75'}`}>
+                      {player.name}
+                    </span>
+                    <span className={`text-sm font-bold ${player.isYou ? 'text-xp-orange' : 'text-white/45'}`}>
+                      {player.xp.toLocaleString()} XP
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex justify-center gap-3 flex-wrap">
+            <button onClick={() => navigate('/courses')} className="btn btn-primary" id="result-continue">
+              Continue
+            </button>
+            <button onClick={() => navigate('/badges')} className="btn btn-outline" id="result-badges">
+              <Award size={15} /> View Badges
+            </button>
+            <button onClick={() => navigate(`/game/${id}`)} className="btn btn-ghost btn-sm" id="result-replay">
+              <RotateCcw size={14} /> Replay
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
-
-const StatItem = ({ label, value }: any) => (
-  <div className="flex justify-between items-center text-[10px] uppercase font-black">
-    <span className="text-gray-600">{label}:</span>
-    <span className="text-spy-green border-b border-spy-green/20">{value}</span>
-  </div>
-);
 
 export default Result;

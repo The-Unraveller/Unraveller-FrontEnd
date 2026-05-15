@@ -1,72 +1,139 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Shield, ChevronRight, Lock, Key, Mail, User } from 'lucide-react';
-import { Button } from '../../components/common/Button';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import Layout from '../../components/layout/Layout';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'login' ? 'login' : 'register';
+  const [mode, setMode] = useState<'register' | 'login'>(initialMode as 'register' | 'login');
+  const [agreed, setAgreed] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/courses');
+  };
 
   return (
-    <div className="min-h-screen bg-spy-black flex items-center justify-center p-6 font-mono text-spy-green">
-      <div className="w-full max-w-lg border border-spy-green/40 p-12 bg-spy-black shadow-[0_0_30px_rgba(0,255,65,0.1)] relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 p-4 text-[10px] text-spy-green/30 tracking-widest uppercase">
-          SECURE_NODE_09 // LVL 4
-        </div>
-        
-        <header className="mb-12">
-          <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
-            <Shield className="w-8 h-8 animate-pulse" /> {isLogin ? 'ESTABLISH LINK' : 'NEW AGENT ENROLLMENT'}
-          </h2>
-          <div className="text-[10px] uppercase text-gray-500 tracking-[0.3em]">Credentials required to access secure data.</div>
-        </header>
+    <Layout isLoggedIn={false}>
+      <div className="max-w-screen-xl mx-auto px-6 py-10">
+        <div className="flex flex-col lg:flex-row items-center gap-10 min-h-[72vh]">
 
-        <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); navigate('/missions'); }}>
-          {!isLogin && (
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><User size={14} /> Agent Handle</label>
-              <input 
-                type="text" 
-                className="w-full bg-spy-black border border-spy-green/20 p-4 text-spy-green focus:border-spy-green outline-none transition-all placeholder:text-spy-green/20"
-                placeholder="UNRAVELLER_AG_01"
-              />
+          {/* ── Left: Image panel ── */}
+          <div className="w-full lg:w-[52%] relative rounded-2xl overflow-hidden shadow-2xl min-h-80 lg:min-h-[500px] flex-shrink-0">
+            <img
+              src="/london_bg.png"
+              alt="English environment"
+              className="w-full h-full object-cover absolute inset-0"
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#12003a]/70 via-[#12003a]/30 to-transparent" />
+            {/* Logo */}
+            <div className="absolute top-6 left-6">
+              <img src="/logo.png" alt="Unraveller" className="h-20 object-contain drop-shadow-xl" />
             </div>
-          )}
-          
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><Mail size={14} /> Neural Interface (Email)</label>
-            <input 
-              type="email" 
-              className="w-full bg-spy-black border border-spy-green/20 p-4 text-spy-green focus:border-spy-green outline-none transition-all placeholder:text-spy-green/20"
-              placeholder="AGENT@HQ.INTEL"
-            />
+            {/* Bottom text */}
+            <div className="absolute bottom-0 left-0 right-0 p-7">
+              <h2 className="text-white text-2xl md:text-3xl font-bold leading-tight mb-3">
+                Ready to join the<br />English speaking environment?
+              </h2>
+              <p className="text-white/70 text-sm leading-relaxed max-w-xs">
+                Explore unique scenarios, improve your English skills, and become a better version of yourself!
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><Key size={14} /> Encryption Key (Password)</label>
-            <input 
-              type="password" 
-              className="w-full bg-spy-black border border-spy-green/20 p-4 text-spy-green focus:border-spy-green outline-none transition-all placeholder:text-spy-green/20"
-              placeholder="••••••••••••"
-            />
+          {/* ── Right: Form ── */}
+          <div className="w-full lg:flex-1 max-w-md mx-auto lg:mx-0">
+            {mode === 'register' ? (
+              <>
+                <h1 className="text-white text-3xl font-bold mb-1">Create an account</h1>
+                <p className="text-white/55 text-sm mb-7">
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => setMode('login')}
+                    className="text-[#f5c842] font-semibold hover:underline transition-all"
+                    id="auth-switch-login"
+                  >
+                    Log in
+                  </button>
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input className="ur-input" type="text" placeholder="First name" id="reg-firstname" required />
+                    <input className="ur-input" type="text" placeholder="Last name" id="reg-lastname" required />
+                  </div>
+                  <input className="ur-input" type="email" placeholder="Email" id="reg-email" required />
+                  <input className="ur-input" type="password" placeholder="Password" id="reg-password" required />
+
+                  {/* Terms checkbox */}
+                  <label className="flex items-center gap-3 cursor-pointer select-none" id="auth-terms-label">
+                    <button
+                      type="button"
+                      onClick={() => setAgreed(!agreed)}
+                      className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 border-2 transition-all ${
+                        agreed ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-white/30 hover:border-white/60'
+                      }`}
+                    >
+                      {agreed && (
+                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                          <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                    <span className="text-white/65 text-sm">
+                      I agree to the{' '}
+                      <span className="text-[#f5c842] font-semibold cursor-pointer hover:underline">Terms &amp; Conditions</span>
+                    </span>
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="ur-btn-primary w-full py-3.5 text-base rounded-xl mt-2"
+                    id="auth-create-btn"
+                  >
+                    Create account
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <h1 className="text-white text-3xl font-bold mb-1">Welcome back!</h1>
+                <p className="text-white/55 text-sm mb-7">
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => setMode('register')}
+                    className="text-[#f5c842] font-semibold hover:underline transition-all"
+                    id="auth-switch-register"
+                  >
+                    Sign up free
+                  </button>
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input className="ur-input" type="email" placeholder="Email address" id="login-email" required />
+                  <input className="ur-input" type="password" placeholder="Password" id="login-password" required />
+                  <div className="flex justify-end">
+                    <span className="text-white/40 text-xs hover:text-white/70 cursor-pointer transition-colors">
+                      Forgot password?
+                    </span>
+                  </div>
+                  <button
+                    type="submit"
+                    className="ur-btn-primary w-full py-3.5 text-base rounded-xl"
+                    id="auth-login-btn"
+                  >
+                    Log in
+                  </button>
+                </form>
+              </>
+            )}
           </div>
-
-          <Button type="submit" className="w-full py-5 text-md">
-            {isLogin ? 'Verify Credentials' : 'Initialize Profile'} <ChevronRight />
-          </Button>
-        </form>
-
-        <footer className="mt-12 text-center pt-8 border-t border-spy-green/10">
-          <button 
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-xs font-bold uppercase hover:text-white transition-all underline underline-offset-8"
-          >
-            {isLogin ? "Lost access? Request new encryption key" : "Existing operative? Authenticate here"}
-          </button>
-        </footer>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
