@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Zap, Award, RotateCcw, Home, TrendingUp } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { XPBar } from '../../components/common/GameStats';
+import { getLeaderboard } from '../../services/api';
+import type { LeaderboardEntry } from '../../services/api';
 
 /* ─── Medal data ─── */
 const medals: Record<string, { name: string; desc: string; color: string; emoji: string }> = {
@@ -26,13 +28,7 @@ const medals: Record<string, { name: string; desc: string; color: string; emoji:
   },
 };
 
-/* ─── Leaderboard mock ─── */
-const leaderboard = [
-  { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑' },
-  { rank: 2, name: 'Lan Anh',   xp: 3950, badge: '🥈' },
-  { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉' },
-  { rank: 4, name: 'You',       xp: 1250, badge: '⚡', isYou: true },
-];
+/* Leaderboard data fetched from server API */
 
 /* ─── SVG Medal ─── */
 const MedalSVG = ({ color }: { color: string }) => (
@@ -76,6 +72,15 @@ const Result = () => {
   const [starsShown, setStarsShown] = useState([false, false, false]);
   const [xpAnimated, setXpAnimated] = useState(0);
   const [showLeader, setShowLeader] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      getLeaderboard(1)
+        .then(data => setLeaderboardData(data))
+        .catch(err => console.error("Failed to load dynamic leaderboard data:", err));
+    }
+  }, [isSuccess]);
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -199,7 +204,7 @@ const Result = () => {
                 <h3 className="font-heading font-semibold text-white text-sm">Leaderboard</h3>
               </div>
               <div className="space-y-2">
-                {leaderboard.map(player => (
+                {leaderboardData.map(player => (
                   <div
                     key={player.rank}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${

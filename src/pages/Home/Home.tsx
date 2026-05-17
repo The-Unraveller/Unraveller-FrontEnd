@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronRight, ChevronDown, Zap, Lock, Star, TrendingUp,
@@ -6,6 +6,7 @@ import {
 import Layout from '../../components/layout/Layout';
 import { StreakBadge, StatPill } from '../../components/common/GameStats';
 import XPBar from '../../components/common/GameStats';
+import { getMissions } from '../../services/api';
 
 /* ─── Mock user data (replace with real auth later) ─── */
 const USER = {
@@ -188,7 +189,34 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
 /* ─── Page ─── */
 const Home = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [scenariosList, setScenariosList] = useState(scenarios);
   const isLoggedIn = false; // toggle to true to see dashboard view
+
+  useEffect(() => {
+    getMissions()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const transformed = data.map((m, idx) => ({
+            id: m.id,
+            stage: idx + 1,
+            label: m.stage.toUpperCase(),
+            title: m.title,
+            desc: m.description || m.goal,
+            img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
+            difficulty: m.difficulty,
+            diffColor: m.difficulty === 'Advanced' ? 'badge-purple' : m.difficulty === 'Intermediate' ? 'badge-cyan' : 'badge-success',
+            xpReward: m.xpReward,
+            locked: m.locked,
+            completed: idx === 0, // mock progress for display consistency
+            stars: idx === 0 ? 3 : 0,
+          }));
+          setScenariosList(transformed);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load missions from API, using fallback data:', err);
+      });
+  }, []);
 
   return (
     <Layout isLoggedIn={isLoggedIn} showBottomNav={isLoggedIn}>
@@ -241,7 +269,7 @@ const Home = () => {
             </h2>
             <p className="text-white/45 text-sm mt-0.5">
               {isLoggedIn
-                ? `${USER.completedStages} / ${scenarios.length} stages completed`
+                ? `${USER.completedStages} / ${scenariosList.length} stages completed`
                 : 'Choose a scenario and start speaking'}
             </p>
           </div>
@@ -252,12 +280,12 @@ const Home = () => {
 
         {/* Featured card (Stage 1 or current stage) */}
         <div className="mb-5">
-          <ScenarioCard s={scenarios[0]} featured />
+          <ScenarioCard s={scenariosList[0]} featured />
         </div>
 
         {/* Grid of remaining stages */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {scenarios.slice(1).map(s => (
+          {scenariosList.slice(1).map(s => (
             <ScenarioCard key={s.id} s={s} />
           ))}
         </div>

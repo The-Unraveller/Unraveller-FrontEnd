@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, AlertTriangle, Zap, Send, Volume2 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
+import { getMissions, sendGameMessage } from '../../services/api';
 
 /* ─── Scenario data ─── */
 const scenarioData: Record<string, {
@@ -53,6 +54,14 @@ const scenarioData: Record<string, {
 
 const defaultScenario = scenarioData['1'];
 
+const startChoicesMap: Record<number, string[]> = {
+  1: ["Yes, let's go!", "I'm a bit nervous…", "What do we do first?", "Sounds great!"],
+  2: ["Understood, ready!", "Can you repeat that?", "What's the first task?", "I'll do my best."],
+  3: ["I'm ready to debate.", "Let's start the negotiation.", "What is the topic?", "Ready!"],
+  4: ["Good morning, Mr. Vance.", "Let's start the interview.", "I'm ready for the questions.", "Thank you for having me."],
+  5: ["I'm on the case.", "Give me the details.", "Where do I start?", "Understood. Let's solve this."]
+};
+
 interface Message {
   role: 'npc' | 'player';
   text: string;
@@ -76,12 +85,13 @@ const npcBadResponses = [
 const Game = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const scenario = scenarioData[id ?? '1'] ?? defaultScenario;
+  const [scenario, setScenario] = useState(scenarioData[id ?? '1'] ?? defaultScenario);
 
   const [messages, setMessages] = useState<Message[]>([
     { role: 'npc', text: scenario.intro },
   ]);
   const [suspicion, setSuspicion] = useState(10);
+  const [shouldShake, setShouldShake] = useState(false);
   const [totalXP, setTotalXP] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -93,6 +103,34 @@ const Game = () => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    const missionId = id ? parseInt(id, 10) : 1;
+    getMissions()
+      .then((data) => {
+        const found = data.find(m => m.id === missionId);
+        if (found) {
+          const transformed = {
+            title: found.title,
+            stage: found.stage.toUpperCase(),
+            bg: found.imageUrl || (missionId === 1 ? '/scenario_coffee.png' : missionId === 2 ? '/scenario_classroom.png' : missionId === 5 ? '/scenario_detective.png' : ''),
+            npcName: found.npcName || 'NPC',
+            npcEmoji: found.npcName?.toLowerCase().includes('barista') ? '☕' 
+                      : found.npcName?.toLowerCase().includes('supervisor') ? '📋'
+                      : found.npcName?.toLowerCase().includes('detective') ? '🔍' : '👤',
+            difficulty: found.difficulty,
+            xpReward: found.xpReward,
+            intro: found.description || found.goal,
+            choices: startChoicesMap[missionId] || ["Hello!", "Ready!"],
+          };
+          setScenario(transformed);
+          setMessages([{ role: 'npc', text: transformed.intro }]);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load mission details from API:', err);
+      });
+  }, [id]);
+
   const processMessage = (text: string) => {
     if (isTyping || gameOver || !text.trim()) return;
 
@@ -101,30 +139,76 @@ const Game = () => {
     setTurnCount(newTurn);
     setIsTyping(true);
 
-    setTimeout(() => {
-      const wordCount = text.trim().split(/\s+/).length;
-      const isGood = wordCount >= 4 && text.length > 14;
-      const susChange = isGood ? -10 : 22;
-      const xpGain = isGood ? Math.floor(scenario.xpReward / 5) : 5;
-      const newSus = Math.min(100, Math.max(0, suspicion + susChange));
+    const missionId = id ? parseInt(id, 10) : 1;
 
-      setSuspicion(newSus);
-      setTotalXP(prev => prev + xpGain);
+    sendGameMessage({
+      userId: 1, // KHOA_PRO seeded user
+      missionId,
+      message: text
+    })
+      .then((res) => {
+        setIsTyping(false);
+        if (res) {
+          const newSus = res.newSuspicionLevel;
+          if (newSus > suspicion) {
+            setShouldShake(true);
+            setTimeout(() => setShouldShake(false), 500);
+          }
+          setSuspicion(newSus);
+          setTotalXP(prev => prev + res.xpEarned);
 
-      const pool = isGood ? npcGoodResponses : npcBadResponses;
-      const npcText = pool[Math.floor(Math.random() * pool.length)];
+          setMessages(prev => [
+            ...prev,
+            {
+              role: 'npc',
+              text: res.npcResponse,
+              xp: res.xpEarned
+            }
+          ]);
 
-      setMessages(prev => [...prev, { role: 'npc', text: npcText, xp: xpGain }]);
-      setIsTyping(false);
+          if (newSus >= 100 || res.isLose) {
+            setGameOver(true);
+            setTimeout(() => navigate(`/result/${id}?status=failed`), 1500);
+          } else if (res.isWin) {
+            setGameOver(true);
+            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + res.xpEarned}`), 1500);
+          } else if (newTurn >= 5) {
+            setGameOver(true);
+            const status = newSus < 50 ? 'success' : 'failed';
+            setTimeout(() => navigate(`/result/${id}?status=${status}&xp=${totalXP + res.xpEarned}`), 1500);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to submit message to game engine API, using mock response fallback:', err);
+        setTimeout(() => {
+          const wordCount = text.trim().split(/\s+/).length;
+          const isGood = wordCount >= 4 && text.length > 14;
+          const susChange = isGood ? -10 : 22;
+          const xpGain = isGood ? Math.floor(scenario.xpReward / 5) : 5;
+          const newSus = Math.min(100, Math.max(0, suspicion + susChange));
+          if (newSus > suspicion) {
+            setShouldShake(true);
+            setTimeout(() => setShouldShake(false), 500);
+          }
+          setSuspicion(newSus);
+          setTotalXP(prev => prev + xpGain);
 
-      if (newSus >= 100) {
-        setGameOver(true);
-        setTimeout(() => navigate(`/result/${id}?status=failed`), 1500);
-      } else if (newTurn >= 5 && newSus < 50) {
-        setGameOver(true);
-        setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + xpGain}`), 1500);
-      }
-    }, 1800);
+          const pool = isGood ? npcGoodResponses : npcBadResponses;
+          const npcText = pool[Math.floor(Math.random() * pool.length)];
+
+          setMessages(prev => [...prev, { role: 'npc', text: npcText, xp: xpGain }]);
+          setIsTyping(false);
+
+          if (newSus >= 100) {
+            setGameOver(true);
+            setTimeout(() => navigate(`/result/${id}?status=failed`), 1500);
+          } else if (newTurn >= 5 && newSus < 50) {
+            setGameOver(true);
+            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + xpGain}`), 1500);
+          }
+        }, 1200);
+      });
   };
 
   const handleChoice = (choice: string) => processMessage(choice);
@@ -184,7 +268,7 @@ const Game = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/50" />
 
             {/* Suspicion overlay */}
-            <div className="absolute top-3 left-3 right-3">
+            <div className={`absolute top-3 left-3 right-3 transition-transform ${shouldShake ? 'animate-shake' : ''}`}>
               <div
                 className="rounded-2xl px-3 py-2 backdrop-blur-md"
                 style={{ background: 'rgba(15,12,30,0.7)' }}

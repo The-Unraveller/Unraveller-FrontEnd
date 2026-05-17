@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText, Star, BookOpen, Flame, ShoppingBag, HelpCircle, Users, Lock, Play,
 } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import { getMissions } from '../../services/api';
 
 const sidebarItems = [
   { icon: FileText, label: 'Report', to: '#' },
@@ -141,6 +142,28 @@ const CourseCard = ({
 
 const Missions = () => {
   const navigate = useNavigate();
+  const [coursesList, setCoursesList] = useState(courses);
+
+  useEffect(() => {
+    getMissions()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const transformed = data.map((m, idx) => ({
+            id: m.id,
+            stage: m.stage.toUpperCase(),
+            title: m.title,
+            desc: m.description || m.goal,
+            img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
+            locked: m.locked,
+            stars: idx === 0 ? 3 : idx === 1 ? 2 : 0, // mock status matching designs
+          }));
+          setCoursesList(transformed);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch missions:', err);
+      });
+  }, []);
 
   return (
     <Layout isLoggedIn username="USERNAME">
@@ -187,7 +210,7 @@ const Missions = () => {
                 </p>
               </div>
               <div className="flex-1 grid grid-cols-2 gap-3">
-                {courses.slice(0, 2).map((c) => (
+                {coursesList.slice(0, 2).map((c) => (
                   <CourseCard
                     key={c.id}
                     course={c}
@@ -199,30 +222,36 @@ const Missions = () => {
             </div>
 
             {/* Wide locked card */}
-            <div className="ur-card rounded-xl p-4 mb-4 opacity-50 flex items-center gap-4">
-              <Lock size={18} className="text-white/30 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-white/60 text-xs font-bold">{courses[2].stage} — {courses[2].title}</p>
-                <p className="text-white/35 text-xs truncate">{courses[2].desc}</p>
+            {coursesList[2] && (
+              <div className="ur-card rounded-xl p-4 mb-4 opacity-50 flex items-center gap-4 animate-fade-in">
+                <Lock size={18} className="text-white/30 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-white/60 text-xs font-bold">{coursesList[2].stage} — {coursesList[2].title}</p>
+                  <p className="text-white/35 text-xs truncate">{coursesList[2].desc}</p>
+                </div>
+                <span className="text-white/20 text-xs font-semibold flex-shrink-0">Locked</span>
               </div>
-              <span className="text-white/20 text-xs font-semibold flex-shrink-0">Locked</span>
-            </div>
+            )}
 
             {/* Bottom row */}
             <div className="grid grid-cols-3 gap-3 items-start">
-              <CourseCard
-                course={courses[3]}
-                onClick={() => {}}
-              />
+              {coursesList[3] ? (
+                <CourseCard
+                  course={coursesList[3]}
+                  onClick={() => !coursesList[3].locked && navigate(`/game/${coursesList[3].id}`)}
+                />
+              ) : <div />}
               <div className="flex items-center justify-center py-4 px-2 text-center">
                 <h2 className="text-white text-xl font-black leading-tight">
                   Join the<br />course<br />now!
                 </h2>
               </div>
-              <CourseCard
-                course={courses[4]}
-                onClick={() => !courses[4].locked && navigate(`/game/${courses[4].id}`)}
-              />
+              {coursesList[4] ? (
+                <CourseCard
+                  course={coursesList[4]}
+                  onClick={() => !coursesList[4].locked && navigate(`/game/${coursesList[4].id}`)}
+                />
+              ) : <div />}
             </div>
           </div>
         </div>
