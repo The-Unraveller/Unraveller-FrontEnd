@@ -5,6 +5,7 @@ import Layout from '../../components/layout/Layout';
 import { XPBar } from '../../components/common/GameStats';
 import { getLeaderboard } from '../../services/api';
 import type { LeaderboardEntry } from '../../services/api';
+import { useGameStore } from '../../store/useGameStore';
 
 /* ─── Medal data ─── */
 const medals: Record<string, { name: string; desc: string; color: string; emoji: string }> = {
@@ -63,6 +64,7 @@ const Result = () => {
   const [searchParams] = useSearchParams();
   const { id } = useParams();
   const navigate = useNavigate();
+  const xp = useGameStore((state) => state.xp);
 
   const status  = searchParams.get('status');
   const earnedXP = parseInt(searchParams.get('xp') || '0', 10) || 150;
@@ -113,11 +115,11 @@ const Result = () => {
             <div className="badge badge-danger mx-auto mb-7 inline-flex">SUSPICION 100%</div>
 
             <div className="flex justify-center gap-4 flex-wrap">
-              <button onClick={() => navigate(`/game/${id}`)} className="btn btn-primary" id="result-retry">
+              <button onClick={() => navigate(`/scenario/${id || '1'}`)} className="btn btn-primary" id="result-retry">
                 <RotateCcw size={16} /> Try Again
               </button>
-              <button onClick={() => navigate('/courses')} className="btn btn-outline" id="result-courses">
-                <Home size={16} /> All Courses
+              <button onClick={() => navigate('/')} className="btn btn-outline" id="result-courses">
+                <Home size={16} /> Dashboard
               </button>
             </div>
           </div>
@@ -171,9 +173,9 @@ const Result = () => {
 
           {/* XP to next level */}
           <div className="mb-5">
-            <XPBar current={1250 + earnedXP} max={2000} />
+            <XPBar current={xp % 1000} max={1000} />
             <p className="text-white/35 text-xs text-center mt-1">
-              {2000 - 1250 - earnedXP > 0 ? `${(2000 - 1250 - earnedXP).toLocaleString()} XP to Level 4` : '🎊 Level Up!'}
+              {1000 - (xp % 1000) > 0 ? `${(1000 - (xp % 1000)).toLocaleString()} XP to Level ${Math.floor(xp / 1000) + 2}` : '🎊 Level Up!'}
             </p>
           </div>
 
@@ -228,13 +230,13 @@ const Result = () => {
 
           {/* Actions */}
           <div className="flex justify-center gap-3 flex-wrap">
-            <button onClick={() => navigate('/courses')} className="btn btn-primary" id="result-continue">
+            <button onClick={() => navigate('/')} className="btn btn-primary" id="result-continue">
               Continue
             </button>
             <button onClick={() => navigate('/badges')} className="btn btn-outline" id="result-badges">
               <Award size={15} /> View Badges
             </button>
-            <button onClick={() => navigate(`/game/${id}`)} className="btn btn-ghost btn-sm" id="result-replay">
+            <button onClick={() => navigate(`/scenario/${id || '1'}`)} className="btn btn-ghost btn-sm" id="result-replay">
               <RotateCcw size={14} /> Replay
             </button>
           </div>

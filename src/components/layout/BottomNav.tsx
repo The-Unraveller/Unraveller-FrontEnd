@@ -3,10 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Award, User } from 'lucide-react';
 
 const navItems = [
-  { icon: Home,     label: 'Home',    to: '/' },
-  { icon: BookOpen, label: 'Courses', to: '/courses' },
-  { icon: Award,    label: 'Badges',  to: '/badges' },
-  { icon: User,     label: 'Profile', to: '/profile' },
+  { icon: Home,     label: 'Dashboard', to: '/dashboard' },
+  { icon: BookOpen, label: 'Courses',   to: '/courses' },
+  { icon: Award,    label: 'Badges',    to: '/badges' },
+  { icon: User,     label: 'Profile',   to: '/profile' },
 ];
 
 const BottomNav: React.FC = () => {
