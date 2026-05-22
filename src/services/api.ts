@@ -77,3 +77,27 @@ export const getLeaderboard = async (userId: number = 1): Promise<LeaderboardEnt
     ];
   }
 };
+
+// Payment APIs
+export interface CreatePaymentRequestDto {
+  userId: number;
+  planId: string;
+  amount: number;
+}
+
+export interface PaymentResponseDto {
+  success: boolean;
+  paymentUrl?: string;
+  orderId?: string;
+  message?: string;
+}
+
+export const createPayment = async (request: CreatePaymentRequestDto): Promise<PaymentResponseDto> => {
+  const response = await apiClient.post<PaymentResponseDto>('/Payment/create-vnpay-url', request);
+  return response.data;
+};
+
+export const getPaymentHistory = async (userId: number): Promise<any[]> => {
+  const response = await apiClient.get<any[]>(`/Payment/history/${userId}`);
+  return response.data;
+};
