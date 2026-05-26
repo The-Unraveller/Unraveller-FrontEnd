@@ -2,12 +2,26 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://localhost:7055/api';
 
+// Create axios instance
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// JWT Interceptor: Automatically add token to requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+// --- DTOs ---
 
 export interface MissionDto {
   id: number;
@@ -25,7 +39,6 @@ export interface MissionDto {
 }
 
 export interface DialogueRequestDto {
-  userId: number;
   missionId: number;
   message: string;
 }
@@ -40,47 +53,51 @@ export interface DialogueResponseDto {
   xpEarned: number;
 }
 
-export const getMissions = async (): Promise<MissionDto[]> => {
-  const response = await apiClient.get<MissionDto[]>('/Mission');
-  return response.data;
-};
-
-export const getMissionById = async (id: number): Promise<MissionDto> => {
-  const response = await apiClient.get<MissionDto>(`/Mission/${id}`);
-  return response.data;
-};
-
-export const sendGameMessage = async (request: DialogueRequestDto): Promise<DialogueResponseDto> => {
-  const response = await apiClient.post<DialogueResponseDto>('/Game/message', request);
-  return response.data;
-};
-
-export interface LeaderboardEntry {
-  rank: number;
-  name: string;
-  xp: number;
-  badge: string;
-  isYou: boolean;
+export interface UserProfileDto {
+  id: number;
+  username: string;
+  email: string;
+  energy: number;
+  maxEnergy: number;
+  lastEnergyRechargedAt: string;
+  streakCount: number;
+  lastActiveDate: string;
+  xpBalance: number;
+  isPremium: boolean;
+  createdAt: string;
 }
 
-export const getLeaderboard = async (userId: number = 1): Promise<LeaderboardEntry[]> => {
-  try {
-    const res = await apiClient.get<LeaderboardEntry[]>(`/Leaderboard?userId=${userId}`);
-    return res.data;
-  } catch (err) {
-    console.error("Failed to fetch leaderboard from API, returning mock data", err);
-    return [
-      { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑', isYou: false },
-      { rank: 2, name: 'Lan Anh',   xp: 3950, badge: '🥈', isYou: false },
-      { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉', isYou: false },
-      { rank: 4, name: 'KHOA_PRO',  xp: 1250, badge: '⚡', isYou: true }
-    ];
-  }
-};
+export interface ShopItemDto {
+  id: number;
+  name: string;
+  description: string;
+  type: string; // 'InGameHint', 'BribeNpc', 'Cosmetic'
+  priceXp: number;
+  emoji: string;
+}
 
-// Payment APIs
+export interface BuyItemRequestDto {
+  itemId: number;
+  quantity: number;
+}
+
+export interface BuyItemResponseDto {
+  success: boolean;
+  message: string;
+  newXpBalance: number;
+  newQuantity: number;
+}
+
+export interface UseItemRequestDto {
+  itemId: number;
+}
+
+export interface UseItemResponseDto {
+  success: boolean;
+  message: string;
+}
+
 export interface CreatePaymentRequestDto {
-  userId: number;
   planId: string;
   amount: number;
 }
@@ -92,12 +109,108 @@ export interface PaymentResponseDto {
   message?: string;
 }
 
+export interface PaymentHistoryDto {
+  id: number;
+  planId: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  orderId: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  xp: number;
+  badge: string;
+  isYou: boolean;
+}
+
+// --- API Functions ---
+
+// Auth
+export const login = async (email: string, password: string): Promise<{ token: string }> => {
+  const response = await apiClient.post<{ token: string }>('/Auth/login', { email, password });
+  return response.data;
+};
+
+export const register = async (username: string, email: string, password: string): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>('/Auth/register', { username, email, password });
+  return response.data;
+};
+
+export const loginWithGoogle = async (idToken: string): Promise<{ token: string }> => {
+  const response = await apiClient.post<{ token: string }>('/Auth/google', { idToken });
+  return response.data;
+};
+
+// User
+export const getUserProfile = async (): Promise<UserProfileDto> => {
+  const response = await apiClient.get<UserProfileDto>('/User/profile');
+  return response.data;
+};
+
+export const updateStreak = async (): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>('/User/update-streak');
+  return response.data;
+};
+
+// Missions
+export const getMissions = async (): Promise<MissionDto[]> => {
+  const response = await apiClient.get<MissionDto[]>('/Mission');
+  return response.data;
+};
+
+export const getMissionById = async (id: number): Promise<MissionDto> => {
+  const response = await apiClient.get<MissionDto>(`/Mission/${id}`);
+  return response.data;
+};
+
+// Game
+export const sendGameMessage = async (request: DialogueRequestDto): Promise<DialogueResponseDto> => {
+  const response = await apiClient.post<DialogueResponseDto>('/Game/message', request);
+  return response.data;
+};
+
+// Leaderboard
+export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
+  try {
+    const res = await apiClient.get<LeaderboardEntry[]>(`/Leaderboard`);
+    return res.data;
+  } catch (err) {
+    console.error("Failed to fetch leaderboard, returning mock data", err);
+    return [
+      { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑', isYou: false },
+      { rank: 2, name: 'Lan Anh',   xp: 3950, badge: '🥈', isYou: false },
+      { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉', isYou: false },
+      { rank: 4, name: 'KHOA_PRO',  xp: 1250, badge: '⚡', isYou: true }
+    ];
+  }
+};
+
+// Shop
+export const getShopItems = async (): Promise<ShopItemDto[]> => {
+  const response = await apiClient.get<ShopItemDto[]>('/Shop/items');
+  return response.data;
+};
+
+export const buyItem = async (request: BuyItemRequestDto): Promise<BuyItemResponseDto> => {
+  const response = await apiClient.post<BuyItemResponseDto>('/Shop/buy', request);
+  return response.data;
+};
+
+export const useItem = async (request: UseItemRequestDto): Promise<UseItemResponseDto> => {
+  const response = await apiClient.post<UseItemResponseDto>('/Shop/use-item', request);
+  return response.data;
+};
+
+// Payments
 export const createPayment = async (request: CreatePaymentRequestDto): Promise<PaymentResponseDto> => {
   const response = await apiClient.post<PaymentResponseDto>('/Payment/create-vnpay-url', request);
   return response.data;
 };
 
-export const getPaymentHistory = async (userId: number): Promise<any[]> => {
-  const response = await apiClient.get<any[]>(`/Payment/history/${userId}`);
+export const getPaymentHistory = async (): Promise<PaymentHistoryDto[]> => {
+  const response = await apiClient.get<PaymentHistoryDto[]>(`/Payment/history`);
   return response.data;
 };

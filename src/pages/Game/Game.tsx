@@ -4,6 +4,7 @@ import { ChevronLeft, AlertTriangle, Zap, Send, Volume2 } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import { getMissions, sendGameMessage } from '../../services/api';
+import { useGameStore } from '../../store/useGameStore';
 
 /* ─── Scenario data ─── */
 const scenarioData: Record<string, {
@@ -142,7 +143,6 @@ const Game = () => {
     const missionId = id ? parseInt(id, 10) : 1;
 
     sendGameMessage({
-      userId: 1, // KHOA_PRO seeded user
       missionId,
       message: text
     })
@@ -224,7 +224,7 @@ const Game = () => {
 
   return (
     <div className="app-bg min-h-screen flex flex-col">
-      <Navbar isLoggedIn username="USERNAME" />
+      <Navbar isLoggedIn username={useGameStore.getState().user?.username || 'Learner'} />
 
       <main className="max-w-screen-sm mx-auto w-full px-3 py-4 flex-1">
         {/* ── Back + stage info ── */}

@@ -1,13 +1,28 @@
 import { create } from 'zustand';
+import type { UserProfileDto } from '../services/api';
 
 interface GameState {
-  xp: number;
-  streak: number;
-  increaseXp: (amount: number) => void;
+  user: UserProfileDto | null;
+  isAuthenticated: boolean;
+
+  // Actions
+  setUser: (user: UserProfileDto | null) => void;
+  setAuthenticated: (status: boolean) => void;
+  updateUser: (updates: Partial<UserProfileDto>) => void;
+  logout: () => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  xp: 450,
-  streak: 5,
-  increaseXp: (amount) => set((state) => ({ xp: state.xp + amount })),
+  user: null,
+  isAuthenticated: !!localStorage.getItem('token'),
+
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setAuthenticated: (status) => set({ isAuthenticated: status }),
+  updateUser: (updates) => set((state) => ({
+    user: state.user ? { ...state.user, ...updates } : null
+  })),
+  logout: () => {
+    localStorage.removeItem('token');
+    set({ user: null, isAuthenticated: false });
+  },
 }));

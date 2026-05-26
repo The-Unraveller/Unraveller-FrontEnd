@@ -62,14 +62,16 @@ const StarSVG = ({ size = 56 }: { size?: number }) => (
 
 const Result = () => {
   const [searchParams] = useSearchParams();
-  const { id } = useParams();
   const navigate = useNavigate();
-  const xp = useGameStore((state) => state.xp);
+  const { id } = useParams<{ id: string }>();
+  const { user } = useGameStore();
+  const username = user?.username || 'Learner';
 
   const status  = searchParams.get('status');
   const earnedXP = parseInt(searchParams.get('xp') || '0', 10) || 150;
   const isSuccess = status === 'success';
   const medal = medals[id || '1'] || medals['1'];
+  const xp = user?.xpBalance || 0;
 
   const [starsShown, setStarsShown] = useState([false, false, false]);
   const [xpAnimated, setXpAnimated] = useState(0);
@@ -78,7 +80,7 @@ const Result = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      getLeaderboard(1)
+      getLeaderboard()
         .then(data => setLeaderboardData(data))
         .catch(err => console.error("Failed to load dynamic leaderboard data:", err));
     }
@@ -102,7 +104,7 @@ const Result = () => {
   /* ── FAILURE ── */
   if (!isSuccess) {
     return (
-      <Layout isLoggedIn username="USERNAME">
+      <Layout isLoggedIn username={username}>
         <div className="max-w-screen-sm mx-auto px-4 py-10">
           <div className="ur-card rounded-3xl p-8 text-center">
             <div className="w-20 h-20 rounded-full bg-danger/15 border border-danger/30 flex items-center justify-center mx-auto mb-5 text-4xl">

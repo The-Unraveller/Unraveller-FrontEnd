@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Home from './pages/Home/Home';
 import Auth from './pages/Auth/Auth';
 import Missions from './pages/Missions/Missions';
@@ -11,27 +12,67 @@ import Premium from './pages/Premium/Premium';
 import Badges from './pages/Badges/Badges';
 import ScenarioScreen from './pages/Scenario/ScenarioScreen';
 import DashboardScreen from './pages/Dashboard/DashboardScreen';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import Header from './components/layout/Header';
+import { useGameStore } from './store/useGameStore';
+import { getUserProfile } from './services/api';
 
-function App() {
+// We need a wrapper component to access Zustand store and useEffect
+const AppRoutes = () => {
+  const { setUser, setAuthenticated } = useGameStore();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const profile = await getUserProfile();
+          setUser(profile);
+          setAuthenticated(true);
+        } catch (err) {
+          console.error('Session expired or invalid token', err);
+          localStorage.removeItem('token');
+          setAuthenticated(false);
+        }
+      }
+    };
+    initAuth();
+  }, [setUser, setAuthenticated]);
+
   return (
-    <Router>
+    <div className="min-h-screen bg-spy-black text-spy-green">
+      <Header />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<DashboardScreen />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/missions" element={<Navigate to="/courses" replace />} />
-        <Route path="/courses" element={<Missions />} />
-        <Route path="/game/:id" element={<Game />} />
-        <Route path="/result/:id" element={<Result />} />
-        <Route path="/result-screen/:id" element={<ResultScreen />} />
         <Route path="/about" element={<About />} />
-        <Route path="/premium" element={<Premium />} />
-        <Route path="/badges" element={<Badges />} />
-        <Route path="/scenario/:id" element={<ScenarioScreen />} />
+
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
+        <Route path="/courses" element={<ProtectedRoute><Missions /></ProtectedRoute>} />
+        <Route path="/game/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
+        <Route path="/result/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
+        <Route path="/result-screen/:id" element={<ProtectedRoute><ResultScreen /></ProtectedRoute>} />
+        <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
+        <Route path="/badges" element={<ProtectedRoute><Badges /></ProtectedRoute>} />
+        <Route path="/scenario/:id" element={<ProtectedRoute><ScenarioScreen /></ProtectedRoute>} />
+        <Route path="/missions" element={<Navigate to="/courses" replace />} />
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <GoogleOAuthProvider clientId="1000507535508-0ih1n8t4k21811i9n0dib9kgudvnlnvq.apps.googleusercontent.com">
+      <Router>
+        <AppRoutes />
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

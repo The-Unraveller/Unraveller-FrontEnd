@@ -71,7 +71,7 @@ type Message = {
 const ScenarioScreen: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const increaseXp = useGameStore((state) => state.increaseXp);
+  const updateUser = useGameStore((state) => state.updateUser);
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
@@ -110,7 +110,8 @@ const ScenarioScreen: React.FC = () => {
 
     // Handle XP Reward and Animation
     if (option.xpReward > 0) {
-      increaseXp(option.xpReward);
+      const currentXp = useGameStore.getState().user?.xpBalance || 0;
+      updateUser({ xpBalance: currentXp + option.xpReward });
       setSessionXp((prev) => prev + option.xpReward);
       const popupId = Date.now();
       setXpPopups((prev) => [...prev, { id: popupId, amount: option.xpReward }]);

@@ -156,7 +156,6 @@ const Premium = () => {
     try {
       // Call backend API to create VNPAY payment
       const response = await createPayment({
-        userId: 1, // In production, get from auth context/store
         planId: selected,
         amount: selected === 'plus' ? 99000 : 299000,
       });

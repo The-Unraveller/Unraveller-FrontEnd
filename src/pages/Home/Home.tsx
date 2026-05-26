@@ -187,12 +187,16 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
 const Home = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [scenariosList, setScenariosList] = useState(scenarios);
-  const isLoggedIn = true; // Show dashboard view
 
-  const xp = useGameStore((state) => state.xp);
-  const streak = useGameStore((state) => state.streak);
+  const { user, isAuthenticated } = useGameStore();
+  const isLoggedIn = isAuthenticated;
+
+  const xp = user?.xpBalance || 0;
+  const streak = user?.streakCount || 0;
   const level = Math.floor(xp / 1000) + 1;
   const xpMax = level * 1000;
+  const badges = USER_PROFILE.badges;
+  const completedStages = USER_PROFILE.completedStages;
 
   useEffect(() => {
     getMissions()
@@ -247,7 +251,7 @@ const Home = () => {
           <div className="flex items-center justify-center gap-3 flex-wrap mb-6 animate-slide-up">
             <StreakBadge count={streak} />
             <StatPill icon="⚡" value={`${xp.toLocaleString()} XP`} label="Total XP" color="text-xp-orange" />
-            <StatPill icon="🏅" value={USER_PROFILE.badges} label="Badges" color="text-gold" />
+            <StatPill icon="🏅" value={badges} label="Badges" color="text-gold" />
             <StatPill icon="📖" value={`Lv.${level}`} label="Level" color="text-cyan-brand" />
           </div>
         )}
@@ -271,7 +275,7 @@ const Home = () => {
             </h2>
             <p className="text-white/45 text-sm mt-0.5">
               {isLoggedIn
-                ? `${USER_PROFILE.completedStages} / ${scenariosList.length} stages completed`
+                ? `${completedStages} / ${scenariosList.length} stages completed`
                 : 'Choose a scenario and start speaking'}
             </p>
           </div>
