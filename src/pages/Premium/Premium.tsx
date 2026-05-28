@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Check, CreditCard, Lock, Shield, AlertCircle, CheckCircle, Zap, Loader2 } from 'lucide-react';
+import { Check, Shield, AlertCircle, CheckCircle, Zap, Loader2, ExternalLink, Clock } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
-import { createPayment } from '../../services/api';
+import { createPayOSLink } from '../../services/api';
 
 interface Plan {
   id: string;
   name: string;
   price: string;
+  priceValue: number;
   priceLabel: string;
   features: string[];
   highlighted: boolean;
+  badge?: string;
 }
 
 const plans: Plan[] = [
@@ -18,6 +20,7 @@ const plans: Plan[] = [
     id: 'free',
     name: 'Free',
     price: '0₫',
+    priceValue: 0,
     priceLabel: 'Forever',
     features: ['3 scenarios per week', 'Basic streak & XP', 'Limited audio feedback'],
     highlighted: false,
@@ -26,6 +29,7 @@ const plans: Plan[] = [
     id: 'plus',
     name: 'Plus+',
     price: '99,000₫',
+    priceValue: 99000,
     priceLabel: 'per month',
     features: ['Unlimited scenarios', 'Full leaderboard & streak', 'All story chapters unlocked'],
     highlighted: false,
@@ -34,37 +38,23 @@ const plans: Plan[] = [
     id: 'premium',
     name: 'Premium',
     price: '299,000₫',
+    priceValue: 299000,
     priceLabel: 'per month',
     features: ['AI Speaking feedback', 'Offline mode', 'Exclusive scenarios & content'],
     highlighted: true,
+    badge: '🔥 Best Value',
   },
 ];
-
-interface FormData {
-  cardholderName: string;
-  cardNumber: string;
-  expiry: string;
-  cvc: string;
-}
 
 const Premium = () => {
   const [selected, setSelected] = useState('premium');
   const [searchParams] = useSearchParams();
-
-  // Form state
-  const [formData, setFormData] = useState<FormData>({
-    cardholderName: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
-  });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [paymentResult, setPaymentResult] = useState<{type: 'success' | 'failed' | 'error'; orderId?: string} | null>(null);
 
-  // Check for payment result from query params on mount
+  // Handle payOS return redirect
   useEffect(() => {
     const payment = searchParams.get('payment');
     const orderId = searchParams.get('orderId');
@@ -72,165 +62,136 @@ const Premium = () => {
     if (payment === 'success') {
       setPaymentResult({ type: 'success', orderId: orderId ?? undefined });
       setPaymentStatus('success');
-      // Clear form
-      setFormData({ cardholderName: '', cardNumber: '', expiry: '', cvc: '' });
     } else if (payment === 'failed') {
       setPaymentResult({ type: 'failed', orderId: orderId ?? undefined });
       setPaymentStatus('error');
-      setErrorMessage('Payment failed. Please try again or use a different payment method.');
+      setErrorMessage('Thanh toán bị huỷ hoặc thất bại. Vui lòng thử lại.');
     } else if (payment === 'error') {
       setPaymentResult({ type: 'error' });
       setPaymentStatus('error');
-      setErrorMessage('An error occurred during payment processing. Please contact support.');
+      setErrorMessage('Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng liên hệ hỗ trợ.');
     }
   }, [searchParams]);
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {};
+  const handleUpgrade = async () => {
+    if (selected === 'free') return;
 
-    if (!formData.cardholderName.trim()) {
-      newErrors.cardholderName = 'Cardholder name is required';
-    }
+    const selectedPlan = plans.find(p => p.id === selected);
+    if (!selectedPlan) return;
 
-    const cardNumberClean = formData.cardNumber.replace(/\s/g, '');
-    if (!cardNumberClean) {
-      newErrors.cardNumber = 'Card number is required';
-    } else if (cardNumberClean.length < 16 || !/^\d+$/.test(cardNumberClean)) {
-      newErrors.cardNumber = 'Invalid card number (16 digits required)';
-    }
-
-    if (!formData.expiry) {
-      newErrors.expiry = 'Expiry date is required';
-    } else if (!/^\d{2}\s?\/\s?\d{2}$/.test(formData.expiry)) {
-      newErrors.expiry = 'Use MM/YY format';
-    }
-
-    if (!formData.cvc) {
-      newErrors.cvc = 'CVC is required';
-    } else if (!/^\d{3,4}$/.test(formData.cvc)) {
-      newErrors.cvc = 'Invalid CVC (3-4 digits)';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    let formattedValue = value;
-
-    if (id === 'payment-card') {
-      formattedValue = value
-        .replace(/\s/g, '')
-        .replace(/(.{4})/g, '$1 ')
-        .trim()
-        .slice(0, 19);
-    } else if (id === 'payment-expiry') {
-      formattedValue = value
-        .replace(/\D/g, '')
-        .replace(/^(\d{2})(\d{0,2})$/, (_, p1, p2) => {
-          if (p2) return `${p1} / ${p2}`;
-          return p1;
-        })
-        .slice(0, 7);
-    } else if (id === 'payment-cvc') {
-      formattedValue = value.replace(/\D/g, '').slice(0, 4);
-    }
-
-    setFormData(prev => ({ ...prev, [id.replace('payment-', '')]: formattedValue }));
-    if (errors[id.replace('payment-', '') as keyof FormData]) {
-      setErrors(prev => ({ ...prev, [id.replace('payment-', '')]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    setIsProcessing(true);
     setPaymentStatus('processing');
     setErrorMessage('');
 
-    if (!validateForm()) {
-      setPaymentStatus('idle');
-      return;
-    }
-
     try {
-      // Call backend API to create VNPAY payment
-      const response = await createPayment({
+      const response = await createPayOSLink({
         planId: selected,
-        amount: selected === 'plus' ? 99000 : 299000,
+        amount: selectedPlan.priceValue,
       });
 
-      if (response.success && response.paymentUrl) {
-        // Redirect to VNPAY payment page
-        window.location.href = response.paymentUrl;
+      if (response.success && response.checkoutUrl) {
+        // Redirect to payOS hosted checkout page
+        window.location.href = response.checkoutUrl;
       } else {
         setPaymentStatus('error');
-        setErrorMessage(response.message || 'Failed to create payment. Please try again.');
+        setErrorMessage(response.message || 'Không thể tạo link thanh toán. Vui lòng thử lại.');
+        setIsProcessing(false);
       }
     } catch (error: any) {
-      console.error('Payment error:', error);
+      console.error('payOS error:', error);
       setPaymentStatus('error');
-      setErrorMessage(error.response?.data?.message || 'Network error. Please check your connection.');
+      setErrorMessage(error.response?.data?.message || 'Lỗi kết nối. Vui lòng kiểm tra đường truyền.');
+      setIsProcessing(false);
     }
   };
 
   const selectedPlan = plans.find(p => p.id === selected);
 
   return (
-    <Layout isLoggedIn={false}>
-      <div className="max-w-screen-xl mx-auto px-6 py-8">
-        {/* Logo */}
-        <div className="flex justify-start mb-8">
-          <img src="/logo.png" alt="Unraveller" className="h-24 object-contain drop-shadow-xl" />
+    <Layout isLoggedIn={true}>
+      <div className="max-w-screen-xl mx-auto px-6 py-12 app-bg min-h-screen">
+        {/* Header Block with Cyberpunk Glow */}
+        <div className="text-center mb-12 animate-fade-in">
+          <h2 className="text-transparent bg-clip-text bg-gradient-brand text-5xl font-black mb-4 tracking-widest drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] font-heading">
+            PRICING PLANS
+          </h2>
+          <div className="ur-divider mb-4"></div>
+          <p className="text-white/60 text-base max-w-md mx-auto">
+            Choose the membership that unlocks your advanced language espionage journey
+          </p>
         </div>
 
-        <div className="flex flex-col xl:flex-row gap-10 items-start">
-          {/* ── Pricing ── */}
-          <div className="flex-1">
-            <h2 className="text-white text-3xl font-black text-center mb-2 tracking-widest">PRICING</h2>
-            <p className="text-white/45 text-sm text-center mb-8">Choose the plan that works for you</p>
+        <div className="flex flex-col lg:flex-row gap-10 items-stretch">
+          {/* ── Pricing Cards Grid ── */}
+          <div className="flex-1 flex flex-col justify-between">
+            <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch mb-8">
+              {plans.map((plan) => {
+                const isSelected = selected === plan.id;
+                return (
+                  <div
+                    key={plan.id}
+                    id={`plan-${plan.id}`}
+                    onClick={() => setSelected(plan.id)}
+                    className={`cursor-pointer rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 w-full md:w-[260px] relative backdrop-blur-md hover:-translate-y-2 hover:scale-[1.02] hover:opacity-100 ${
+                      isSelected
+                        ? plan.id === 'free'
+                          ? 'border-2 border-slate-400 bg-slate-400/10 shadow-[0_0_25px_rgba(148,163,184,0.2)] opacity-100 z-10'
+                          : plan.id === 'plus'
+                          ? 'border-2 border-cyan-brand bg-cyan-brand/10 shadow-glow-cyan opacity-100 z-10'
+                          : 'border-2 border-purple-brand bg-purple-brand/10 shadow-glow-purple opacity-100 z-10'
+                        : 'border-2 border-purple-brand/20 bg-card/45 opacity-70 hover:border-purple-brand/40 hover:shadow-glow-purple/10'
+                    }`}
+                  >
+                    {plan.badge && (
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-brand text-white text-xs font-black px-4 py-1.5 rounded-full whitespace-nowrap shadow-glow-purple animate-pulse-slow">
+                        {plan.badge}
+                      </span>
+                    )}
+                    <div>
+                      <h3 className="text-white text-2xl font-black mb-6 flex items-center justify-between">
+                        {plan.name}
+                        {isSelected && (
+                          <span className={`w-2.5 h-2.5 rounded-full ${
+                            plan.id === 'free' ? 'bg-slate-400' :
+                            plan.id === 'plus' ? 'bg-cyan-brand' : 'bg-purple-brand'
+                          } animate-ping`} />
+                        )}
+                      </h3>
+                      
+                      <ul className="space-y-4 mb-8">
+                        {plan.features.map((f, i) => (
+                          <li key={i} className="text-white/80 text-sm flex items-start gap-3">
+                            <Check size={16} className={`mt-0.5 flex-shrink-0 ${
+                              plan.id === 'free' ? 'text-slate-400' :
+                              plan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-brand'
+                            }`} />
+                            <span className="leading-snug">{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  id={`plan-${plan.id}`}
-                  onClick={() => setSelected(plan.id)}
-                  className={`cursor-pointer rounded-2xl p-6 flex flex-col transition-all w-full sm:max-w-[200px] ${
-                    plan.highlighted
-                      ? 'plan-highlighted border-2 border-cyan-brand/60 shadow-glow-cyan'
-                      : `ur-card ${selected === plan.id ? 'border-purple-500/60' : 'hover:border-purple-500/40'}`
-                  }`}
-                >
-                  <h3 className="text-white text-2xl font-black mb-5">{plan.name}</h3>
-                  <ul className="space-y-2.5 flex-1 mb-6">
-                    {plan.features.map((f, i) => (
-                      <li key={i} className="text-white/80 text-sm flex items-start gap-2.5">
-                        <Check size={14} className="text-cyan-brand mt-0.5 flex-shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <div>
-                    <p className="text-white text-2xl font-black">{plan.price}</p>
-                    <p className="text-white/40 text-xs mt-0.5">{plan.priceLabel}</p>
+                    <div className="pt-6 border-t border-white/5 mt-auto">
+                      <p className="text-white text-3xl font-black tracking-tight">{plan.price}</p>
+                      <p className="text-white/40 text-xs mt-1 font-mono uppercase tracking-wider">{plan.priceLabel}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex justify-center gap-4 mt-8 flex-wrap">
+            {/* Visual Decorative Action Block */}
+            <div className="flex justify-center gap-6 mt-4 flex-wrap">
               <Link to="/auth?mode=register">
                 <button
-                  className="ur-btn-primary px-7 py-3 rounded-full font-bold"
+                  className="ur-btn-primary px-8 py-3.5 rounded-full font-bold text-sm hover:shadow-glow-purple transition-all duration-300"
                   id="premium-free-start"
                 >
                   Start for Free
                 </button>
               </Link>
               <button
-                className="ur-btn-outline px-7 py-3 rounded-full font-bold"
+                className="ur-btn-outline px-8 py-3.5 rounded-full font-bold text-sm transition-all duration-300"
                 id="premium-register-plan"
                 onClick={() => document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
@@ -239,176 +200,171 @@ const Premium = () => {
             </div>
           </div>
 
-          {/* ── Payment Form ── */}
-          <div className="w-full xl:w-96 flex-shrink-0" id="payment-section">
-            <div className="ur-card p-6 rounded-2xl border border-purple-brand/30">
-              <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
-                <CreditCard size={20} className="text-cyan-brand" />
-                Payment Details
-              </h3>
+          {/* ── High-Fidelity payOS Checkout Panel ── */}
+          <div className="w-full lg:w-[400px] flex-shrink-0" id="payment-section">
+            <div className="ur-card p-8 rounded-3xl border border-purple-brand/35 relative overflow-hidden shadow-glow-purple/10 flex flex-col justify-between h-full">
+              {/* Header Gradient Top Bar */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-brand"></div>
 
-              {/* Payment result message */}
+              {/* Payment result banner */}
               {paymentResult && (
-                <div className={`mb-4 p-3 rounded-xl flex items-center gap-2 ${
+                <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 animate-slide-up ${
                   paymentResult.type === 'success'
-                    ? 'bg-green-500/20 border border-green-500/50'
-                    : paymentResult.type === 'failed'
-                    ? 'bg-red-500/20 border border-red-500/50'
-                    : 'bg-yellow-500/20 border border-yellow-500/50'
+                    ? 'bg-success/15 border border-success/40 text-success'
+                    : 'bg-danger/15 border border-danger/40 text-danger'
                 }`}>
-                  {paymentResult.type === 'success' && <CheckCircle size={18} className="text-green-400" />}
-                  {paymentResult.type === 'failed' && <AlertCircle size={18} className="text-red-400" />}
-                  {paymentResult.type === 'error' && <AlertCircle size={18} className="text-yellow-400" />}
-                  <span className={`text-sm ${
-                    paymentResult.type === 'success' ? 'text-green-300' :
-                    paymentResult.type === 'failed' ? 'text-red-300' : 'text-yellow-300'
-                  }`}>
-                    {paymentResult.type === 'success'
-                      ? 'Payment successful! Welcome to Premium!'
-                      : paymentResult.type === 'failed'
-                      ? 'Payment failed. Please try again.'
-                      : 'Payment processing error.'}
-                  </span>
-                </div>
-              )}
-
-              {/* Selected plan summary */}
-              {selectedPlan && !paymentStatus && (
-                <div className="mb-4 p-3 rounded-xl bg-cyan-brand/10 border border-cyan-brand/30">
-                  <p className="text-white/70 text-xs mb-1">Selected Plan</p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white font-bold">{selectedPlan.name}</p>
-                      <p className="text-cyan-brand font-black text-lg">{selectedPlan.price}</p>
-                    </div>
-                    <Zap size={24} className="text-cyan-brand" />
+                  {paymentResult.type === 'success' ? (
+                    <CheckCircle size={22} className="text-success mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <AlertCircle size={22} className="text-danger mt-0.5 flex-shrink-0" />
+                  )}
+                  <div>
+                    <p className="font-bold text-sm tracking-wide">
+                      {paymentResult.type === 'success'
+                        ? '🎉 NÂNG CẤP PREMIUM THÀNH CÔNG!'
+                        : 'THANH TOÁN THẤT BẠI'}
+                    </p>
+                    <p className="text-white/60 text-xs mt-1 leading-relaxed">
+                      {paymentResult.type === 'success'
+                        ? 'Tài khoản của bạn đã được kích hoạt VIP. Hãy trải nghiệm năng lượng vô hạn ngay!'
+                        : 'Giao dịch bị huỷ hoặc chưa hoàn tất. Vui lòng kiểm tra và thanh toán lại.'}
+                    </p>
+                    {paymentResult.orderId && (
+                      <p className="text-white/40 text-[10px] font-mono mt-2 uppercase tracking-widest">
+                        Mã đơn: #{paymentResult.orderId}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Payment method icons */}
-              <div className="flex items-center justify-around mb-5 p-3 rounded-xl bg-white/8 border border-white/10">
-                {/* Mastercard */}
-                <div className="relative w-9 h-6">
-                  <div className="absolute left-0 w-6 h-6 rounded-full bg-red-500 opacity-90" />
-                  <div className="absolute right-0 w-6 h-6 rounded-full bg-yellow-400 opacity-90 mix-blend-multiply" />
-                </div>
-                <span className="text-white font-black text-base italic tracking-tight">VISA</span>
-                <span className="text-blue-400 font-black text-sm">PayPal</span>
-                <CreditCard size={22} className="text-white/50" />
+              <div>
+                <h3 className="text-white font-extrabold text-xl mb-1 flex items-center gap-2.5 font-heading">
+                  <Zap size={22} className="text-cyan-brand animate-pulse" />
+                  Upgrade via payOS
+                </h3>
+                <p className="text-white/50 text-xs mb-6 leading-relaxed">
+                  Trải nghiệm thanh toán nhanh bảo mật bằng cổng thanh toán payOS qua quét mã VietQR.
+                </p>
+
+                {/* Dynamic Selected Plan Summary Card */}
+                {selectedPlan && selectedPlan.id !== 'free' && (
+                  <div className={`mb-6 p-5 rounded-2xl transition-all duration-300 border ${
+                    selectedPlan.id === 'plus'
+                      ? 'bg-cyan-brand/10 border-cyan-brand/30 shadow-[0_0_15px_rgba(6,182,212,0.08)]'
+                      : 'bg-purple-brand/15 border-purple-brand/35 shadow-[0_0_20px_rgba(124,58,237,0.08)]'
+                  }`}>
+                    <p className="text-white/45 text-xs uppercase tracking-wider mb-2 font-mono">Gói đang chọn</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-black text-lg font-heading">{selectedPlan.name}</p>
+                        <p className={`font-black text-2xl mt-1 ${
+                          selectedPlan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-soft'
+                        }`}>{selectedPlan.price}</p>
+                        <p className="text-white/40 text-xs font-mono">{selectedPlan.priceLabel}</p>
+                      </div>
+                      <div className={`p-3 rounded-xl ${
+                        selectedPlan.id === 'plus' ? 'bg-cyan-brand/20' : 'bg-purple-brand/20'
+                      }`}>
+                        <Zap size={28} className={selectedPlan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-soft'} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selected === 'free' && (
+                  <div className="mb-6 p-6 rounded-2xl bg-white/5 border border-white/10 text-center animate-slide-up">
+                    <p className="text-white/60 text-sm">Gói Free không cần giao dịch thanh toán.</p>
+                    <Link to="/auth?mode=register">
+                      <button className="ur-btn-primary mt-4 px-6 py-2.5 rounded-full text-sm font-black tracking-wide">
+                        Đăng ký tài khoản mới
+                      </button>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Error Banner */}
+                {paymentStatus === 'error' && errorMessage && !paymentResult && (
+                  <div className="mb-5 p-4 rounded-2xl bg-danger/15 border border-danger/45 flex items-center gap-3">
+                    <AlertCircle size={18} className="text-danger flex-shrink-0" />
+                    <span className="text-red-300 text-xs leading-relaxed">{errorMessage}</span>
+                  </div>
+                )}
+
+                {/* Payment checklist steps */}
+                {selected !== 'free' && paymentStatus !== 'success' && (
+                  <div className="mb-6 space-y-3">
+                    {[
+                      { icon: '1', text: 'Chọn gói hội viên bạn mong muốn đăng ký' },
+                      { icon: '2', text: 'Bấm nút thanh toán để chuyển tiếp sang cổng payOS' },
+                      { icon: '3', text: 'Quét mã VietQR bằng bất kỳ App Ngân hàng hoặc ví điện tử' },
+                    ].map(step => (
+                      <div key={step.icon} className="flex items-start gap-3.5 text-white/50 text-xs">
+                        <span className="w-5.5 h-5.5 rounded-full bg-cyan-brand/10 border border-cyan-brand/30 text-cyan-brand text-xs flex items-center justify-center font-black flex-shrink-0">
+                          {step.icon}
+                        </span>
+                        <span className="leading-snug pt-0.5">{step.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Error message */}
-              {paymentStatus === 'error' && errorMessage && !paymentResult && (
-                <div className="mb-4 p-3 rounded-xl bg-red-500/20 border border-red-500/50 flex items-center gap-2">
-                  <AlertCircle size={18} className="text-red-400" />
-                  <span className="text-red-300 text-sm">{errorMessage}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div>
-                  <input
-                    className={`ur-input ${errors.cardholderName ? 'border-red-500 focus:border-red-500' : ''}`}
-                    type="text"
-                    placeholder="Cardholder name"
-                    id="payment-name"
-                    value={formData.cardholderName}
-                    onChange={handleInputChange}
-                    disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
-                  />
-                  {errors.cardholderName && (
-                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.cardholderName}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <input
-                    className={`ur-input ${errors.cardNumber ? 'border-red-500 focus:border-red-500' : ''}`}
-                    type="text"
-                    placeholder="Card number"
-                    id="payment-card"
-                    value={formData.cardNumber}
-                    onChange={handleInputChange}
-                    maxLength={19}
-                    disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
-                  />
-                  {errors.cardNumber && (
-                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.cardNumber}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <input
-                      className={`ur-input ${errors.expiry ? 'border-red-500 focus:border-red-500' : ''}`}
-                      type="text"
-                      placeholder="MM / YY"
-                      id="payment-expiry"
-                      value={formData.expiry}
-                      onChange={handleInputChange}
-                      maxLength={7}
-                      disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
-                    />
-                    {errors.expiry && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.expiry}
-                      </p>
+              <div>
+                {/* Main pay button with neon color gradients based on selection */}
+                {selected !== 'free' && (
+                  <button
+                    type="button"
+                    className={`w-full py-4 text-base font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] ${
+                      isProcessing ? 'cursor-wait' : ''
+                    } ${
+                      selectedPlan?.id === 'plus'
+                        ? 'bg-gradient-to-r from-cyan-brand to-cyan-light text-navy shadow-glow-cyan hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]'
+                        : 'bg-gradient-purple text-white shadow-glow-purple hover:shadow-[0_0_30px_rgba(124,58,237,0.55)]'
+                    }`}
+                    id="payment-pay-btn"
+                    disabled={isProcessing || paymentStatus === 'success'}
+                    onClick={handleUpgrade}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        Đang kết nối cổng payOS...
+                      </>
+                    ) : paymentStatus === 'success' ? (
+                      <>
+                        <CheckCircle size={18} />
+                        Đã nâng cấp VIP!
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink size={18} />
+                        Thanh toán {selectedPlan?.price} qua payOS
+                      </>
                     )}
+                  </button>
+                )}
+
+                {/* Security trust badges */}
+                <div className="mt-6 space-y-2.5">
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
+                    <Shield size={16} className="text-cyan-brand mt-0.5 flex-shrink-0" />
+                    <p className="text-white/45 text-[11px] leading-relaxed">
+                      🔒 Kết nối bảo mật bởi đối tác <strong className="text-white/70 font-bold">payOS</strong> — mã hoá chuẩn SSL 256-bit bảo vệ giao dịch tuyệt đối.
+                    </p>
                   </div>
-                  <div>
-                    <input
-                      className={`ur-input ${errors.cvc ? 'border-red-500 focus:border-red-500' : ''}`}
-                      type="text"
-                      placeholder="CVC"
-                      id="payment-cvc"
-                      value={formData.cvc}
-                      onChange={handleInputChange}
-                      maxLength={4}
-                      disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
-                    />
-                    {errors.cvc && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.cvc}
-                      </p>
-                    )}
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
+                    <Clock size={16} className="text-purple-soft mt-0.5 flex-shrink-0" />
+                    <p className="text-white/45 text-[11px] leading-relaxed">
+                      Tài khoản VIP được kích hoạt tự động tức thì ngay sau khi hệ thống ghi nhận chuyển khoản thành công.
+                    </p>
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  className="ur-btn-primary w-full py-3.5 text-base rounded-xl mt-2 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                  id="payment-pay-btn"
-                  disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
-                >
-                  {paymentStatus === 'processing' ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <Lock size={16} />
-                      Pay {selectedPlan?.price || '0₫'}
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2">
-                <Shield size={16} className="text-cyan-brand mt-0.5 flex-shrink-0" />
-                <p className="text-white/50 text-xs leading-relaxed">
-                  🔒 Secured by VNPAY 256-bit SSL encryption. Your payment data is protected.
+                <p className="text-white/30 text-[10px] text-center mt-5 leading-normal">
+                  Bằng việc tiến hành thanh toán, bạn đồng ý tuân thủ với Điều khoản Dịch vụ và Chính sách Bảo mật của chúng tôi.
                 </p>
               </div>
-
-              <p className="text-white/30 text-xs text-center mt-4">
-                By paying, you agree to our Terms of Service
-              </p>
             </div>
           </div>
         </div>

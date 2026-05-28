@@ -72,7 +72,7 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId="1000507535508-0ih1n8t4k21811i9n0dib9kgudvnlnvq.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="857953455071-06bni6pvv29qabiot2kqt7b8segm5pda.apps.googleusercontent.com">
       <Router>
         <AppRoutes />
       </Router>

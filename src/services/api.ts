@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:7055/api';
+const API_BASE_URL = 'http://localhost:5251/api';
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -107,6 +107,13 @@ export interface PaymentResponseDto {
   success: boolean;
   paymentUrl?: string;
   orderId?: string;
+  message?: string;
+}
+
+// payOS — response from create-payos-link
+export interface CreatePayOSLinkResponseDto {
+  success: boolean;
+  checkoutUrl?: string;
   message?: string;
 }
 
@@ -220,8 +227,8 @@ export const getUserInventory = async (): Promise<UserInventoryDto[]> => {
 };
 
 // Payments
-export const createPayment = async (request: CreatePaymentRequestDto): Promise<PaymentResponseDto> => {
-  const response = await apiClient.post<PaymentResponseDto>('/Payment/create-vnpay-url', request);
+export const createPayOSLink = async (request: CreatePaymentRequestDto): Promise<CreatePayOSLinkResponseDto> => {
+  const response = await apiClient.post<CreatePayOSLinkResponseDto>('/Payment/create-payos-link', request);
   return response.data;
 };
 
