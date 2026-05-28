@@ -130,6 +130,15 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               </Link>
             );
           })}
+          {user?.role === 'Admin' && (
+            <Link
+              to="/admin"
+              className="relative text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 shadow-glow-red/20 font-mono flex items-center gap-1.5 ml-2"
+            >
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+              Admin Portal
+            </Link>
+          )}
         </div>
 
         {/* Search — desktop */}
@@ -211,6 +220,15 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               {link.label}
             </Link>
           ))}
+          {user?.role === 'Admin' && (
+            <Link
+              to="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="block text-sm font-semibold py-2.5 px-3 rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 font-mono"
+            >
+              🚨 Admin Portal
+            </Link>
+          )}
           <div className="pt-3 border-t border-white/5 flex gap-3">
             <Link to="/auth?mode=register" onClick={() => setMenuOpen(false)}>
               <button className="btn btn-primary btn-sm">Sign Up</button>

@@ -15,6 +15,10 @@ import DashboardScreen from './pages/Dashboard/DashboardScreen';
 import UserProfile from './pages/Profile/UserProfile';
 import Market from './pages/Market/Market';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminProtectedRoute from './components/common/AdminProtectedRoute';
+import AdminLayout from './pages/Admin/AdminLayout';
+import AdminUsers from './pages/Admin/AdminUsers';
+import AdminMissions from './pages/Admin/AdminMissions';
 import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
@@ -61,6 +65,14 @@ const AppRoutes = () => {
         <Route path="/scenario/:id" element={<ProtectedRoute><ScenarioScreen /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="missions" element={<AdminMissions />} />
+          <Route index element={<Navigate to="users" replace />} />
+        </Route>
+
         <Route path="/missions" element={<Navigate to="/courses" replace />} />
 
         {/* Fallback */}

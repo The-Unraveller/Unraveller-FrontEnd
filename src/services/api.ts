@@ -57,6 +57,7 @@ export interface UserProfileDto {
   id: number;
   username: string;
   email: string;
+  role: string;
   energy: number;
   maxEnergy: number;
   lastEnergyRechargedAt: string;

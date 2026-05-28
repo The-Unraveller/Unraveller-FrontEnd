@@ -36,7 +36,7 @@ const Auth = () => {
         setUser(profile);
         setAuthenticated(true);
         toast.success(`Welcome back, Agent ${profile.username}! Establishing secure connection...`);
-        navigate('/courses');
+        navigate(profile.role === 'Admin' ? '/admin' : '/courses');
       } else {
         if (!agreed) {
           setError('You must agree to the Terms & Conditions.');
@@ -76,7 +76,7 @@ const Auth = () => {
       setUser(profile);
       setAuthenticated(true);
       toast.success(`Google verification secure. Welcome, Agent ${profile.username}!`);
-      navigate('/courses');
+      navigate(profile.role === 'Admin' ? '/admin' : '/courses');
     } catch (err: any) {
       let errMsg = '';
       if (err.response) {
