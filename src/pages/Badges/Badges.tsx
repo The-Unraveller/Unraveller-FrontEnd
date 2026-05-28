@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
+import { useGameStore } from '../../store/useGameStore';
 
 interface Badge {
   id: number;
@@ -52,8 +53,10 @@ const BadgeCell = ({ badge }: { badge: Badge }) => (
 const Badges = () => {
   const navigate = useNavigate();
 
+  const { user } = useGameStore();
+
   return (
-    <Layout isLoggedIn username="USERNAME">
+    <Layout isLoggedIn username={user?.username || 'Agent'}>
       <div className="max-w-screen-sm mx-auto px-4 py-8">
         <div className="ur-card rounded-2xl p-6 md:p-8">
           <h1 className="text-white text-2xl font-bold text-center mb-1">Your Collection</h1>

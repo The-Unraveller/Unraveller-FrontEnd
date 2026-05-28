@@ -90,6 +90,7 @@ export interface BuyItemResponseDto {
 
 export interface UseItemRequestDto {
   itemId: number;
+  missionId?: number;
 }
 
 export interface UseItemResponseDto {
@@ -124,6 +125,15 @@ export interface LeaderboardEntry {
   xp: number;
   badge: string;
   isYou: boolean;
+}
+
+export interface UserInventoryDto {
+  itemId: number;
+  name: string;
+  description: string;
+  type: string;
+  quantity: number;
+  emoji: string;
 }
 
 // --- API Functions ---
@@ -181,9 +191,9 @@ export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
     console.error("Failed to fetch leaderboard, returning mock data", err);
     return [
       { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑', isYou: false },
-      { rank: 2, name: 'Lan Anh',   xp: 3950, badge: '🥈', isYou: false },
+      { rank: 2, name: 'Lan Anh', xp: 3950, badge: '🥈', isYou: false },
       { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉', isYou: false },
-      { rank: 4, name: 'KHOA_PRO',  xp: 1250, badge: '⚡', isYou: true }
+      { rank: 4, name: 'KHOA_PRO', xp: 1250, badge: '⚡', isYou: true }
     ];
   }
 };
@@ -201,6 +211,11 @@ export const buyItem = async (request: BuyItemRequestDto): Promise<BuyItemRespon
 
 export const useItem = async (request: UseItemRequestDto): Promise<UseItemResponseDto> => {
   const response = await apiClient.post<UseItemResponseDto>('/Shop/use-item', request);
+  return response.data;
+};
+
+export const getUserInventory = async (): Promise<UserInventoryDto[]> => {
+  const response = await apiClient.get<UserInventoryDto[]>('/Shop/inventory');
   return response.data;
 };
 

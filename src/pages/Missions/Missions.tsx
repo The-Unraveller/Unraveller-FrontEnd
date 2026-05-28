@@ -5,13 +5,14 @@ import {
 } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { getMissions } from '../../services/api';
+import { useGameStore } from '../../store/useGameStore';
 
 const sidebarItems = [
   { icon: FileText, label: 'Report', to: '#' },
   { icon: Star, label: 'Score', to: '#' },
   { icon: BookOpen, label: 'Scenario', to: '/courses' },
   { icon: Flame, label: 'Streak', to: '#' },
-  { icon: ShoppingBag, label: 'Market', to: '#' },
+  { icon: ShoppingBag, label: 'Market', to: '/market' },
   { icon: HelpCircle, label: 'Guide', to: '#' },
   { icon: Users, label: 'Friends', to: '#' },
 ];
@@ -165,8 +166,10 @@ const Missions = () => {
       });
   }, []);
 
+  const { user } = useGameStore();
+
   return (
-    <Layout isLoggedIn username="USERNAME">
+    <Layout isLoggedIn username={user?.username || 'Agent'}>
       <div className="max-w-screen-xl mx-auto px-4 py-5">
         <div className="flex gap-5">
           {/* ── Sidebar ── */}

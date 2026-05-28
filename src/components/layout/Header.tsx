@@ -54,14 +54,14 @@ const Header = () => {
 
         {/* User Profile & Logout */}
         <div className="flex items-center gap-3 pl-6 border-l border-spy-green/20">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-spy-green/20 border border-spy-green/50 flex items-center justify-center">
+          <Link to="/profile" className="flex items-center gap-2 hover:opacity-85 transition-all group">
+            <div className="w-7 h-7 rounded-full bg-spy-green/20 border border-spy-green/50 flex items-center justify-center group-hover:border-spy-green group-hover:bg-spy-green/30 transition-all">
               <UserIcon className="w-4 h-4 text-spy-green" />
             </div>
             <span className="text-xs font-bold uppercase text-spy-green hidden sm:block">
               {user.username}
             </span>
-          </div>
+          </Link>
 
           <button
             onClick={logout}

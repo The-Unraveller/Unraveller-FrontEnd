@@ -225,7 +225,7 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout isLoggedIn={isLoggedIn} showBottomNav={isLoggedIn}>
+    <Layout isLoggedIn={isLoggedIn} username={user?.username} showBottomNav={isLoggedIn}>
       {/* ══════ HERO ══════ */}
       <section className="max-w-screen-lg mx-auto px-5 pt-10 pb-6 text-center">
         <div className="flex justify-center mb-5">
@@ -251,6 +251,7 @@ const Home = () => {
           <div className="flex items-center justify-center gap-3 flex-wrap mb-6 animate-slide-up">
             <StreakBadge count={streak} />
             <StatPill icon="⚡" value={`${xp.toLocaleString()} XP`} label="Total XP" color="text-xp-orange" />
+            <StatPill icon="🔋" value={`${user?.energy ?? 100}/${user?.maxEnergy ?? 100}`} label="Energy" color="text-yellow-400" />
             <StatPill icon="🏅" value={badges} label="Badges" color="text-gold" />
             <StatPill icon="📖" value={`Lv.${level}`} label="Level" color="text-cyan-brand" />
           </div>

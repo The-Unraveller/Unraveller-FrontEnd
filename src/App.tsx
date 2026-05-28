@@ -12,10 +12,13 @@ import Premium from './pages/Premium/Premium';
 import Badges from './pages/Badges/Badges';
 import ScenarioScreen from './pages/Scenario/ScenarioScreen';
 import DashboardScreen from './pages/Dashboard/DashboardScreen';
+import UserProfile from './pages/Profile/UserProfile';
+import Market from './pages/Market/Market';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import Header from './components/layout/Header';
 import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // We need a wrapper component to access Zustand store and useEffect
 const AppRoutes = () => {
@@ -41,7 +44,6 @@ const AppRoutes = () => {
 
   return (
     <div className="min-h-screen bg-spy-black text-spy-green">
-      <Header />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -57,6 +59,8 @@ const AppRoutes = () => {
         <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
         <Route path="/badges" element={<ProtectedRoute><Badges /></ProtectedRoute>} />
         <Route path="/scenario/:id" element={<ProtectedRoute><ScenarioScreen /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+        <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
         <Route path="/missions" element={<Navigate to="/courses" replace />} />
 
         {/* Fallback */}
@@ -72,6 +76,18 @@ function App() {
       <Router>
         <AppRoutes />
       </Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={3500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </GoogleOAuthProvider>
   );
 }

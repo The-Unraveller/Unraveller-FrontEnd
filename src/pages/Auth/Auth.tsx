@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import { toast } from 'react-toastify';
 import Layout from '../../components/layout/Layout';
 import { login, register, loginWithGoogle, getUserProfile } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
@@ -34,26 +35,32 @@ const Auth = () => {
         const profile = await getUserProfile();
         setUser(profile);
         setAuthenticated(true);
+        toast.success(`Welcome back, Agent ${profile.username}! Establishing secure connection...`);
         navigate('/courses');
       } else {
         if (!agreed) {
           setError('You must agree to the Terms & Conditions.');
+          toast.error('You must agree to the Terms & Conditions.');
           setIsLoading(false);
           return;
         }
         const username = `${firstName} ${lastName}`.trim() || email.split('@')[0];
         await register(username, email, password);
         setMode('login');
+        toast.success('Agent profile initialized! Please log in to establish link.');
         setError('Agent profile initialized! Log in to establish link.');
       }
     } catch (err: any) {
+      let errMsg = '';
       if (err.response) {
-        setError(err.response.data?.message || err.response.data || 'Authentication failed. Please verify credentials.');
+        errMsg = err.response.data?.message || err.response.data || 'Authentication failed. Please verify credentials.';
       } else if (err.request) {
-        setError('Cannot connect to server. Please verify the backend API is running.');
+        errMsg = 'Cannot connect to server. Please verify the backend API is running.';
       } else {
-        setError('Authentication error: ' + err.message);
+        errMsg = 'Authentication error: ' + err.message;
       }
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -68,15 +75,19 @@ const Auth = () => {
       const profile = await getUserProfile();
       setUser(profile);
       setAuthenticated(true);
+      toast.success(`Google verification secure. Welcome, Agent ${profile.username}!`);
       navigate('/courses');
     } catch (err: any) {
+      let errMsg = '';
       if (err.response) {
-        setError(err.response.data?.message || err.response.data || 'Google authentication failed.');
+        errMsg = err.response.data?.message || err.response.data || 'Google authentication failed.';
       } else if (err.request) {
-        setError('Cannot connect to server. Please verify the backend is running.');
+        errMsg = 'Cannot connect to server. Please verify the backend is running.';
       } else {
-        setError('Google login error: ' + err.message);
+        errMsg = 'Google login error: ' + err.message;
       }
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsLoading(false);
     }
