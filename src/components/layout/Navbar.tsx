@@ -20,7 +20,7 @@ const navLinks = [
 const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useGameStore();
+  const { user, isAuthenticated } = useGameStore();
 
   const displayIsLoggedIn = isLoggedIn || !!user;
   const displayUsername = user?.username || username || 'USERNAME';
@@ -130,13 +130,14 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               </Link>
             );
           })}
-          {(user?.role === 'Admin' || user?.role === 'Moderator') && (
+          {/* Admin/Moderator portal — ONLY shown when user is fully loaded and has the correct role */}
+          {isAuthenticated && user !== null && (user.role === 'Admin' || user.role === 'Moderator') && (
             <Link
               to="/admin"
               className="relative text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 shadow-glow-red/20 font-mono flex items-center gap-1.5 ml-2"
             >
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-              {user?.role === 'Admin' ? 'Admin Portal' : 'Moderator Portal'}
+              {user.role === 'Admin' ? '🛡️ Admin Portal' : '⚙️ Moderator Portal'}
             </Link>
           )}
         </div>
@@ -220,13 +221,14 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               {link.label}
             </Link>
           ))}
-          {(user?.role === 'Admin' || user?.role === 'Moderator') && (
+          {/* Mobile: only show portal for confirmed Admin/Moderator */}
+          {isAuthenticated && user !== null && (user.role === 'Admin' || user.role === 'Moderator') && (
             <Link
               to="/admin"
               onClick={() => setMenuOpen(false)}
               className="block text-sm font-semibold py-2.5 px-3 rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 font-mono"
             >
-              🚨 {user?.role === 'Admin' ? 'Admin Portal' : 'Moderator Portal'}
+              🚨 {user.role === 'Admin' ? 'Admin Portal' : 'Moderator Portal'}
             </Link>
           )}
           {/* Only show auth buttons when NOT logged in */}
