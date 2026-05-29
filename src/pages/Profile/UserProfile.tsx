@@ -101,7 +101,7 @@ const UserProfile = () => {
             {/* Identity Card */}
             <div className="ur-card p-6 rounded-2xl border border-spy-green/20 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-spy-green/10 to-transparent pointer-events-none rounded-bl-full" />
-              
+
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-brand to-purple-light flex items-center justify-center text-3xl shadow-glow-purple border border-white/10">
                   🕵️‍♂️
@@ -109,9 +109,6 @@ const UserProfile = () => {
                 <div>
                   <h3 className="text-white font-bold text-lg leading-tight truncate">{user?.username}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-spy-green/10 border border-spy-green/30 text-spy-green">
-                      Agent ID #{user?.id}
-                    </span>
                     {user?.isPremium && (
                       <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/40 text-yellow-400">
                         PREMIUM
