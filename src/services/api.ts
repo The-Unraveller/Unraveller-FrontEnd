@@ -1,9 +1,10 @@
 import axios from 'axios';
 // Deployed Backend (Render)
-const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
+//const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
 
 // Local Backend (for adding new functions/testing)
-// const API_BASE_URL = 'http://localhost:5251/api';
+const API_BASE_URL = 'http://localhost:5251/api';
+//for now, we use local backend
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -71,6 +72,7 @@ export interface UserProfileDto {
   lastActiveDate: string;
   xpBalance: number;
   isPremium: boolean;
+  englishLevel: string;
   createdAt: string;
 }
 
@@ -97,12 +99,14 @@ export interface BuyItemResponseDto {
 
 export interface UseItemRequestDto {
   itemId: number;
-  missionId?: number;
+  missionId: number;
 }
 
 export interface UseItemResponseDto {
   success: boolean;
   message: string;
+  newSuspicionLevel?: number;
+  hint?: string | null;
 }
 
 export interface CreatePaymentRequestDto {
@@ -224,7 +228,7 @@ export const buyItem = async (request: BuyItemRequestDto): Promise<BuyItemRespon
 };
 
 export const useItem = async (request: UseItemRequestDto): Promise<UseItemResponseDto> => {
-  const response = await apiClient.post<UseItemResponseDto>('/Shop/use-item', request);
+  const response = await apiClient.post<UseItemResponseDto>('/Game/use-item', request);
   return response.data;
 };
 

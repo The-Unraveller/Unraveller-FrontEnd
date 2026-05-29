@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ChevronLeft, AlertTriangle, Zap, Send, Volume2, VolumeX, Mic, MicOff, Check
+  ChevronLeft, AlertTriangle, Zap, Send, Volume2, VolumeX, Mic, MicOff, Check, X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
@@ -83,6 +83,7 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [turnCount, setTurnCount] = useState(0);
   const [inventory, setInventory] = useState<UserInventoryDto[]>([]);
+  const [activeHint, setActiveHint] = useState<string | null>(null);
 
   /* Voice — TTS */
   const [autoSpeak, setAutoSpeak] = useState(false);
@@ -164,14 +165,18 @@ const Game = () => {
       const response = await useItem({ itemId, missionId });
       if (response.success) {
         toast.success(response.message);
-        if (itemId === 2) setSuspicion(prev => Math.max(0, prev - 20));
-        else if (itemId === 1) setSuspicion(prev => Math.max(0, prev - 10));
+        if (response.newSuspicionLevel !== undefined) {
+          setSuspicion(response.newSuspicionLevel);
+        }
+        if (response.hint) {
+          setActiveHint(response.hint);
+        }
         loadInventory();
       } else {
-        toast.error(response.message || 'Failed to use item.');
+        toast.error(response.message || 'Không thể sử dụng vật phẩm.');
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Network error using item.');
+      toast.error(err.response?.data?.message || 'Lỗi kết nối khi sử dụng vật phẩm.');
     }
   };
 
@@ -214,6 +219,9 @@ const Game = () => {
   const processMessage = (text: string) => {
     if (isTyping || gameOver || !text.trim()) return;
 
+    // Clear active hint when sending a message
+    setActiveHint(null);
+
     // Stop any ongoing TTS / STT
     window.speechSynthesis?.cancel();
     setSpeakingIndex(null);
@@ -255,7 +263,7 @@ const Game = () => {
           } else if (res.isWin) {
             setGameOver(true);
             setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + res.xpEarned}`), 1800);
-          } else if (newTurn >= 5) {
+          } else if (newTurn >= 10) {
             setGameOver(true);
             const status = newSus < 50 ? 'success' : 'failed';
             setTimeout(() => navigate(`/result/${id}?status=${status}&xp=${totalXP + res.xpEarned}`), 1800);
@@ -295,7 +303,7 @@ const Game = () => {
           if (newSus >= 100) {
             setGameOver(true);
             setTimeout(() => navigate(`/result/${id}?status=failed`), 1800);
-          } else if (newTurn >= 5 && newSus < 50) {
+          } else if (newTurn >= 10 && newSus < 50) {
             setGameOver(true);
             setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + xpGain}`), 1800);
           }
@@ -497,6 +505,24 @@ const Game = () => {
           </div>
         )}
 
+        {/* ── AI Hint Card ── */}
+        {activeHint && (
+          <div className="mb-3 p-4 rounded-2xl bg-cyan-brand/10 border border-cyan-brand/35 shadow-[0_0_20px_rgba(6,182,212,0.15)] animate-fade-in relative backdrop-blur-md">
+            <button 
+              onClick={() => setActiveHint(null)} 
+              className="absolute top-3.5 right-3.5 text-white/40 hover:text-white transition-colors"
+              type="button"
+            >
+              <X size={14} />
+            </button>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-sm">💡</span>
+              <span className="text-xs font-mono uppercase tracking-widest text-cyan-brand font-bold">GỢI Ý TỪ AI</span>
+            </div>
+            <p className="text-xs text-white/95 leading-relaxed font-sans">{activeHint}</p>
+          </div>
+        )}
+
         {/* ── Choice buttons ── */}
         <div className="grid grid-cols-2 gap-2.5 mb-3">
           {scenario.choices.map((choice, i) => (
@@ -576,10 +602,10 @@ const Game = () => {
             <div className="flex-1 xp-bar-track h-1.5">
               <div
                 className="h-full rounded-full bg-cyan-brand/70 transition-all duration-500"
-                style={{ width: `${Math.min(100, (turnCount / 5) * 100)}%` }}
+                style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
               />
             </div>
-            <span className="text-white/35 text-xs">{turnCount}/5</span>
+            <span className="text-white/35 text-xs">{turnCount}/10</span>
           </div>
         )}
 
