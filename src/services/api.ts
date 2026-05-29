@@ -1,6 +1,9 @@
 import axios from 'axios';
+// Deployed Backend (Render)
+const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
 
-const API_BASE_URL = 'http://localhost:5251/api';
+// Local Backend (for adding new functions/testing)
+// const API_BASE_URL = 'http://localhost:5251/api';
 
 // Create axios instance
 export const apiClient = axios.create({
