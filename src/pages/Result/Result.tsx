@@ -110,18 +110,18 @@ const Result = () => {
             <div className="w-20 h-20 rounded-full bg-danger/15 border border-danger/30 flex items-center justify-center mx-auto mb-5 text-4xl">
               😰
             </div>
-            <h1 className="font-heading font-black text-3xl text-white mb-2">Busted!</h1>
+            <h1 className="font-heading font-black text-3xl text-white mb-2">Bị phát hiện!</h1>
             <p className="text-white/55 text-sm leading-relaxed mb-3 max-w-xs mx-auto">
-              Your suspicion hit 100%. Try speaking in longer, more natural sentences next time.
+              Mức nghi ngờ chạm 100%. Hãy thử nói các câu dài và tự nhiên hơn lần sau nhé.
             </p>
-            <div className="badge badge-danger mx-auto mb-7 inline-flex">SUSPICION 100%</div>
+            <div className="badge badge-danger mx-auto mb-7 inline-flex">NGhi NGờ 100%</div>
 
             <div className="flex justify-center gap-4 flex-wrap">
               <button onClick={() => navigate(`/scenario/${id || '1'}`)} className="btn btn-primary" id="result-retry">
-                <RotateCcw size={16} /> Try Again
+                <RotateCcw size={16} /> Thử lại
               </button>
               <button onClick={() => navigate('/')} className="btn btn-outline" id="result-courses">
-                <Home size={16} /> Dashboard
+                <Home size={16} /> Trang chủ
               </button>
             </div>
           </div>
@@ -137,7 +137,7 @@ const Result = () => {
         <div className="ur-card rounded-3xl p-6 md:p-8 animate-fade-in">
           {/* Title */}
           <h1 className="font-heading font-black text-3xl text-white text-center mb-5">
-            Congratulations! 🎉
+            Chúc mừng! 🎉
           </h1>
 
           {/* Stars */}
@@ -158,7 +158,7 @@ const Result = () => {
           </div>
 
           <p className="text-white/65 text-sm text-center mb-5">
-            You have completed the course — here is your reward!
+            Bạn đã hoàn thành chương trình — đây là phần thưởng của bạn!
           </p>
 
           {/* ── XP gained ── */}
@@ -169,7 +169,7 @@ const Result = () => {
             <Zap size={28} className="text-xp-orange" />
             <div>
               <div className="font-heading font-black text-3xl text-gradient-gold">+{xpAnimated} XP</div>
-              <div className="text-white/50 text-xs">Experience earned this session</div>
+              <div className="text-white/50 text-xs">Kinh nghiệm nhận được trong phiên này</div>
             </div>
           </div>
 
@@ -177,7 +177,7 @@ const Result = () => {
           <div className="mb-5">
             <XPBar current={xp % 1000} max={1000} />
             <p className="text-white/35 text-xs text-center mt-1">
-              {1000 - (xp % 1000) > 0 ? `${(1000 - (xp % 1000)).toLocaleString()} XP to Level ${Math.floor(xp / 1000) + 2}` : '🎊 Level Up!'}
+              {1000 - (xp % 1000) > 0 ? `Còn ${(1000 - (xp % 1000)).toLocaleString()} XP để lên cấp ${Math.floor(xp / 1000) + 2}` : '🎊 Lên cấp!'}
             </p>
           </div>
 
@@ -205,7 +205,7 @@ const Result = () => {
             <div className="mb-6 animate-slide-up">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp size={15} className="text-cyan-brand" />
-                <h3 className="font-heading font-semibold text-white text-sm">Leaderboard</h3>
+                <h3 className="font-heading font-semibold text-white text-sm">Bảng xếp hạng</h3>
               </div>
               <div className="space-y-2">
                 {leaderboardData.map(player => (
@@ -233,13 +233,13 @@ const Result = () => {
           {/* Actions */}
           <div className="flex justify-center gap-3 flex-wrap">
             <button onClick={() => navigate('/')} className="btn btn-primary" id="result-continue">
-              Continue
+              Tiếp tục
             </button>
             <button onClick={() => navigate('/badges')} className="btn btn-outline" id="result-badges">
-              <Award size={15} /> View Badges
+              <Award size={15} /> Xem huy hiệu
             </button>
             <button onClick={() => navigate(`/scenario/${id || '1'}`)} className="btn btn-ghost btn-sm" id="result-replay">
-              <RotateCcw size={14} /> Replay
+              <RotateCcw size={14} /> Chơi lại
             </button>
           </div>
         </div>

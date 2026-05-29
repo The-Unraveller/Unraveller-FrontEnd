@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Users, Search, Edit3, ShieldAlert, Zap } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { apiClient } from '../../services/api';
+import { useGameStore } from '../../store/useGameStore';
 
 const AdminUsers: React.FC = () => {
+  const { user } = useGameStore();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  if (user?.role !== 'Admin') {
+    return <Navigate to="/admin/missions" replace />;
+  }
 
   useEffect(() => {
     fetchUsers();

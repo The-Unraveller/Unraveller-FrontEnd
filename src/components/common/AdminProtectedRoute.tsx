@@ -22,7 +22,7 @@ const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }
 
-  if (user.role !== 'Admin') {
+  if (user.role !== 'Admin' && user.role !== 'Moderator') {
     return <Navigate to="/" replace />;
   }
 

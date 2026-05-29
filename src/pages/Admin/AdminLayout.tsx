@@ -5,7 +5,7 @@ import { useGameStore } from '../../store/useGameStore';
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { logout } = useGameStore();
+  const { logout, user } = useGameStore();
 
   return (
     <div className="flex h-screen bg-navy-3 text-white overflow-hidden">
@@ -15,17 +15,23 @@ const AdminLayout: React.FC = () => {
           <div className="p-2 bg-purple-brand rounded-lg shadow-glow-purple">
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
-          <span className="font-heading font-bold text-lg tracking-tight">Admin Panel</span>
+          <span className="font-heading font-bold text-lg tracking-tight">
+            {user?.role === 'Admin' ? '🛡️ Bảng Admin' : '⚙️ Bảng Moderator'}
+          </span>
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          <Link to="/admin/users" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-brand/10 transition-all text-white/60 hover:text-white group">
-            <Users className="w-5 h-5 group-hover:text-purple-brand" />
-            <span className="font-medium">User Management</span>
-          </Link>
+          {user?.role === 'Admin' && (
+            <Link to="/admin/users" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-brand/10 transition-all text-white/60 hover:text-white group">
+              <Users className="w-5 h-5 group-hover:text-purple-brand" />
+              <span className="font-medium">Quản lý người dùng</span>
+            </Link>
+          )}
           <Link to="/admin/missions" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-brand/10 transition-all text-white/60 hover:text-white group">
             <BookOpen className="w-5 h-5 group-hover:text-purple-brand" />
-            <span className="font-medium">Mission Editor</span>
+            <span className="font-medium">
+              {user?.role === 'Admin' ? 'Duyệt nhiệm vụ' : 'Tạo nhiệm vụ'}
+            </span>
           </Link>
         </nav>
 
@@ -33,12 +39,14 @@ const AdminLayout: React.FC = () => {
           <button 
             onClick={() => {
               logout();
-              navigate('/auth');
+              navigate('/dashboard');
             }}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all"
           >
             <LogOut className="w-5 h-5" />
-            <span className="font-medium">Exit Admin</span>
+            <span className="font-medium">
+              {user?.role === 'Admin' ? 'Thoát Admin' : 'Thoát Moderator'}
+            </span>
           </button>
         </div>
       </aside>

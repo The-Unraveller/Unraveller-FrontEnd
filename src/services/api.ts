@@ -36,6 +36,9 @@ export interface MissionDto {
   npcName: string;
   npcEmoji: string;
   locked: boolean;
+  approvalStatus: number;
+  rejectionReason: string | null;
+  createdByUserId: number | null;
 }
 
 export interface DialogueRequestDto {

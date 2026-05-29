@@ -312,7 +312,7 @@ const Game = () => {
 
   /* Suspicion colour */
   const susColor = suspicion > 70 ? '#ef4444' : suspicion > 45 ? '#f59e0b' : '#10b981';
-  const susLabel = suspicion > 70 ? 'HIGH' : suspicion > 45 ? 'MEDIUM' : 'LOW';
+  const susLabel = suspicion > 70 ? 'CAO 🔴' : suspicion > 45 ? 'TRUNG BÌNH 🟡' : 'THẤP 🟢';
 
   return (
     <div className="app-bg min-h-screen flex flex-col">
@@ -381,7 +381,7 @@ const Game = () => {
                 <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="flex items-center gap-1.5 text-white/70 font-semibold">
                     <AlertTriangle size={12} style={{ color: susColor }} />
-                    Suspicion Level
+                    Mức Nghi Ngờ
                   </span>
                   <span className="font-black text-xs" style={{ color: susColor }}>
                     {suspicion}% — {susLabel}
@@ -420,7 +420,7 @@ const Game = () => {
                     {msg.xp != null && msg.role === 'npc' && (
                       <div className="mt-1.5 flex items-center gap-1">
                         <Zap size={10} className="text-xp-orange" />
-                        <span className="text-xp-orange text-[10px] font-bold">+{msg.xp} XP earned</span>
+                        <span className="text-xp-orange text-[10px] font-bold">+{msg.xp} XP đã nhận</span>
                       </div>
                     )}
                   </div>
@@ -477,7 +477,7 @@ const Game = () => {
         {/* ── Inventory Tools ── */}
         {inventory.length > 0 && (
           <div className="mb-3 p-3 rounded-2xl bg-navy-2 border border-white/5 flex flex-col gap-2">
-            <span className="text-[9px] font-mono uppercase tracking-widest text-white/40 block">🧰 INVENTORY TOOLS</span>
+            <span className="text-[9px] font-mono uppercase tracking-widest text-white/40 block">🧰 ĐỒ DÙNG</span>
             <div className="flex flex-wrap gap-2">
               {inventory.map((item) => (
                 <button
@@ -537,7 +537,7 @@ const Game = () => {
             type="text"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-            placeholder={isListening ? '🎤 Listening…' : 'Type or speak your response…'}
+            placeholder={isListening ? '🎤 Đang nghe...' : 'Nhập hoặc nói câu trả lời tiếng Anh...'}
             className={`ur-input flex-1 text-sm py-2.5 px-4 rounded-full transition-all ${isListening ? 'border-red-400/50 bg-red-500/5' : ''}`}
             id="game-custom-input"
             disabled={isTyping || gameOver}
@@ -557,22 +557,22 @@ const Game = () => {
         {sttSupported && (
           <p className="text-center text-[10px] text-white/20 mt-2 font-mono">
             {isListening
-              ? '🔴 Recording… speak clearly in English'
-              : '🎤 Click mic to speak your answer'}
+              ? '🔴 Đang ghi âm... hãy nói rõ bằng tiếng Anh'
+              : '🎤 Nhấn micro để nói câu trả lời'}
           </p>
         )}
 
         {/* Game over */}
         {gameOver && (
           <div className="text-center mt-4 text-white/50 text-xs animate-fade-in">
-            {suspicion >= 100 ? '⚠️ Mission failed — redirecting…' : '✅ Stage complete — well done!'}
+            {suspicion >= 100 ? '⚠️ Nhiệm vụ thất bại — đang chuyển trang...' : '✅ Hoàn thành giai đoạn — xuất sắc!'}
           </div>
         )}
 
         {/* Turn progress */}
         {!gameOver && (
           <div className="flex items-center gap-2 mt-4">
-            <span className="text-white/35 text-xs">Progress</span>
+            <span className="text-white/35 text-xs">Tiến độ</span>
             <div className="flex-1 xp-bar-track h-1.5">
               <div
                 className="h-full rounded-full bg-cyan-brand/70 transition-all duration-500"

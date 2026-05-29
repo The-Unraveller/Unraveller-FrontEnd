@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
@@ -13,6 +13,11 @@ const Auth = () => {
   
   // State variables
   const [mode, setMode] = useState<'register' | 'login'>(initialMode as 'register' | 'login');
+
+  useEffect(() => {
+    const currentMode = searchParams.get('mode') === 'login' ? 'login' : 'register';
+    setMode(currentMode);
+  }, [searchParams]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
