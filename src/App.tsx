@@ -24,6 +24,13 @@ import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Role-aware redirect for /admin index — Admin → users, Moderator → missions
+const AdminIndexRedirect = () => {
+  const { user } = useGameStore();
+  if (user?.role === 'Moderator') return <Navigate to="missions" replace />;
+  return <Navigate to="users" replace />;
+};
+
 // We need a wrapper component to access Zustand store and useEffect
 const AppRoutes = () => {
   const { setUser, setAuthenticated } = useGameStore();
@@ -70,7 +77,7 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
           <Route path="users" element={<AdminUsers />} />
           <Route path="missions" element={<AdminMissions />} />
-          <Route index element={<Navigate to="users" replace />} />
+          <Route index element={<AdminIndexRedirect />} />
         </Route>
 
         <Route path="/missions" element={<Navigate to="/courses" replace />} />

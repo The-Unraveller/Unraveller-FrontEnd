@@ -41,7 +41,10 @@ const Auth = () => {
         setUser(profile);
         setAuthenticated(true);
         toast.success(`Welcome back, Agent ${profile.username}! Establishing secure connection...`);
-        navigate(profile.role === 'Admin' ? '/admin' : '/courses');
+        // Role-based redirect: Admin → user management, Moderator → mission editor, Player → courses
+        if (profile.role === 'Admin') navigate('/admin/users');
+        else if (profile.role === 'Moderator') navigate('/admin/missions');
+        else navigate('/courses');
       } else {
         if (!agreed) {
           setError('You must agree to the Terms & Conditions.');
@@ -81,7 +84,10 @@ const Auth = () => {
       setUser(profile);
       setAuthenticated(true);
       toast.success(`Google verification secure. Welcome, Agent ${profile.username}!`);
-      navigate(profile.role === 'Admin' ? '/admin' : '/courses');
+      // Role-based redirect: Admin → user management, Moderator → mission editor, Player → courses
+      if (profile.role === 'Admin') navigate('/admin/users');
+      else if (profile.role === 'Moderator') navigate('/admin/missions');
+      else navigate('/courses');
     } catch (err: any) {
       let errMsg = '';
       if (err.response) {
