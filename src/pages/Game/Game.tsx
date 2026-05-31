@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ChevronLeft, AlertTriangle, Zap, Send, Volume2, VolumeX, Mic, MicOff, Check, X
+  ChevronLeft, AlertTriangle, Zap, Send, Check, X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
@@ -39,28 +39,7 @@ const defaultScenario = {
   choices: ["Hello!", "Ready!"],
 };
 
-/* ─── Web Speech API (types provided by @types/dom-speech-recognition) ─── */
 
-/* ─── Helper: speak text via TTS ─── */
-const speakText = (text: string, onEnd?: () => void) => {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const clean = text.replace(/[*_`#>~]/g, '').trim();
-  const utterance = new SpeechSynthesisUtterance(clean);
-  utterance.lang = 'en-US';
-  utterance.rate = 0.95;
-  utterance.pitch = 1.0;
-
-  // Prefer a natural English voice
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v =>
-    v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha'))
-  ) || voices.find(v => v.lang.startsWith('en'));
-  if (preferred) utterance.voice = preferred;
-
-  if (onEnd) utterance.onend = onEnd;
-  window.speechSynthesis.speak(utterance);
-};
 
 /* ─── Component ─── */
 const Game = () => {
@@ -85,72 +64,10 @@ const Game = () => {
   const [inventory, setInventory] = useState<UserInventoryDto[]>([]);
   const [activeHint, setActiveHint] = useState<string | null>(null);
 
-  /* Voice — TTS */
-  const [autoSpeak, setAutoSpeak] = useState(false);
-  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
-
-  /* Voice — STT */
-  const [isListening, setIsListening] = useState(false);
-  const [sttSupported, setSttSupported] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
   const chatRef = useRef<HTMLDivElement>(null);
 
-  /* ─── STT setup ─── */
-  useEffect(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) { setSttSupported(false); return; }
-    setSttSupported(true);
-    const rec = new SR();
-    rec.lang = 'en-US';
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.continuous = false;
 
-    rec.onresult = (e: any) => {
-      const transcript = e.results[0][0].transcript;
-      setInputValue(transcript);
-      setIsListening(false);
-    };
-    rec.onerror = (e: any) => {
-      setIsListening(false);
-      const errorMsg = e.error === 'not-allowed'
-        ? 'Permission denied. Please allow microphone access in browser settings.'
-        : e.error === 'no-speech'
-        ? 'No speech detected. Please try speaking again.'
-        : `Voice recognition error: ${e.error}. Try again.`;
-      toast.error(errorMsg);
-    };
-    rec.onend = () => setIsListening(false);
-    recognitionRef.current = rec;
-
-    return () => { rec.abort(); window.speechSynthesis?.cancel(); };
-  }, []);
-
-  const toggleMic = () => {
-    if (!recognitionRef.current) return;
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      window.speechSynthesis?.cancel();
-      recognitionRef.current.start();
-      setIsListening(true);
-      toast.info('🎤 Listening… speak now!', { autoClose: 3000 });
-    }
-  };
-
-  /* ─── TTS for a specific message ─── */
-  const handleSpeak = useCallback((text: string, idx: number) => {
-    if (speakingIndex === idx) {
-      window.speechSynthesis?.cancel();
-      setSpeakingIndex(null);
-      return;
-    }
-    setSpeakingIndex(idx);
-    speakText(text, () => setSpeakingIndex(null));
-  }, [speakingIndex]);
 
   /* ─── Inventory ─── */
   const loadInventory = () => {
@@ -202,7 +119,6 @@ const Game = () => {
           setScenario(transformed);
           const introMsg: Message = { role: 'npc', text: transformed.intro };
           setMessages([introMsg]);
-          if (autoSpeak) speakText(transformed.intro);
         }
       })
       .catch((err) => console.error('Failed to load mission:', err));
@@ -221,10 +137,6 @@ const Game = () => {
 
     // Clear active hint when sending a message
     setActiveHint(null);
-
-    // Stop any ongoing TTS / STT
-    window.speechSynthesis?.cancel();
-    setSpeakingIndex(null);
 
     setMessages(prev => [...prev, { role: 'player', text }]);
     const newTurn = turnCount + 1;
@@ -250,12 +162,6 @@ const Game = () => {
             feedback: res.feedback || undefined,
           };
           setMessages(prev => [...prev, npcMsg]);
-
-          // Auto-speak NPC response if enabled
-          if (autoSpeak) {
-            const idx = messages.length + 1; // approximate next index
-            speakText(res.npcResponse);
-          }
 
           if (newSus >= 100 || res.isLose) {
             setGameOver(true);
@@ -297,7 +203,6 @@ const Game = () => {
             feedback: isGood ? 'Great use of natural phrasing!' : "Try starting with 'Could I...' or 'I was wondering if...' for a more natural tone."
           };
           setMessages(prev => [...prev, npcMsg]);
-          if (autoSpeak) speakText(fallbackText);
           setIsTyping(false);
 
           if (newSus >= 100) {
@@ -353,20 +258,7 @@ const Game = () => {
             <p className="text-white/40 text-xs">{scenario.npcName}</p>
           </div>
 
-          {/* Auto-speak toggle */}
-          <button
-            onClick={() => setAutoSpeak(v => !v)}
-            className={`ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono transition-all border ${
-              autoSpeak
-                ? 'bg-cyan-brand/20 border-cyan-brand text-cyan-brand'
-                : 'bg-white/5 border-white/10 text-white/30 hover:text-white/60'
-            }`}
-            title={autoSpeak ? 'Auto-speak ON (click to mute)' : 'Auto-speak OFF (click to enable)'}
-            id="auto-speak-toggle"
-          >
-            {autoSpeak ? <Volume2 size={12} /> : <VolumeX size={12} />}
-            <span>{autoSpeak ? 'SPEAK ON' : 'MUTE'}</span>
-          </button>
+
         </div>
 
         {/* ── Main game card ── */}
@@ -433,21 +325,7 @@ const Game = () => {
                     )}
                   </div>
 
-                  {/* Speaker button for NPC messages */}
-                  {msg.role === 'npc' && (
-                    <button
-                      onClick={() => handleSpeak(msg.text, i)}
-                      className={`ml-1.5 mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                        speakingIndex === i
-                          ? 'bg-cyan-brand text-navy-1 animate-pulse'
-                          : 'bg-white/5 text-white/30 hover:bg-cyan-brand/20 hover:text-cyan-brand'
-                      }`}
-                      title={speakingIndex === i ? 'Stop speaking' : 'Hear this message'}
-                      id={`speak-btn-${i}`}
-                    >
-                      {speakingIndex === i ? <VolumeX size={11} /> : <Volume2 size={11} />}
-                    </button>
-                  )}
+
                 </div>
 
                 {/* Feedback coaching tip under NPC message */}
@@ -538,37 +416,17 @@ const Game = () => {
           ))}
         </div>
 
-        {/* ── Free-text input + mic ── */}
+        {/* ── Free-text input ── */}
         <form onSubmit={handleSend} className="flex gap-2 items-center">
-
-          {/* Microphone button */}
-          {sttSupported && (
-            <button
-              type="button"
-              onClick={toggleMic}
-              disabled={isTyping || gameOver}
-              id="mic-btn"
-              className={`flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-all border-2 ${
-                isListening
-                  ? 'bg-red-500 border-red-400 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                  : 'bg-white/5 border-white/10 text-white/40 hover:bg-purple-brand/20 hover:border-purple-brand hover:text-white'
-              } disabled:opacity-30`}
-              title={isListening ? 'Stop listening' : 'Speak your answer (English)'}
-            >
-              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            </button>
-          )}
-
           <input
             type="text"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-            placeholder={isListening ? '🎤 Đang nghe...' : 'Nhập hoặc nói câu trả lời tiếng Anh...'}
-            className={`ur-input flex-1 text-sm py-2.5 px-4 rounded-full transition-all ${isListening ? 'border-red-400/50 bg-red-500/5' : ''}`}
+            placeholder="Viết câu trả lời tiếng Anh của bạn..."
+            className="ur-input flex-1 text-sm py-2.5 px-4 rounded-full"
             id="game-custom-input"
             disabled={isTyping || gameOver}
           />
-
           <button
             type="submit"
             id="game-send-btn"
@@ -578,15 +436,6 @@ const Game = () => {
             <Send size={15} />
           </button>
         </form>
-
-        {/* STT status hint */}
-        {sttSupported && (
-          <p className="text-center text-[10px] text-white/20 mt-2 font-mono">
-            {isListening
-              ? '🔴 Đang ghi âm... hãy nói rõ bằng tiếng Anh'
-              : '🎤 Nhấn micro để nói câu trả lời'}
-          </p>
-        )}
 
         {/* Game over */}
         {gameOver && (
