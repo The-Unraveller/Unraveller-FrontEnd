@@ -8,13 +8,13 @@ import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 
 const sidebarItems = [
-  { icon: FileText, label: 'Report', to: '#' },
-  { icon: Star, label: 'Score', to: '#' },
+  { icon: FileText, label: 'Report', to: '/report' },
+  { icon: Star, label: 'Score', to: '/score' },
   { icon: BookOpen, label: 'Scenario', to: '/courses' },
-  { icon: Flame, label: 'Streak', to: '#' },
+  { icon: Flame, label: 'Streak', to: '/streak' },
   { icon: ShoppingBag, label: 'Market', to: '/market' },
-  { icon: HelpCircle, label: 'Guide', to: '#' },
-  { icon: Users, label: 'Friends', to: '#' },
+  { icon: HelpCircle, label: 'Guide', to: '/guide' },
+  { icon: Users, label: 'Friends', to: '/friends' },
 ];
 
 const courses = [

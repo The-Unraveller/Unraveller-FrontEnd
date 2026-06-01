@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ChevronLeft, AlertTriangle, Zap, Send, Check, X
+  ChevronLeft, AlertTriangle, Zap, Send, Check, X, Sparkles
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
-import { getMissions, sendGameMessage, getUserInventory, useItem } from '../../services/api';
-import type { UserInventoryDto } from '../../services/api';
+import { getMissions, sendGameMessage, getUserInventory, useItem, getGameSession, resetGameSession } from '../../services/api';
+import type { UserInventoryDto, GameSessionDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 
 /* ─── Types ─── */
@@ -64,6 +64,10 @@ const Game = () => {
   const [inventory, setInventory] = useState<UserInventoryDto[]>([]);
   const [activeHint, setActiveHint] = useState<string | null>(null);
 
+  /* Session Resume/Retry States */
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [sessionData, setSessionData] = useState<GameSessionDto | null>(null);
+
 
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +101,48 @@ const Game = () => {
     }
   };
 
+  const handleResume = () => {
+    if (!sessionData) return;
+
+    const restoredMessages: Message[] = [];
+    restoredMessages.push({ role: 'npc', text: scenario.intro });
+
+    for (const h of sessionData.history) {
+      if (h.playerMessage) {
+        restoredMessages.push({ role: 'player', text: h.playerMessage });
+      }
+      if (h.npcResponse) {
+        restoredMessages.push({
+          role: 'npc',
+          text: h.npcResponse,
+          feedback: h.feedback || undefined
+        });
+      }
+    }
+
+    setMessages(restoredMessages);
+    setSuspicion(sessionData.currentSuspicion);
+    setTurnCount(sessionData.turnCount);
+    setTotalXP(sessionData.xpEarned);
+    setShowResumeModal(false);
+    toast.success("Đã khôi phục tiến độ nhiệm vụ trước đó!");
+  };
+
+  const handleReset = async () => {
+    try {
+      await resetGameSession(missionId);
+      setMessages([{ role: 'npc', text: scenario.intro }]);
+      setSuspicion(10); 
+      setTurnCount(0);
+      setTotalXP(0);
+      setShowResumeModal(false);
+      toast.success("Đã khởi động lại nhiệm vụ!");
+    } catch (err) {
+      console.error('Failed to reset session:', err);
+      toast.error("Không thể khởi động lại nhiệm vụ.");
+    }
+  };
+
   /* ─── Load mission from API ─── */
   useEffect(() => {
     getMissions()
@@ -117,8 +163,21 @@ const Game = () => {
             choices: startChoicesMap[missionId] || ["Hello!", "Ready!"],
           };
           setScenario(transformed);
-          const introMsg: Message = { role: 'npc', text: transformed.intro };
-          setMessages([introMsg]);
+          // Now check for active session before setting initial messages
+          getGameSession(missionId)
+            .then((session) => {
+              if (session && session.hasActiveSession && session.history.length > 0) {
+                setSessionData(session);
+                setShowResumeModal(true);
+              } else {
+                // No active session, start from intro
+                setMessages([{ role: 'npc', text: transformed.intro }]);
+              }
+            })
+            .catch((err) => {
+              console.error('Failed to load session, falling back to intro:', err);
+              setMessages([{ role: 'npc', text: transformed.intro }]);
+            });
         }
       })
       .catch((err) => console.error('Failed to load mission:', err));
@@ -242,7 +301,14 @@ const Game = () => {
           >
             <ChevronLeft size={15} /> Courses
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={handleReset}
+              className="text-[10px] font-mono border border-red-500/30 hover:border-red-500 text-red-400 px-2 py-0.5 rounded transition-all hover:bg-red-500/10"
+              title="Khởi động lại nhiệm vụ này từ đầu"
+            >
+              🔄 Làm lại
+            </button>
             <span className="badge badge-purple text-[10px]">{scenario.stage}</span>
             <span className="badge badge-xp text-[10px]">
               <Zap size={9} /> +{totalXP} XP
@@ -330,9 +396,16 @@ const Game = () => {
 
                 {/* Feedback coaching tip under NPC message */}
                 {msg.role === 'npc' && msg.feedback && (
-                  <div className="ml-9 mt-1.5 flex items-start gap-1.5 max-w-[82%]">
-                    <Check size={10} className="text-cyan-brand mt-0.5 flex-shrink-0" />
-                    <p className="text-[10px] text-cyan-brand/70 leading-snug italic">{msg.feedback}</p>
+                  <div className="ml-9 mt-2 mb-1 p-3.5 rounded-xl bg-cyan-brand/5 border border-cyan-brand/20 shadow-[0_2px_10px_rgba(6,182,212,0.05)] max-w-[82%] flex items-start gap-2.5">
+                    <Sparkles size={14} className="text-cyan-brand flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] font-bold font-mono tracking-wider text-cyan-brand uppercase block mb-1">
+                        🎯 Nhận xét từ AI Coach
+                      </span>
+                      <p className="text-xs text-white/80 leading-relaxed whitespace-pre-line font-sans">
+                        {msg.feedback}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -457,7 +530,33 @@ const Game = () => {
             <span className="text-white/35 text-xs">{turnCount}/10</span>
           </div>
         )}
-
+        {/* Resume Mission Modal */}
+        {showResumeModal && (
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-mono text-white">
+            <div className="w-full max-w-md bg-navy-2 border border-purple-brand/30 p-8 rounded-2xl relative shadow-glow-purple animate-fade-in text-center">
+              <h3 className="text-white text-lg font-bold mb-4 flex items-center justify-center gap-2 tracking-wider">
+                <span className="text-purple-brand">🕵️‍♂️</span> TIẾP TỤC NHIỆM VỤ?
+              </h3>
+              <p className="text-white/60 text-xs mb-6 leading-relaxed">
+                Phát hiện tiến trình chơi dở dang của nhiệm vụ này. Bạn có muốn tiếp tục hay muốn chơi lại từ đầu?
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={handleReset}
+                  className="w-full py-2.5 rounded-full border border-red-500/40 hover:border-red-500 text-red-400 font-bold uppercase transition-all text-xs font-mono bg-transparent"
+                >
+                  Chơi lại (Reset)
+                </button>
+                <button
+                  onClick={handleResume}
+                  className="w-full py-2.5 rounded-full bg-gradient-brand text-white font-bold uppercase hover:opacity-90 transition-all text-xs font-mono shadow-glow-purple"
+                >
+                  Tiếp tục (Resume)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

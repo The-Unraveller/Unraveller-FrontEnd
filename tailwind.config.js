@@ -39,6 +39,12 @@ export default {
         'success':       '#10b981',
         'danger':        '#ef4444',
         'warning':       '#f59e0b',
+
+        // ── Spy Cyberpunk Theme colors ──
+        'spy-black':     '#080612',
+        'spy-green':     '#00ff41',
+        'spy-red':       '#ff0055',
+        'spy-blue':      '#00f0ff',
       },
       fontFamily: {
         'heading': ['Poppins', 'sans-serif'],

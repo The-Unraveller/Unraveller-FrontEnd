@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Zap, Flame, Star, Mail, Calendar, Shield, CreditCard, ShoppingBag, Loader2, RefreshCw } from 'lucide-react';
+import { User, Zap, Flame, Star, Mail, Calendar, Shield, CreditCard, ShoppingBag, Loader2, RefreshCw, Award } from 'lucide-react';
+import { toast } from 'react-toastify';
 import Layout from '../../components/layout/Layout';
 import { useGameStore } from '../../store/useGameStore';
-import { getUserProfile, getUserInventory, getPaymentHistory } from '../../services/api';
+import { getUserProfile, getUserInventory, getPaymentHistory, updateEnglishLevel, updateUserProfile } from '../../services/api';
 import type { UserInventoryDto, PaymentHistoryDto } from '../../services/api';
 
 const UserProfile = () => {
@@ -15,6 +16,12 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+
+  // Edit profile states
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editUsername, setEditUsername] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const fetchData = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
@@ -43,6 +50,53 @@ const UserProfile = () => {
     }
   };
 
+  const handleLevelChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLevel = e.target.value;
+    try {
+      setRefreshing(true);
+      await updateEnglishLevel(newLevel);
+      if (user) {
+        setUser({ ...user, englishLevel: newLevel });
+      }
+      toast.success(`Đã cập nhật trình độ tiếng Anh sang ${newLevel}`);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Không thể cập nhật trình độ.');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleStartEdit = () => {
+    if (user) {
+      setEditUsername(user.username);
+      setEditEmail(user.email);
+      setIsEditingProfile(true);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editUsername.trim() || !editEmail.trim()) {
+      toast.error("Vui lòng điền đầy đủ thông tin.");
+      return;
+    }
+
+    try {
+      setSavingProfile(true);
+      const res = await updateUserProfile(editUsername.trim(), editEmail.trim());
+      toast.success(res.message || "Đã cập nhật hồ sơ cá nhân thành công.");
+      
+      if (user) {
+        setUser({ ...user, username: editUsername.trim(), email: editEmail.trim() });
+      }
+      setIsEditingProfile(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Không thể cập nhật thông tin hồ sơ.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -51,7 +105,7 @@ const UserProfile = () => {
     return (
       <Layout isLoggedIn username="Agent">
         <div className="flex-1 flex flex-col items-center justify-center min-h-[70vh]">
-          <Loader2 className="w-10 h-10 text-spy-green animate-spin mb-4" />
+          <Loader2 className="w-10 h-10 text-purple-brand animate-spin mb-4" />
           <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Retrieving Profile Credentials...</p>
         </div>
       </Layout>
@@ -65,7 +119,7 @@ const UserProfile = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-              <span className="text-spy-green">🕵️‍♂️</span> AGENT DOSSIER
+              <span className="text-purple-brand">🕵️‍♂️</span> AGENT DOSSIER
             </h1>
             <p className="text-white/45 text-xs font-mono uppercase tracking-wider mt-1">
               Verification Status: Secure Connection Verified
@@ -75,14 +129,14 @@ const UserProfile = () => {
             <button
               onClick={() => fetchData(true)}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:border-spy-green/45 rounded-xl text-xs font-mono uppercase tracking-wider text-white/70 hover:text-white transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:border-purple-brand/45 rounded-xl text-xs font-mono uppercase tracking-wider text-white/70 hover:text-white transition-all disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Syncing...' : 'Sync Data'}
             </button>
             <button
               onClick={() => navigate('/courses')}
-              className="flex items-center gap-2 px-4 py-2 bg-spy-green/20 hover:bg-spy-green text-spy-green hover:text-black border border-spy-green/40 hover:border-transparent rounded-xl text-xs font-mono uppercase tracking-wider transition-all font-bold"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-brand/20 hover:bg-purple-brand text-purple-brand hover:text-white border border-purple-brand/40 hover:border-transparent rounded-xl text-xs font-mono uppercase tracking-wider transition-all font-bold"
             >
               Mission Desk
             </button>
@@ -99,21 +153,31 @@ const UserProfile = () => {
           {/* Left Column: User details, membership card */}
           <div className="lg:col-span-1 space-y-6">
             {/* Identity Card */}
-            <div className="ur-card p-6 rounded-2xl border border-spy-green/20 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-spy-green/10 to-transparent pointer-events-none rounded-bl-full" />
+            <div className="ur-card p-6 rounded-2xl border border-purple-brand/20 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-brand/10 to-transparent pointer-events-none rounded-bl-full" />
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-brand to-purple-light flex items-center justify-center text-3xl shadow-glow-purple border border-white/10">
                   🕵️‍♂️
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <h3 className="text-white font-bold text-lg leading-tight truncate">{user?.username}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    {user?.isPremium && (
+                  <div className="flex items-center justify-between mt-1">
+                    {user?.isPremium ? (
                       <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/40 text-yellow-400">
                         PREMIUM
                       </span>
+                    ) : (
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">
+                        BASIC
+                      </span>
                     )}
+                    <button
+                      onClick={handleStartEdit}
+                      className="text-[10px] font-mono text-cyan-brand hover:underline font-bold"
+                    >
+                      [Sửa hồ sơ]
+                    </button>
                   </div>
                 </div>
               </div>
@@ -125,7 +189,22 @@ const UserProfile = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/40 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Rank Level:</span>
-                  <span className="text-spy-green font-bold">Lv.{Math.floor((user?.xpBalance || 0) / 1000) + 1}</span>
+                  <span className="text-cyan-brand font-bold">Lv.{Math.floor((user?.xpBalance || 0) / 1000) + 1}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/40 flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> CEFR Level:</span>
+                  <select
+                    value={user?.englishLevel || 'B1'}
+                    onChange={handleLevelChange}
+                    className="bg-navy-3 border border-white/10 text-cyan-brand rounded px-2 py-0.5 text-xs outline-none focus:border-cyan-brand/50 cursor-pointer font-bold font-mono"
+                  >
+                    <option value="A1">A1 - Sơ cấp (A1)</option>
+                    <option value="A2">A2 - Sơ trung cấp (A2)</option>
+                    <option value="B1">B1 - Trung cấp (B1)</option>
+                    <option value="B2">B2 - Trung cấp trên (B2)</option>
+                    <option value="C1">C1 - Cao cấp (C1)</option>
+                    <option value="C2">C2 - Thành thạo (C2)</option>
+                  </select>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/40 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Joined:</span>
@@ -219,7 +298,7 @@ const UserProfile = () => {
                       </div>
                       <div className="px-2 py-1 bg-white/5 rounded-md border border-white/10 text-center min-w-[32px]">
                         <span className="text-white/30 text-[8px] font-mono uppercase block leading-none">QTY</span>
-                        <span className="text-spy-green font-bold text-xs font-mono">{item.quantity}</span>
+                        <span className="text-cyan-brand font-bold text-xs font-mono">{item.quantity}</span>
                       </div>
                     </div>
                   ))}
@@ -289,6 +368,59 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditingProfile && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-mono">
+          <div className="w-full max-w-md bg-navy-2 border border-purple-brand/30 p-8 rounded-2xl relative shadow-glow-purple animate-fade-in">
+            <h3 className="text-white text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-wider">
+              <span className="text-purple-brand">⚡</span> Cập Nhật Hồ Sơ Agent
+            </h3>
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              <div>
+                <label className="block text-xs uppercase mb-2 text-white/60">Agent Username</label>
+                <input
+                  type="text"
+                  required
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  className="ur-input"
+                  placeholder="AG_USER_X"
+                />
+              </div>
+              <div>
+                <label className="block text-xs uppercase mb-2 text-white/60">Agent Email</label>
+                <input
+                  type="email"
+                  required
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="ur-input"
+                  placeholder="AGENT@UNRAVELLER.IO"
+                />
+              </div>
+ 
+              <div className="flex justify-end gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingProfile(false)}
+                  disabled={savingProfile}
+                  className="px-5 py-2.5 rounded-full border border-white/10 hover:border-white/30 text-white/70 hover:text-white transition-all uppercase text-xs font-bold font-mono bg-transparent"
+                >
+                  HỦY
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="px-6 py-2.5 rounded-full bg-gradient-brand text-white font-bold uppercase hover:opacity-90 transition-all text-xs font-mono shadow-glow-purple disabled:opacity-50"
+                >
+                  {savingProfile ? 'ĐANG LƯU...' : 'CẬP NHẬT'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

@@ -14,6 +14,11 @@ import ScenarioScreen from './pages/Scenario/ScenarioScreen';
 import DashboardScreen from './pages/Dashboard/DashboardScreen';
 import UserProfile from './pages/Profile/UserProfile';
 import Market from './pages/Market/Market';
+import Report from './pages/Report/Report';
+import Score from './pages/Score/Score';
+import Streak from './pages/Streak/Streak';
+import Guide from './pages/Guide/Guide';
+import Friends from './pages/Friends/Friends';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AdminProtectedRoute from './components/common/AdminProtectedRoute';
 import AdminLayout from './pages/Admin/AdminLayout';
@@ -72,6 +77,11 @@ const AppRoutes = () => {
         <Route path="/scenario/:id" element={<ProtectedRoute><ScenarioScreen /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+        <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+        <Route path="/score" element={<ProtectedRoute><Score /></ProtectedRoute>} />
+        <Route path="/streak" element={<ProtectedRoute><Streak /></ProtectedRoute>} />
+        <Route path="/guide" element={<ProtectedRoute><Guide /></ProtectedRoute>} />
+        <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>

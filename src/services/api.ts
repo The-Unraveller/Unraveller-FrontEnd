@@ -1,9 +1,9 @@
 import axios from 'axios';
 // Deployed Backend (Render)
-const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
+// const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
 
 // Local Backend (for adding new functions/testing)
-// const API_BASE_URL = 'http://localhost:5251/api';
+const API_BASE_URL = 'http://localhost:5251/api';
 //for now, we use local backend
 
 // Create axios instance
@@ -183,6 +183,16 @@ export const updateStreak = async (): Promise<{ message: string }> => {
   return response.data;
 };
 
+export const updateEnglishLevel = async (englishLevel: string): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>('/User/english-level', { englishLevel });
+  return response.data;
+};
+
+export const updateUserProfile = async (username: string, email: string): Promise<{ message: string }> => {
+  const response = await apiClient.put<{ message: string }>('/User/profile', { username, email });
+  return response.data;
+};
+
 // Missions
 export const getMissions = async (): Promise<MissionDto[]> => {
   const response = await apiClient.get<MissionDto[]>('/Mission');
@@ -195,8 +205,34 @@ export const getMissionById = async (id: number): Promise<MissionDto> => {
 };
 
 // Game
+export interface DialogueMessageHistoryDto {
+  role: string;
+  playerMessage?: string;
+  npcResponse?: string;
+  feedback?: string;
+  suspicionChange: number;
+}
+
+export interface GameSessionDto {
+  hasActiveSession: boolean;
+  currentSuspicion: number;
+  turnCount: number;
+  xpEarned: number;
+  history: DialogueMessageHistoryDto[];
+}
+
 export const sendGameMessage = async (request: DialogueRequestDto): Promise<DialogueResponseDto> => {
   const response = await apiClient.post<DialogueResponseDto>('/Game/message', request);
+  return response.data;
+};
+
+export const getGameSession = async (missionId: number): Promise<GameSessionDto> => {
+  const response = await apiClient.get<GameSessionDto>(`/Game/session/${missionId}`);
+  return response.data;
+};
+
+export const resetGameSession = async (missionId: number): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(`/Game/reset/${missionId}`);
   return response.data;
 };
 

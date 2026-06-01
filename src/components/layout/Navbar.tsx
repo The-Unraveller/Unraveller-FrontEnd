@@ -26,6 +26,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
   const displayUsername = user?.username || username || 'USERNAME';
 
   const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [missionsList, setMissionsList] = useState<any[]>([]);
 
   useEffect(() => {
@@ -162,15 +163,88 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
                 <span className="text-white font-black">{user?.energy ?? 100}/{user?.maxEnergy ?? 100}</span>
               </div>
 
-              <Link
-                to="/profile"
-                id="navbar-user-btn"
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-brand/40 hover:border-purple-soft/60 transition-all text-sm font-semibold text-white/80 hover:text-white"
+              <div
+                className="relative py-1 group"
+                onMouseEnter={() => setProfileDropdownOpen(true)}
+                onMouseLeave={() => setProfileDropdownOpen(false)}
               >
-                <span className="w-6 h-6 rounded-full bg-purple-brand/40 flex items-center justify-center text-xs">🎭</span>
-                {displayUsername}
-                <Zap size={12} className="text-xp-orange" />
-              </Link>
+                <button
+                  id="navbar-user-btn"
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-brand/40 hover:border-purple-soft/60 transition-all text-sm font-semibold text-white/80 hover:text-white bg-transparent outline-none cursor-pointer"
+                >
+                  <span className="w-6 h-6 rounded-full bg-purple-brand/40 flex items-center justify-center text-xs">🎭</span>
+                  {displayUsername}
+                  <Zap size={12} className="text-xp-orange" />
+                  <ChevronDown size={12} className="opacity-60 transition-transform group-hover:rotate-180" />
+                </button>
+
+                {/* Profile dropdown menu */}
+                {profileDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-navy-2 border border-purple-brand/25 rounded-2xl p-2 shadow-glow-purple/20 z-50 animate-slide-up select-none font-mono">
+                    <div className="text-[10px] text-white/30 px-3 py-1.5 border-b border-white/5 uppercase tracking-wider">
+                      Agent Console
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      <Link
+                        to="/profile"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>👤</span> Hồ sơ (Profile)
+                      </Link>
+                      <Link
+                        to="/report"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>📊</span> Báo cáo (Report)
+                      </Link>
+                      <Link
+                        to="/score"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>🏆</span> Điểm số (Score)
+                      </Link>
+                      <Link
+                        to="/courses"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>📖</span> Kịch bản (Scenario)
+                      </Link>
+                      <Link
+                        to="/streak"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>🔥</span> Chuỗi ngày (Streak)
+                      </Link>
+                      <Link
+                        to="/market"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>🛒</span> Cửa hàng (Market)
+                      </Link>
+                      <Link
+                        to="/guide"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>ℹ️</span> Hướng dẫn (Guide)
+                      </Link>
+                      <Link
+                        to="/friends"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
+                      >
+                        <span>👥</span> Bạn bè (Friends)
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => useGameStore.getState().logout()}
                 className="p-2 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-all group text-white/60 hover:text-red-500"

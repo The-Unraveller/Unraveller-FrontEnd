@@ -123,6 +123,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 .ur-input::placeholder { color: #9090a8; }
 
+/* Browser autofill overrides to match light input theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a1a2e !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Search */
 .ur-search {
   background: rgba(255,255,255,0.95);
