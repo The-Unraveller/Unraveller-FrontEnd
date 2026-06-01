@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { HelpCircle, BookOpen, AlertTriangle, Zap, Star, Shield } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { useGameStore } from '../../store/useGameStore';
@@ -8,24 +8,24 @@ const Guide = () => {
 
   const rules = [
     {
-      title: '🕵️‍♂️ dialogue gameplay rules',
+      title: '🕵️‍♂️ LUẬT CHƠI HỘI THOẠI',
       icon: BookOpen,
-      desc: 'Enter your custom written response to the NPC. You will receive AI evaluated feedback in three categories: Sửa lỗi (Typo correction), Diễn đạt tự nhiên hơn (More natural expression), and Giải thích ngắn gọn (Short explanation).',
+      desc: 'Nhập câu trả lời viết tay của riêng bạn gửi cho NPC. Bạn sẽ nhận được phản hồi được AI đánh giá qua ba phần: Sửa lỗi (Typo correction), Diễn đạt tự nhiên hơn (More natural expression) và Giải thích ngắn gọn (Short explanation).',
     },
     {
-      title: '⚠️ suspicion level system',
+      title: '⚠️ HỆ THỐNG MỨC NGHI NGỜ',
       icon: AlertTriangle,
-      desc: 'Each turn, your message is evaluated. If you use poor grammar, make typos, or choose inappropriate phrasing, suspicion increases. If suspicion reaches 100%, you are exposed and fail the mission!',
+      desc: 'Mỗi lượt, câu thoại của bạn sẽ được đánh giá. Nếu bạn dùng ngữ pháp yếu, viết sai chính tả hoặc diễn đạt không phù hợp, mức độ nghi ngờ sẽ tăng lên. Nếu mức độ nghi ngờ đạt 100%, bạn sẽ bị phát hiện và thất bại nhiệm vụ!',
     },
     {
-      title: '⚡ inventory tools',
+      title: '⚡ ĐỒ DÙNG HACKER & VẬT PHẨM',
       icon: Zap,
-      desc: 'Purchase tools from the shop using your XP: InGameHint helps you frame a natural response, and BribeNpc reduces suspicion during active dialogue. Use them carefully in mid-game!',
+      desc: 'Mua các công cụ từ cửa hàng bằng điểm XP tích lũy: Gợi ý AI (InGameHint) giúp bạn soạn câu trả lời tự nhiên, và Hối lộ NPC (BribeNpc) giúp giảm mức độ nghi ngờ. Sử dụng chúng thật cẩn thận khi chơi!',
     },
     {
-      title: '🏆 cefr English level target',
+      title: '🏆 MỤC TIÊU TRÌNH ĐỘ TIẾNG ANH CEFR',
       icon: Shield,
-      desc: 'Choose your level target (A1 to C2) in User Profile. The AI coach will adjust the strictness of vocabulary and syntactic evaluation based on your selected level. Higher levels require sophisticated phrasing.',
+      desc: 'Chọn mục tiêu trình độ tiếng Anh của bạn (từ A1 đến C2) tại phần Hồ sơ Đặc vụ. Trợ lý AI sẽ tự động điều chỉnh độ nghiêm ngặt của từ vựng và cú pháp dựa trên cấp độ đã chọn. Trình độ cao đòi hỏi cách viết tự nhiên và phức tạp hơn.',
     },
   ];
 
@@ -34,10 +34,10 @@ const Guide = () => {
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-            <HelpCircle className="text-purple-brand" /> AGENT MANUAL & GUIDELINES
+            <HelpCircle className="text-purple-brand" /> SỔ TAY HƯỚNG DẪN & NGUYÊN TẮC ĐẶC VỤ
           </h1>
           <p className="text-white/45 text-xs uppercase tracking-wider mt-1">
-            Documentation on dialogue systems, suspicion controls, items logic, and CEFR ratings.
+            Tài liệu hướng dẫn về hệ thống hội thoại, kiểm soát mức độ nghi ngờ, logic sử dụng vật phẩm và xếp hạng trình độ CEFR.
           </p>
         </div>
 
@@ -61,22 +61,22 @@ const Guide = () => {
         {/* Level Progression FAQ */}
         <div className="ur-card p-6 bg-navy-2 border border-white/5">
           <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-            🛡️ RANK & XP PROGRESSION SYSTEM
+            🛡️ HỆ THỐNG TIẾN TRÌNH CẤP BẬC & XP
           </h2>
           <div className="space-y-4 text-xs text-white/70">
             <div>
-              <h4 className="font-bold text-white uppercase mb-1">Q: How do I earn XP?</h4>
-              <p className="text-white/45">A: Submit high-quality, CEFR-appropriate dialogue messages. Lower suspicion changes yield higher XP reward multipliers at the end of each round.</p>
+              <h4 className="font-bold text-white uppercase mb-1">Hỏi: Làm cách nào để tích lũy XP?</h4>
+              <p className="text-white/45">Đáp: Hãy gửi các câu hội thoại chất lượng cao, đúng mục tiêu ngữ pháp và cấp độ CEFR. Mức độ nghi ngờ càng thấp, hệ số nhân thưởng XP khi hoàn thành màn chơi càng cao.</p>
             </div>
             <div className="h-px bg-white/5" />
             <div>
-              <h4 className="font-bold text-white uppercase mb-1">Q: What happens if I fail a mission?</h4>
-              <p className="text-white/45">A: You can always use the "Làm lại (Retry)" button mid-game or click reset to clear your session dialogue history and start again without penalties.</p>
+              <h4 className="font-bold text-white uppercase mb-1">Hỏi: Điều gì xảy ra nếu tôi thất bại nhiệm vụ?</h4>
+              <p className="text-white/45">Đáp: Bạn luôn có thể sử dụng nút "Chơi lại (Reset)" để đặt lại tiến trình hội thoại và bắt đầu lại từ đầu bất cứ lúc nào mà không gặp bất kỳ hình phạt nào.</p>
             </div>
             <div className="h-px bg-white/5" />
             <div>
-              <h4 className="font-bold text-white uppercase mb-1">Q: How does energy affect gameplay?</h4>
-              <p className="text-white/45">A: Starting a dialogue mission costs 20 energy. Energy automatically restores over time, keeping your daily practice cycle balanced.</p>
+              <h4 className="font-bold text-white uppercase mb-1">Hỏi: Năng lượng ảnh hưởng như thế nào đến lượt chơi?</h4>
+              <p className="text-white/45">Đáp: Mỗi lượt bắt đầu kịch bản hội thoại mới tiêu tốn 20 năng lượng. Năng lượng sẽ tự động hồi phục theo thời gian để cân bằng chu kỳ luyện tập hàng ngày của bạn.</p>
             </div>
           </div>
         </div>

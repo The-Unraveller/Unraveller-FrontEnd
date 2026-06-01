@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { useGameStore } from '../../store/useGameStore';
@@ -12,21 +12,21 @@ interface Badge {
 }
 
 const allBadges: Badge[] = [
-  { id: 1, name: 'First Victory Medal', desc: 'Complete your very first stage.', earned: true, color: '#f5c842' },
-  { id: 2, name: 'Coffee Master', desc: 'Complete Stage 1 with a perfect score.', earned: false, color: '#a78bfa' },
-  { id: 3, name: 'Quick Learner', desc: 'Finish 3 stages in one day.', earned: false, color: '#34d399' },
-  { id: 4, name: 'Detective Eye', desc: 'Complete the Detective Writing stage.', earned: false, color: '#60a5fa' },
-  { id: 5, name: 'Silver Tongue', desc: 'Achieve A+ in speaking evaluation.', earned: false, color: '#c0c0c0' },
-  { id: 6, name: 'Streak Master', desc: 'Maintain a 7-day learning streak.', earned: false, color: '#f97316' },
-  { id: 7, name: 'Social Butterfly', desc: 'Pass 5 social scenarios successfully.', earned: false, color: '#ec4899' },
-  { id: 8, name: 'Unraveller Elite', desc: 'Complete all available stages.', earned: false, color: '#8b5cf6' },
-  { id: 9, name: 'Storyteller', desc: 'Write a complete story in English.', earned: false, color: '#14b8a6' },
+  { id: 1, name: 'Huy hiệu Chiến thắng Đầu tiên', desc: 'Hoàn thành màn chơi đầu tiên của bạn.', earned: true, color: '#f5c842' },
+  { id: 2, name: 'Bậc thầy Cà phê', desc: 'Hoàn thành Stage 1 với số điểm tuyệt đối.', earned: false, color: '#a78bfa' },
+  { id: 3, name: 'Học nhanh siêu tốc', desc: 'Hoàn thành 3 màn chơi trong một ngày.', earned: false, color: '#34d399' },
+  { id: 4, name: 'Thám tử Tinh mắt', desc: 'Hoàn thành màn chơi Thám tử Điều tra.', earned: false, color: '#60a5fa' },
+  { id: 5, name: 'Miệng lưỡi Linh hoạt', desc: 'Đạt điểm A+ trong phần đánh giá nói.', earned: false, color: '#c0c0c0' },
+  { id: 6, name: 'Bậc thầy Chuỗi ngày', desc: 'Duy trì chuỗi học tập liên tục trong 7 ngày.', earned: false, color: '#f97316' },
+  { id: 7, name: 'Giao tiếp Tự tin', desc: 'Vượt qua thành công 5 tình huống giao tiếp xã hội.', earned: false, color: '#ec4899' },
+  { id: 8, name: 'Đặc vụ Ưu tú', desc: 'Hoàn thành tất cả các màn chơi hiện có.', earned: false, color: '#8b5cf6' },
+  { id: 9, name: 'Người kể chuyện', desc: 'Viết một câu chuyện hoàn chỉnh bằng tiếng Anh.', earned: false, color: '#14b8a6' },
 ];
 
 const BadgeCell = ({ badge }: { badge: Badge }) => (
   <div
     id={`badge-cell-${badge.id}`}
-    title={badge.earned ? `${badge.name}: ${badge.desc}` : 'Complete more stages to unlock'}
+    title={badge.earned ? `${badge.name}: ${badge.desc}` : 'Hoàn thành thêm màn chơi để mở khóa'}
     className={`rounded-xl aspect-square flex flex-col items-center justify-center transition-all ${
       badge.earned
         ? 'bg-gradient-to-br from-purple-800/60 to-purple-900/40 border border-purple-500/40 cursor-pointer hover:border-purple-400/70 hover:shadow-[0_0_16px_rgba(124,58,237,0.3)]'
@@ -59,9 +59,9 @@ const Badges = () => {
     <Layout isLoggedIn username={user?.username || 'Agent'}>
       <div className="max-w-screen-sm mx-auto px-4 py-8">
         <div className="ur-card rounded-2xl p-6 md:p-8">
-          <h1 className="text-white text-2xl font-bold text-center mb-1">Your Collection</h1>
+          <h1 className="text-white text-2xl font-bold text-center mb-1">Bộ Sưu Tập Của Bạn</h1>
           <p className="text-white/45 text-sm text-center mb-7">
-            Complete more stages to earn badges
+            Hoàn thành thêm các màn chơi để nhận huy chương
           </p>
 
           {/* Badge grid */}
@@ -84,9 +84,9 @@ const Badges = () => {
               </svg>
             </div>
             <div>
-              <p className="text-white font-bold text-sm">First Victory Medal</p>
+              <p className="text-white font-bold text-sm">Huy hiệu Chiến thắng Đầu tiên</p>
               <p className="text-white/55 text-xs mt-0.5 leading-relaxed">
-                Awarded for completing your first stage. Your journey begins here!
+                Được trao khi hoàn thành màn chơi đầu tiên của bạn. Cuộc hành trình của bạn bắt đầu từ đây!
               </p>
             </div>
           </div>
@@ -98,14 +98,14 @@ const Badges = () => {
               className="ur-btn-primary px-7 py-3 rounded-full font-bold"
               id="badges-next-btn"
             >
-              Continue
+              Tiếp tục
             </button>
             <button
               onClick={() => navigate('/')}
               className="ur-btn-outline px-7 py-3 rounded-full font-bold"
               id="badges-home-btn"
             >
-              Home
+              Trang chủ
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import * as React from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield } from 'lucide-react';
 
@@ -33,7 +34,7 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping }) 
             <div className="max-w-[85%] md:max-w-[70%] space-y-4">
               <div className={`flex items-center gap-3 mb-2 uppercase text-[10px] font-black tracking-widest ${msg.role === 'player' ? 'flex-row-reverse text-spy-blue' : 'text-spy-green'}`}>
                 {msg.role === 'player' ? <User size={14} /> : <Shield size={14} />}
-                <span>{msg.role === 'player' ? 'OPERATIVE_07' : 'TARGET_OBJECTIVE'}</span>
+                <span>{msg.role === 'player' ? 'ĐẶC VỤ_07' : 'ĐỐI TƯỢNG_MỤC TIÊU'}</span>
                 <span className="opacity-30 font-normal">{msg.timestamp.toLocaleTimeString()}</span>
               </div>
               
@@ -50,7 +51,7 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping }) 
         {isTyping && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
             <div className="p-6 border border-spy-green bg-spy-green/5 animate-pulse text-[10px] uppercase font-black tracking-[0.2em] text-gray-500">
-              [ ANALYZING TRANSMISSION... ]
+              [ ĐANG PHÂN TÍCH TÍN HIỆU... ]
             </div>
           </motion.div>
         )}

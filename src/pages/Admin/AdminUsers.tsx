@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Users, Search, Edit3, ShieldAlert, Zap, X, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';

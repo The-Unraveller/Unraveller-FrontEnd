@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, Edit3, Plus, Zap, X, Check, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { apiClient } from '../../services/api';

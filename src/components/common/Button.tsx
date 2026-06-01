@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 type Variant = 'primary' | 'cyan' | 'outline' | 'gold' | 'ghost';
 type Size = 'sm' | 'md' | 'lg';

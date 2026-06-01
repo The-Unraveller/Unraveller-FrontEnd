@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 
@@ -14,9 +14,9 @@ export const SuspicionMeter: React.FC<SuspicionMeterProps> = ({ level }) => {
   };
 
   const getStatusText = () => {
-    if (level > 80) return 'DANGER: HIGH SUSPICION';
-    if (level > 50) return 'WARNING: ELEVATED';
-    return 'STATUS: SECURE';
+    if (level > 80) return 'NGUY HIỂM: ĐỘ NGHI NGỜ CAO';
+    if (level > 50) return 'CẢNH BÁO: TĂNG CAO';
+    return 'TRẠNG THÁI: AN TOÀN';
   };
 
   return (

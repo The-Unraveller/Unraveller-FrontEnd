@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Flame, Star, LogOut, User as UserIcon } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Zap, Award, RotateCcw, Home, TrendingUp } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
@@ -10,21 +10,21 @@ import { useGameStore } from '../../store/useGameStore';
 /* ─── Medal data ─── */
 const medals: Record<string, { name: string; desc: string; color: string; emoji: string }> = {
   '1': {
-    name: '"First Victory Medal"',
+    name: '"Huy chương Chiến thắng Đầu tiên"',
     emoji: '🏅',
-    desc: 'Awarded for completing your very first stage. This marks the beginning of your journey — courage, curiosity, and the willingness to start. Every great learner begins somewhere.',
+    desc: 'Được trao khi hoàn thành màn chơi đầu tiên của bạn. Đây là dấu mốc khởi đầu hành trình học tập đầy lòng quả cảm, tò mò và ý chí vươn lên. Mọi huyền thoại học tập đều bắt đầu từ một bước đi đầu tiên.',
     color: '#f5c842',
   },
   '2': {
-    name: '"Master Listener"',
+    name: '"Bậc Thầy Lắng Nghe"',
     emoji: '🎧',
-    desc: 'Awarded for successfully following all instructions with precision. Your listening skills are a true asset in any English-speaking environment.',
+    desc: 'Được trao khi hoàn thành xuất sắc tất cả các hướng dẫn một cách chính xác. Khả năng lắng nghe của bạn là một tài sản vô cùng quý giá trong bất kỳ môi trường giao tiếp tiếng Anh nào.',
     color: '#a78bfa',
   },
   '5': {
-    name: '"Sharp Eye Detective"',
+    name: '"Thám Tử Có Mắt Tinh Tường"',
     emoji: '🔍',
-    desc: 'Awarded for completing the Detective Writing stage. Your observation and writing have unraveled the mystery with style.',
+    desc: 'Được trao khi hoàn thành màn chơi Viết lách Thám tử. Kỹ năng quan sát và diễn đạt của bạn đã giải mã bí ẩn một cách đầy phong cách.',
     color: '#60a5fa',
   },
 };
@@ -67,7 +67,7 @@ const Result = () => {
   const { user } = useGameStore();
   const username = user?.username || 'Learner';
 
-  const status  = searchParams.get('status');
+  const status = searchParams.get('status');
   const earnedXP = parseInt(searchParams.get('xp') || '0', 10) || 150;
   const isSuccess = status === 'success';
   const medal = medals[id || '1'] || medals['1'];
@@ -211,11 +211,10 @@ const Result = () => {
                 {leaderboardData.map(player => (
                   <div
                     key={player.rank}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
-                      player.isYou
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${player.isYou
                         ? 'bg-purple-brand/25 border border-purple-brand/40'
                         : 'bg-white/4'
-                    }`}
+                      }`}
                   >
                     <span className="text-base w-6 text-center">{player.badge}</span>
                     <span className={`flex-1 text-sm font-semibold ${player.isYou ? 'text-purple-soft' : 'text-white/75'}`}>

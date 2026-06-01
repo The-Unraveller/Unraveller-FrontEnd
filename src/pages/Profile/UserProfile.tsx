@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Zap, Flame, Star, Mail, Calendar, Shield, CreditCard, ShoppingBag, Loader2, RefreshCw, Award } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -106,7 +107,7 @@ const UserProfile = () => {
       <Layout isLoggedIn username="Agent">
         <div className="flex-1 flex flex-col items-center justify-center min-h-[70vh]">
           <Loader2 className="w-10 h-10 text-purple-brand animate-spin mb-4" />
-          <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Retrieving Profile Credentials...</p>
+          <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang tải thông tin hồ sơ...</p>
         </div>
       </Layout>
     );
@@ -119,10 +120,10 @@ const UserProfile = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-              <span className="text-purple-brand">🕵️‍♂️</span> AGENT DOSSIER
+              <span className="text-purple-brand">🕵️‍♂️</span> HỒ SƠ ĐẶC VỤ
             </h1>
             <p className="text-white/45 text-xs font-mono uppercase tracking-wider mt-1">
-              Verification Status: Secure Connection Verified
+              Trạng thái xác thực: Kết nối an toàn
             </p>
           </div>
           <div className="flex gap-3">
@@ -132,13 +133,13 @@ const UserProfile = () => {
               className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:border-purple-brand/45 rounded-xl text-xs font-mono uppercase tracking-wider text-white/70 hover:text-white transition-all disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Syncing...' : 'Sync Data'}
+              {refreshing ? 'Đang đồng bộ...' : 'Đồng bộ'}
             </button>
             <button
               onClick={() => navigate('/courses')}
               className="flex items-center gap-2 px-4 py-2 bg-purple-brand/20 hover:bg-purple-brand text-purple-brand hover:text-white border border-purple-brand/40 hover:border-transparent rounded-xl text-xs font-mono uppercase tracking-wider transition-all font-bold"
             >
-              Mission Desk
+              Bàn Nhiệm Vụ
             </button>
           </div>
         </div>
@@ -188,11 +189,11 @@ const UserProfile = () => {
                   <span className="text-white font-medium truncate max-w-[170px]">{user?.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/40 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Rank Level:</span>
-                  <span className="text-cyan-brand font-bold">Lv.{Math.floor((user?.xpBalance || 0) / 1000) + 1}</span>
+                  <span className="text-white/40 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Cấp bậc đặc vụ:</span>
+                  <span className="text-cyan-brand font-bold">Cấp {Math.floor((user?.xpBalance || 0) / 1000) + 1}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white/40 flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> CEFR Level:</span>
+                  <span className="text-white/40 flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Trình độ CEFR:</span>
                   <select
                     value={user?.englishLevel || 'B1'}
                     onChange={handleLevelChange}
@@ -207,8 +208,8 @@ const UserProfile = () => {
                   </select>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/40 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Joined:</span>
-                  <span className="text-white/70">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</span>
+                  <span className="text-white/40 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Ngày gia nhập:</span>
+                  <span className="text-white/70">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Không rõ'}</span>
                 </div>
               </div>
             </div>
@@ -218,36 +219,36 @@ const UserProfile = () => {
               {/* Energy */}
               <div className="ur-card p-4 rounded-xl border border-white/5 bg-navy-3 flex flex-col justify-between">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">Energy</span>
+                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">Năng lượng</span>
                   <Zap className="w-4 h-4 text-yellow-400" />
                 </div>
                 <div>
                   <p className="text-white font-bold text-lg leading-tight">{user?.energy}/{user?.maxEnergy}</p>
-                  <p className="text-white/30 text-[9px] font-mono mt-1 uppercase">Recharges over time</p>
+                  <p className="text-white/30 text-[9px] font-mono mt-1 uppercase">Tự phục hồi theo thời gian</p>
                 </div>
               </div>
 
               {/* Streak */}
               <div className="ur-card p-4 rounded-xl border border-white/5 bg-navy-3 flex flex-col justify-between">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">Streak</span>
+                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">Chuỗi ngày</span>
                   <Flame className="w-4 h-4 text-orange-500" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-lg leading-tight">{user?.streakCount} days</p>
-                  <p className="text-white/30 text-[9px] font-mono mt-1 uppercase">Consecutive activity</p>
+                  <p className="text-white font-bold text-lg leading-tight">{user?.streakCount} ngày</p>
+                  <p className="text-white/30 text-[9px] font-mono mt-1 uppercase">Chuỗi hoạt động liên tiếp</p>
                 </div>
               </div>
 
               {/* XP Balance */}
               <div className="ur-card p-4 rounded-xl border border-white/5 bg-navy-3 flex flex-col justify-between col-span-2">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">XP Intel</span>
+                  <span className="text-white/45 text-[10px] font-mono uppercase tracking-wider">Hồ sơ XP</span>
                   <Star className="w-4 h-4 text-cyan-400 fill-cyan-400/20" />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <p className="text-white font-bold text-2xl tracking-tight">{user?.xpBalance}</p>
-                  <span className="text-white/30 text-xs font-mono uppercase">XP Total</span>
+                  <span className="text-white/30 text-xs font-mono uppercase">Tổng XP</span>
                 </div>
                 {/* Visual indicator of next level */}
                 <div className="w-full bg-white/5 h-1 rounded-full mt-3 overflow-hidden">
@@ -257,7 +258,7 @@ const UserProfile = () => {
                   />
                 </div>
                 <p className="text-white/30 text-[9px] font-mono mt-1.5 text-right uppercase">
-                  {1000 - ((user?.xpBalance || 0) % 1000)} XP to next level rank
+                  Còn {1000 - ((user?.xpBalance || 0) % 1000)} XP để lên cấp bậc tiếp theo
                 </p>
               </div>
             </div>
@@ -268,18 +269,18 @@ const UserProfile = () => {
             {/* Inventory Container */}
             <div className="ur-card p-6 rounded-2xl border border-white/5 bg-navy-2">
               <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-                <ShoppingBag className="w-4.5 h-4.5 text-purple-brand" /> INVENTORY
+                <ShoppingBag className="w-4.5 h-4.5 text-purple-brand" /> KHO ĐỒ CỦA BẠN
               </h2>
 
               {inventory.length === 0 ? (
                 <div className="p-8 text-center rounded-xl bg-white/5 border border-white/5">
-                  <p className="text-white/40 text-xs font-mono">No assets found in your inventory.</p>
-                  <p className="text-white/25 text-[10px] font-mono mt-1 uppercase">Purchase tools to assist you in scenario gameplay</p>
+                  <p className="text-white/40 text-xs font-mono">Không tìm thấy vật phẩm nào trong kho đồ của bạn.</p>
+                  <p className="text-white/25 text-[10px] font-mono mt-1 uppercase">Mua các công cụ hỗ trợ trong cửa hàng để vượt qua các thử thách dễ dàng hơn</p>
                   <button
                     onClick={() => navigate('/market')}
                     className="mt-4 px-5 py-2 bg-purple-brand hover:bg-purple-brand/80 text-white rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all"
                   >
-                    Visit Market
+                    Ghé Cửa Hàng
                   </button>
                 </div>
               ) : (
@@ -297,7 +298,7 @@ const UserProfile = () => {
                         <p className="text-white/40 text-[10px] line-clamp-1 mt-0.5">{item.description}</p>
                       </div>
                       <div className="px-2 py-1 bg-white/5 rounded-md border border-white/10 text-center min-w-[32px]">
-                        <span className="text-white/30 text-[8px] font-mono uppercase block leading-none">QTY</span>
+                        <span className="text-white/30 text-[8px] font-mono uppercase block leading-none">SL</span>
                         <span className="text-cyan-brand font-bold text-xs font-mono">{item.quantity}</span>
                       </div>
                     </div>
@@ -309,23 +310,23 @@ const UserProfile = () => {
             {/* Payment Logs */}
             <div className="ur-card p-6 rounded-2xl border border-white/5 bg-navy-2">
               <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-                <CreditCard className="w-4.5 h-4.5 text-cyan-brand" /> TRANSACTION HISTORY
+                <CreditCard className="w-4.5 h-4.5 text-cyan-brand" /> LỊCH SỬ GIAO DỊCH
               </h2>
 
               {payments.length === 0 ? (
                 <div className="p-6 text-center rounded-xl bg-white/5 border border-white/5">
-                  <p className="text-white/40 text-xs font-mono">No payment logs located for this account.</p>
+                  <p className="text-white/40 text-xs font-mono">Chưa có bản ghi giao dịch nào cho tài khoản này.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs font-mono">
                     <thead>
                       <tr className="border-b border-white/10 text-white/40 uppercase text-[9px] tracking-wider">
-                        <th className="pb-3.5 font-bold">Transaction Ref</th>
-                        <th className="pb-3.5 font-bold">Plan</th>
-                        <th className="pb-3.5 font-bold">Amount</th>
-                        <th className="pb-3.5 font-bold">Status</th>
-                        <th className="pb-3.5 font-bold text-right">Date</th>
+                        <th className="pb-3.5 font-bold">Mã Giao Dịch</th>
+                        <th className="pb-3.5 font-bold">Gói dịch vụ</th>
+                        <th className="pb-3.5 font-bold">Số tiền</th>
+                        <th className="pb-3.5 font-bold">Trạng thái</th>
+                        <th className="pb-3.5 font-bold text-right">Ngày lập</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5 text-white/80">
@@ -336,6 +337,14 @@ const UserProfile = () => {
                           failed: 'bg-red-500/10 border border-red-500/30 text-red-400',
                           pending: 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400',
                           created: 'bg-blue-500/10 border border-blue-500/30 text-blue-400',
+                        };
+
+                        const statusLabels: Record<string, string> = {
+                          success: 'THÀNH CÔNG',
+                          completed: 'HOÀN TẤT',
+                          failed: 'THẤT BẠI',
+                          pending: 'ĐANG XỬ LÝ',
+                          created: 'ĐÃ KHỞI TẠO',
                         };
 
                         return (
@@ -351,7 +360,7 @@ const UserProfile = () => {
                             </td>
                             <td className="py-3">
                               <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${statusColors[pay.status.toLowerCase()] || 'bg-white/10 border border-white/20 text-white/70'}`}>
-                                {pay.status}
+                                {statusLabels[pay.status.toLowerCase()] || pay.status}
                               </span>
                             </td>
                             <td className="py-3 text-right text-white/40">
@@ -378,7 +387,7 @@ const UserProfile = () => {
             </h3>
             <form onSubmit={handleSaveProfile} className="space-y-6">
               <div>
-                <label className="block text-xs uppercase mb-2 text-white/60">Agent Username</label>
+                <label className="block text-xs uppercase mb-2 text-white/60">Tên đặc vụ (Username)</label>
                 <input
                   type="text"
                   required
@@ -389,7 +398,7 @@ const UserProfile = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase mb-2 text-white/60">Agent Email</label>
+                <label className="block text-xs uppercase mb-2 text-white/60">Email đặc vụ</label>
                 <input
                   type="email"
                   required

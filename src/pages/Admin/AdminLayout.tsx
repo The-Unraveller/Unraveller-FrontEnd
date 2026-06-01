@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, BookOpen, LogOut, ShieldCheck } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';

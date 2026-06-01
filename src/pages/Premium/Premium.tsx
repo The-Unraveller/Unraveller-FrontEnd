@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Check, Shield, AlertCircle, CheckCircle, Zap, Loader2, ExternalLink, Clock } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
@@ -21,8 +22,8 @@ const plans: Plan[] = [
     name: 'Free',
     price: '0₫',
     priceValue: 0,
-    priceLabel: 'Forever',
-    features: ['3 scenarios per week', 'Basic streak & XP', 'Limited audio feedback'],
+    priceLabel: 'Vĩnh viễn',
+    features: ['3 kịch bản mỗi tuần', 'Chuỗi ngày học & XP cơ bản', 'Phản hồi âm thanh giới hạn'],
     highlighted: false,
   },
   {
@@ -30,8 +31,8 @@ const plans: Plan[] = [
     name: 'Plus+',
     price: '99,000₫',
     priceValue: 99000,
-    priceLabel: 'per month',
-    features: ['Unlimited scenarios', 'Full leaderboard & streak', 'All story chapters unlocked'],
+    priceLabel: 'mỗi tháng',
+    features: ['Không giới hạn kịch bản', 'Đầy đủ bảng xếp hạng & chuỗi ngày', 'Mở khóa tất cả chương cốt truyện'],
     highlighted: false,
   },
   {
@@ -39,10 +40,10 @@ const plans: Plan[] = [
     name: 'Premium',
     price: '299,000₫',
     priceValue: 299000,
-    priceLabel: 'per month',
-    features: ['AI Speaking feedback', 'Offline mode', 'Exclusive scenarios & content'],
+    priceLabel: 'mỗi tháng',
+    features: ['AI chấm điểm & phản hồi phát âm', 'Chế độ học ngoại tuyến', 'Kịch bản & nội dung độc quyền'],
     highlighted: true,
-    badge: '🔥 Best Value',
+    badge: '🔥 Gợi ý tốt nhất',
   },
 ];
 
@@ -113,11 +114,11 @@ const Premium = () => {
         {/* Header Block with Cyberpunk Glow */}
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-transparent bg-clip-text bg-gradient-brand text-5xl font-black mb-4 tracking-widest drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] font-heading">
-            PRICING PLANS
+            CÁC GÓI DỊCH VỤ
           </h2>
           <div className="ur-divider mb-4"></div>
           <p className="text-white/60 text-base max-w-md mx-auto">
-            Choose the membership that unlocks your advanced language espionage journey
+            Chọn gói hội viên giúp mở khóa hành trình học tập ngôn ngữ đặc vụ nâng cao của bạn
           </p>
         </div>
 
@@ -187,7 +188,7 @@ const Premium = () => {
                   className="ur-btn-primary px-8 py-3.5 rounded-full font-bold text-sm hover:shadow-glow-purple transition-all duration-300"
                   id="premium-free-start"
                 >
-                  Start for Free
+                  Bắt đầu Miễn phí
                 </button>
               </Link>
               <button
@@ -195,7 +196,7 @@ const Premium = () => {
                 id="premium-register-plan"
                 onClick={() => document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Subscribe to a Plan
+                Đăng ký Hội viên
               </button>
             </div>
           </div>
@@ -241,7 +242,7 @@ const Premium = () => {
               <div>
                 <h3 className="text-white font-extrabold text-xl mb-1 flex items-center gap-2.5 font-heading">
                   <Zap size={22} className="text-cyan-brand animate-pulse" />
-                  Upgrade via payOS
+                  Nâng cấp qua PayOS
                 </h3>
                 <p className="text-white/50 text-xs mb-6 leading-relaxed">
                   Trải nghiệm thanh toán nhanh bảo mật bằng cổng thanh toán payOS qua quét mã VietQR.

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, Menu, X, Zap, LogOut, ChevronDown } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
@@ -10,11 +11,11 @@ interface NavbarProps {
 }
 
 const navLinks = [
-  { label: 'Homepage', to: '/' },
+  { label: 'Trang chủ', to: '/' },
   { label: 'Premium',  to: '/premium' },
-  { label: 'Courses',  to: '/courses' },
-  { label: 'Badges',   to: '/badges' },
-  { label: 'About us', to: '/about' },
+  { label: 'Nhiệm vụ',  to: '/courses' },
+  { label: 'Huy chương',   to: '/badges' },
+  { label: 'Giới thiệu', to: '/about' },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
@@ -23,7 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
   const { user, isAuthenticated } = useGameStore();
 
   const displayIsLoggedIn = isLoggedIn || !!user;
-  const displayUsername = user?.username || username || 'USERNAME';
+  const displayUsername = user?.username || username || 'ĐẶC VỤ';
 
   const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -55,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-0.5 flex-1">
           {navLinks.map(link => {
-            if (link.label === 'Courses') {
+            if (link.label === 'Nhiệm vụ') {
               return (
                 <div
                   key={link.to}
@@ -82,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
                   {coursesDropdownOpen && missionsList.length > 0 && (
                     <div className="absolute top-full left-0 mt-1 w-64 bg-navy-2 border border-purple-brand/25 rounded-2xl p-2 shadow-glow-purple/20 z-50 animate-slide-up select-none font-mono">
                       <div className="text-[10px] text-white/30 px-3 py-1.5 border-b border-white/5 uppercase tracking-wider">
-                        Select Mission
+                        Chọn nhiệm vụ
                       </div>
                       <div className="max-h-60 overflow-y-auto mt-1 space-y-1">
                         {missionsList.map((m) => (
@@ -104,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
                             {m.locked ? (
                               <span className="text-[9px] text-white/20">🔒</span>
                             ) : (
-                              <span className="text-[9px] text-spy-green">PLAY</span>
+                              <span className="text-[9px] text-spy-green">CHƠI</span>
                             )}
                           </Link>
                         ))}
@@ -147,7 +148,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         <div className="hidden lg:flex items-center gap-2">
           <div className="ur-search w-52 xl:w-60 flex-shrink-0">
             <Search size={14} className="text-gray-400 flex-shrink-0" />
-            <input placeholder="Search scenarios…" id="navbar-search" />
+            <input placeholder="Tìm kiếm kịch bản…" id="navbar-search" />
           </div>
         </div>
 
@@ -159,7 +160,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               {/* Energy Meter */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-purple-brand/20 rounded-full text-xs font-mono select-none">
                 <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/20" />
-                <span className="text-white/40 uppercase text-[9px] tracking-wider">Energy:</span>
+                <span className="text-white/40 uppercase text-[9px] tracking-wider">Năng lượng:</span>
                 <span className="text-white font-black">{user?.energy ?? 100}/{user?.maxEnergy ?? 100}</span>
               </div>
 
@@ -248,7 +249,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
               <button
                 onClick={() => useGameStore.getState().logout()}
                 className="p-2 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-all group text-white/60 hover:text-red-500"
-                title="Logout"
+                title="Đăng xuất"
               >
                 <LogOut size={16} />
               </button>
@@ -256,11 +257,11 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
           ) : (
             <>
               <Link to="/auth?mode=register" className="hidden sm:block">
-                <button id="navbar-signup" className="btn btn-primary btn-sm">Sign Up</button>
+                <button id="navbar-signup" className="btn btn-primary btn-sm">Đăng ký</button>
               </Link>
               <Link to="/auth?mode=login" className="hidden sm:block">
                 <span className="text-white/60 text-sm font-medium hover:text-white transition-colors cursor-pointer">
-                  Login
+                  Đăng nhập
                 </span>
               </Link>
             </>

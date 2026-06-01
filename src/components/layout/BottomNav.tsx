@@ -1,12 +1,12 @@
-import React from 'react';
+import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Award, User } from 'lucide-react';
 
 const navItems = [
-  { icon: Home,     label: 'Dashboard', to: '/dashboard' },
-  { icon: BookOpen, label: 'Courses',   to: '/courses' },
-  { icon: Award,    label: 'Badges',    to: '/badges' },
-  { icon: User,     label: 'Profile',   to: '/profile' },
+  { icon: Home,     label: 'Tổng quan', key: 'dashboard', to: '/dashboard' },
+  { icon: BookOpen, label: 'Nhiệm vụ',   key: 'courses',   to: '/courses' },
+  { icon: Award,    label: 'Huy chương',    key: 'badges',    to: '/badges' },
+  { icon: User,     label: 'Hồ sơ',   key: 'profile',   to: '/profile' },
 ];
 
 const BottomNav: React.FC = () => {
@@ -18,13 +18,13 @@ const BottomNav: React.FC = () => {
   return (
     <nav className="bottom-nav md:hidden">
       <div className="flex items-center justify-around px-2 py-2">
-        {navItems.map(({ icon: Icon, label, to }) => {
+        {navItems.map(({ icon: Icon, label, key, to }) => {
           const active = isActive(to);
           return (
             <Link
               key={to}
               to={to}
-              id={`bottom-nav-${label.toLowerCase()}`}
+              id={`bottom-nav-${key}`}
               className="flex flex-col items-center gap-1 min-w-[56px] py-1 px-2 rounded-xl transition-all"
             >
               <div

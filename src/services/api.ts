@@ -4,7 +4,6 @@ const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
 
 // Local Backend (for adding new functions/testing)
 // const API_BASE_URL = 'http://localhost:5251/api';
-//for now, we use local backend
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -43,6 +42,7 @@ export interface MissionDto {
   approvalStatus: number;
   rejectionReason: string | null;
   createdByUserId: number | null;
+  grammarTarget: string;
 }
 
 export interface DialogueRequestDto {
