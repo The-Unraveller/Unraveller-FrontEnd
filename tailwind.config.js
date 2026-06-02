@@ -47,7 +47,7 @@ export default {
         'spy-blue':      '#00f0ff',
       },
       fontFamily: {
-        'heading': ['Poppins', 'sans-serif'],
+        'heading': ['Be Vietnam Pro', 'sans-serif'],
         'body':    ['Inter', 'sans-serif'],
         'mono':    ['JetBrains Mono', 'monospace'],
       },

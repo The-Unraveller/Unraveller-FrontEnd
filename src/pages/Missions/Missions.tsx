@@ -242,121 +242,78 @@ const Missions = () => {
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
       <div className="max-w-screen-xl mx-auto px-4 py-8">
-        <div className="flex gap-6">
-          {/* ── Futuristic Cyberpunk Side-dock ── */}
-          <aside className="hidden md:flex flex-col w-20 flex-shrink-0 gap-4">
-            <div className="ur-card rounded-2xl p-2.5 flex flex-col items-center gap-3 border-purple-500/20 backdrop-blur-xl bg-black/25 relative overflow-hidden">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-purple-brand to-cyan-brand opacity-60" />
-              {/* Avatar indicator */}
-              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-2 shadow-[inset_0_1px_5px_rgba(255,255,255,0.1)] relative">
-                <Users size={16} className="text-white/60" />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0f0c1e]" />
-              </div>
-              <div className="w-full h-px bg-white/10 mb-1" />
-              {sidebarItems.map(({ icon: Icon, label, id, to }) => {
-                const isActive = id === 'scenario';
-                return (
-                  <Link
-                    key={label}
-                    to={to}
-                    id={`sidebar-${id}`}
-                    className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl transition-all duration-300 w-full text-center relative group ${
-                      isActive 
-                        ? 'bg-purple-brand/15 text-cyan-brand border-l-2 border-cyan-brand rounded-l-none' 
-                        : 'hover:bg-white/5 text-white/45 hover:text-white/80'
-                    }`}
-                  >
-                    <Icon size={14} className={`transition-colors ${isActive ? 'text-cyan-brand' : 'text-white/45 group-hover:text-white/80'}`} />
-                    <span className={`text-[9px] transition-colors leading-none tracking-wide ${isActive ? 'text-cyan-brand font-bold' : 'text-white/40 group-hover:text-white/70'}`}>
-                      {label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-            {/* Mini Brand Logo */}
-            <div className="flex justify-center opacity-40 hover:opacity-75 transition-opacity">
-              <img src="/logo.png" alt="UR" className="h-10 object-contain" />
-            </div>
-          </aside>
-
-          {/* ── Main Content Dashboard ── */}
-          <div className="flex-1 min-w-0">
-            {/* Holographic Header Panel */}
-            <div className="gradient-card border border-purple-500/20 rounded-2xl p-6 mb-6 relative overflow-hidden backdrop-blur-xl bg-black/25">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-brand/10 to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-purple-brand/20 via-cyan-brand/40 to-purple-brand/20" />
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                  <div className="flex items-center gap-2 text-cyan-brand font-mono text-[10px] uppercase tracking-widest font-black">
-                    <Activity size={10} className="animate-pulse" />
-                    NHẬT KÝ HỆ THỐNG: HOẠT ĐỘNG // TIẾN TRÌNH GIẢI MÃ CỔNG MẠNG ĐANG CHẠY
-                  </div>
-                  <h1 className="text-white text-2xl font-black mt-1 tracking-normal uppercase">
-                    Cổng Kết Nối Đặc Vụ:&nbsp;
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#7c3aed] to-cyan-brand">
-                      {user?.username || 'AGENT_GUEST'}
-                    </span>
-                  </h1>
-                  <p className="text-white/45 text-xs mt-1 leading-relaxed max-w-xl">
-                    Hãy chọn một nút mạng bảo mật bên dưới để bắt đầu vượt qua bộ lọc ngôn ngữ của hệ thống. Các nút bảo mật cấp cao yêu cầu tuân thủ đúng mục tiêu ngữ pháp tương ứng.
-                  </p>
+        {/* ── Main Content Dashboard ── */}
+        <div className="min-w-0">
+          {/* Holographic Header Panel */}
+          <div className="gradient-card border border-purple-500/20 rounded-2xl p-6 mb-6 relative overflow-hidden backdrop-blur-xl bg-black/25">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-brand/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-purple-brand/20 via-cyan-brand/40 to-purple-brand/20" />
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-cyan-brand font-mono text-[10px] uppercase tracking-widest font-black">
+                  <Activity size={10} className="animate-pulse" />
+                  NHẬT KÝ HỆ THỐNG: HOẠT ĐỘNG // TIẾN TRÌNH GIẢI MÃ CỔNG MẠNG ĐANG CHẠY
                 </div>
+                <h1 className="text-white text-2xl font-black mt-1 tracking-normal uppercase">
+                  Cổng Kết Nối Đặc Vụ:&nbsp;
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#7c3aed] to-cyan-brand">
+                    {user?.username || 'AGENT_GUEST'}
+                  </span>
+                </h1>
+                <p className="text-white/45 text-xs mt-1 leading-relaxed max-w-xl">
+                  Hãy chọn một nút mạng bảo mật bên dưới để bắt đầu vượt qua bộ lọc ngôn ngữ của hệ thống. Các nút bảo mật cấp cao yêu cầu tuân thủ đúng mục tiêu ngữ pháp tương ứng.
+                </p>
+              </div>
 
-                {/* Dashboard Stats */}
-                <div className="flex gap-3 w-full md:w-auto">
-                  <div className="flex-1 md:flex-none bg-black/45 rounded-xl p-3 border border-white/5 min-w-[125px]">
-                    <div className="text-white/40 text-[8px] font-mono uppercase tracking-widest font-bold">TỔNG ĐIỂM XP</div>
-                    <div className="text-[#f5c842] text-lg font-black flex items-baseline gap-1 mt-0.5 font-mono">
-                      {user?.xpBalance || 0} <span className="text-[9px] font-normal text-white/35">XP</span>
-                    </div>
+              {/* Dashboard Stats */}
+              <div className="flex gap-3 w-full md:w-auto">
+                <div className="flex-1 md:flex-none bg-black/45 rounded-xl p-3 border border-white/5 min-w-[125px]">
+                  <div className="text-white/40 text-[8px] font-mono uppercase tracking-widest font-bold">TỔNG ĐIỂM XP</div>
+                  <div className="text-[#f5c842] text-lg font-black flex items-baseline gap-1 mt-0.5 font-mono">
+                    {user?.xpBalance.toLocaleString() || '0'}
+                    <span className="text-[10px] text-white/40 font-normal">XP</span>
                   </div>
-
-                  <div className="flex-1 md:flex-none bg-black/45 rounded-xl p-3 border border-white/5 min-w-[125px]">
-                    <div className="text-white/40 text-[8px] font-mono uppercase tracking-widest font-bold">CƯỜNG ĐỘ VƯỢT RÀO</div>
-                    <div className="text-cyan-brand text-lg font-black flex items-baseline gap-1 mt-0.5 font-mono">
-                      {user?.englishLevel || 'A2'} <span className="text-[9px] font-normal text-white/35">CẤP ĐỘ</span>
-                    </div>
+                </div>
+                <div className="flex-1 md:flex-none bg-black/45 rounded-xl p-3 border border-white/5 min-w-[125px]">
+                  <div className="text-white/40 text-[8px] font-mono uppercase tracking-widest font-bold">TRÌNH ĐỘ CEFR</div>
+                  <div className="text-cyan-brand text-lg font-black mt-0.5 font-mono">
+                    {user?.englishLevel || 'A1'}
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Seamless Nodes Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coursesList.map((c) => (
-                <CourseCard
-                  key={c.id}
-                  course={c}
-                  onClick={() => !c.locked && navigate(`/game/${c.id}`)}
-                />
-              ))}
-            </div>
+          {/* Unified Mission Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {coursesList.map((c) => (
+              <CourseCard key={c.id} course={c} onClick={() => !c.locked && navigate(`/game/${c.id}`)} />
+            ))}
+          </div>
 
-            {/* Master Agent Premium Upgrade Terminal Banner */}
-            <div className="gradient-card border border-[#f5c842]/30 rounded-2xl p-6 mt-8 relative overflow-hidden backdrop-blur-xl bg-black/25 shadow-[0_8px_32px_rgba(245,200,66,0.03)]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#f5c842]/5 to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#f5c842]/10 via-[#f5c842]/30 to-[#f5c842]/10" />
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5 text-[#f5c842] font-mono text-[9px] uppercase tracking-widest font-black">
-                    <Shield size={10} className="animate-pulse" />
-                    MỨC ĐỘ MẬT // PHÁT HIỆN HÀNH TRÌNH NÂNG CẤP ĐẶC QUYỀN TRUY CẬP
-                  </div>
-                  <h3 className="text-white text-lg font-black mt-1 uppercase tracking-tight">
-                    Nâng Cấp Đặc Vụ Giải Mã Bậc Thầy
-                  </h3>
-                  <p className="text-white/45 text-xs mt-1 max-w-2xl leading-relaxed">
-                    Sở hữu quyền truy cập tối cao (Root) vào hơn 50+ máy chủ bảo mật toàn cầu, vượt qua các đợt quét an ninh chuyên sâu không giới hạn với năng lượng vô hạn, nhận phản hồi sửa lỗi nâng cao từ AI bản xứ và hiển thị huy hiệu danh hiệu Cybernetic vàng huyền thoại trên hồ sơ của bạn.
-                  </p>
+          {/* Premium Banner */}
+          <div className="gradient-card border border-[#f5c842]/20 rounded-2xl p-6 relative overflow-hidden backdrop-blur-xl bg-black/25">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#f5c842]/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-[#f5c842]/30 to-transparent" />
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 text-[#f5c842] font-mono text-[9px] uppercase tracking-widest font-black">
+                  <Shield size={10} className="animate-pulse" />
+                  MỨC ĐỘ MẬT // PHÁT HIỆN HÀNH TRÌNH NÂNG CẤP ĐẶC QUYỀN TRUY CẬP
                 </div>
-                <Link
-                  to="/premium"
-                  className="w-full md:w-auto text-center py-2.5 px-6 bg-gradient-to-r from-[#f5c842] to-amber-600 hover:from-amber-400 hover:to-amber-600 text-black font-black text-xs rounded-xl tracking-widest uppercase transition-all duration-300 shadow-[0_4px_16px_rgba(245,200,66,0.15)] hover:shadow-[0_4px_22px_rgba(245,200,66,0.3)] shrink-0 active:scale-95 border border-[#f5c842]/30"
-                >
-                  NÂNG CẤP NGAY
-                </Link>
+                <h3 className="text-white text-lg font-black mt-1 uppercase tracking-tight">
+                  Nâng Cấp Đặc Vụ Giải Mã Bậc Thầy
+                </h3>
+                <p className="text-white/45 text-xs mt-1 max-w-2xl leading-relaxed">
+                  Sở hữu quyền truy cập tối cao (Root) vào hơn 50+ máy chủ bảo mật toàn cầu, vượt qua các đợt quét an ninh chuyên sâu không giới hạn với năng lượng vô hạn, nhận phản hồi sửa lỗi nâng cao từ AI bản xứ và hiển thị huy hiệu danh hiệu Cybernetic vàng huyền thoại trên hồ sơ của bạn.
+                </p>
               </div>
+              <Link
+                to="/premium"
+                className="w-full md:w-auto text-center py-2.5 px-6 bg-gradient-to-r from-[#f5c842] to-amber-600 hover:from-amber-400 hover:to-amber-600 text-black font-black text-xs rounded-xl tracking-widest uppercase transition-all duration-300 shadow-[0_4px_16px_rgba(245,200,66,0.15)] hover:shadow-[0_4px_22px_rgba(245,200,66,0.3)] shrink-0 active:scale-95 border border-[#f5c842]/30"
+              >
+                NÂNG CẤP NGAY
+              </Link>
             </div>
           </div>
         </div>

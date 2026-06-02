@@ -9,14 +9,11 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2d0a6e] to-[#12003a] border border-purple-700/40 flex items-center justify-center shadow-lg hover:border-purple-500/60 transition-colors">
-              <div className="text-center">
-                <div className="w-9 h-7 rounded-md bg-gradient-to-br from-[#f5c842] to-[#e0a800] flex items-center justify-center mb-1">
-                  <span className="text-[#12003a] font-black text-xs">UR</span>
-                </div>
-                <div className="w-7 h-1 bg-purple-600 rounded-full mx-auto" />
-              </div>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="The Unraveller" 
+              className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_8px_rgba(124,58,237,0.4)]" 
+            />
           </Link>
 
           {/* Links */}

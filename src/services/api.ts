@@ -4,6 +4,7 @@ const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
 
 // Local Backend (for adding new functions/testing)
 // const API_BASE_URL = 'http://localhost:5251/api';
+//for now, we use local backend
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -284,9 +285,17 @@ export const getPaymentHistory = async (): Promise<PaymentHistoryDto[]> => {
   return response.data;
 };
 
-// NPCs for Moderator
+// --- Moderator NPCs Management ---
 export interface NpcDto {
   id: number;
+  name: string;
+  role: string;
+  npcEmoji: string;
+  description: string;
+  personality: string;
+}
+
+export interface NpcCreateDto {
   name: string;
   role: string;
   npcEmoji: string;
@@ -299,20 +308,12 @@ export const getModeratorNpcs = async (): Promise<NpcDto[]> => {
   return response.data;
 };
 
-export interface NpcCreateDto {
-  name: string;
-  role: string;
-  npcEmoji: string;
-  description: string;
-  personality: string;
-}
-
-export const createModeratorNpc = async (request: NpcCreateDto): Promise<NpcDto> => {
-  const response = await apiClient.post<NpcDto>('/Moderator/npcs', request);
+export const createModeratorNpc = async (dto: NpcCreateDto): Promise<NpcDto> => {
+  const response = await apiClient.post<NpcDto>('/Moderator/npcs', dto);
   return response.data;
 };
 
-export const updateModeratorNpc = async (id: number, request: NpcCreateDto): Promise<{ message: string }> => {
-  const response = await apiClient.put<{ message: string }>(`/Moderator/npcs/${id}`, request);
+export const updateModeratorNpc = async (id: number, dto: NpcCreateDto): Promise<{ message: string }> => {
+  const response = await apiClient.put<{ message: string }>(`/Moderator/npcs/${id}`, dto);
   return response.data;
 };

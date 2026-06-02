@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Terminal, Shield, Cpu, MessageSquare, Play } from 'lucide-react';
 
@@ -25,20 +24,20 @@ const LandingPage = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <FeatureCard 
-            icon={<MessageSquare className="w-8 h-8" />} 
-            title="Tra hỏi bằng AI" 
-            desc="Trò chuyện với các nhân vật độc đáo. Lời nói của bạn quyết định mức độ tin cậy." 
+          <FeatureCard
+            icon={<MessageSquare className="w-8 h-8" />}
+            title="Tra hỏi bằng AI"
+            desc="Trò chuyện với các nhân vật độc đáo. Lời nói của bạn quyết định mức độ tin cậy."
           />
-          <FeatureCard 
-            icon={<Shield className="w-8 h-8" />} 
-            title="Thanh đo Nghi ngờ" 
-            desc="Chú ý cách diễn đạt. Lỗi chính tả & ngữ pháp sẽ làm tăng sự nghi ngờ." 
+          <FeatureCard
+            icon={<Shield className="w-8 h-8" />}
+            title="Thanh đo Nghi ngờ"
+            desc="Chú ý cách diễn đạt. Lỗi chính tả & ngữ pháp sẽ làm tăng sự nghi ngờ."
           />
-          <FeatureCard 
-            icon={<Cpu className="w-8 h-8" />} 
-            title="Huấn luyện Đặc vụ" 
-            desc="Cải thiện tiếng Anh thông qua các nhiệm vụ đầy thử thách kịch tính." 
+          <FeatureCard
+            icon={<Cpu className="w-8 h-8" />}
+            title="Huấn luyện Đặc vụ"
+            desc="Cải thiện tiếng Anh thông qua các nhiệm vụ đầy thử thách kịch tính."
           />
         </div>
 

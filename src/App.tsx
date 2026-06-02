@@ -18,6 +18,7 @@ import Score from './pages/Score/Score';
 import Streak from './pages/Streak/Streak';
 import Guide from './pages/Guide/Guide';
 import Friends from './pages/Friends/Friends';
+import NotFound from './pages/NotFound/NotFound';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AdminProtectedRoute from './components/common/AdminProtectedRoute';
 import AdminLayout from './pages/Admin/AdminLayout';
@@ -94,7 +95,7 @@ const AppRoutes = () => {
         <Route path="/missions" element={<Navigate to="/courses" replace />} />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
