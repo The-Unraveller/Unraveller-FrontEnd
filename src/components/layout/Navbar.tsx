@@ -54,67 +54,8 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-0.5 flex-1">
+        <div className="hidden md:flex items-center gap-3.5 flex-1">
           {navLinks.map(link => {
-            if (link.label === 'Nhiệm vụ') {
-              return (
-                <div
-                  key={link.to}
-                  className="relative group py-1"
-                  onMouseEnter={() => setCoursesDropdownOpen(true)}
-                  onMouseLeave={() => setCoursesDropdownOpen(false)}
-                >
-                  <Link
-                    to={link.to}
-                    className={`relative text-sm font-medium px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 ${
-                      isActive(link.to)
-                        ? 'text-gold font-semibold'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    {link.label}
-                    <ChevronDown size={12} className="opacity-60 group-hover:rotate-180 transition-transform" />
-                    {isActive(link.to) && (
-                      <span className="absolute bottom-0.5 left-3 right-3 h-0.5 bg-gold rounded-full" />
-                    )}
-                  </Link>
-
-                  {/* Dropdown Menu */}
-                  {coursesDropdownOpen && missionsList.length > 0 && (
-                    <div className="absolute top-full left-0 mt-1 w-64 bg-navy-2 border border-purple-brand/25 rounded-2xl p-2 shadow-glow-purple/20 z-50 animate-slide-up select-none font-mono">
-                      <div className="text-[10px] text-white/30 px-3 py-1.5 border-b border-white/5 uppercase tracking-wider">
-                        Chọn nhiệm vụ
-                      </div>
-                      <div className="max-h-60 overflow-y-auto mt-1 space-y-1">
-                        {missionsList.map((m) => (
-                          <Link
-                            key={m.id}
-                            to={m.locked ? '#' : `/game/${m.id}`}
-                            onClick={() => setCoursesDropdownOpen(false)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-colors ${
-                              m.locked
-                                ? 'text-white/20 cursor-not-allowed'
-                                : 'text-white/70 hover:text-gold hover:bg-white/5'
-                            }`}
-                          >
-                            <span className="text-sm">{m.npcEmoji || '☕'}</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold truncate leading-none">{m.title}</p>
-                              <p className="text-[9px] text-white/35 mt-0.5 truncate uppercase">{m.stage} — {m.difficulty}</p>
-                            </div>
-                            {m.locked ? (
-                              <span className="text-[9px] text-white/20">🔒</span>
-                            ) : (
-                              <span className="text-[9px] text-spy-green">CHƠI</span>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            }
             return (
               <Link
                 key={link.to}
@@ -153,10 +94,10 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-2 ml-auto md:ml-0 flex-shrink-0">
+        <div className="flex items-center gap-4 ml-auto md:ml-0 flex-shrink-0">
           {displayIsLoggedIn ? (
             /* User pill (logged in) + Logout button */
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               {/* Energy Meter */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-purple-brand/20 rounded-full text-xs font-mono select-none">
                 <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/20" />
@@ -271,7 +212,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
           <button
             id="navbar-hamburger"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="text-white/50 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5"
+            className="text-white/50 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 md:hidden"
             aria-label="Menu"
           >
             {menuOpen ? <X size={21} /> : <Menu size={21} />}

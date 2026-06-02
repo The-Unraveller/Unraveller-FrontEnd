@@ -160,20 +160,20 @@ const CourseCard = ({
       </div>
 
       {/* Main Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-white text-sm font-black tracking-tight leading-tight line-clamp-1">{course.title}</h3>
-          <p className="text-white/40 text-[11px] leading-relaxed line-clamp-2">{course.desc}</p>
+      <div className="p-4 flex-1 flex flex-col justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h3 className="text-white text-base font-black tracking-normal leading-snug line-clamp-1">{course.title}</h3>
+          <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mt-0.5">{course.desc}</p>
         </div>
 
         {/* Decryption Syntax constraint */}
         {course.grammarTarget && !course.locked && (
-          <div className="mt-1 p-2.5 rounded-lg bg-black/45 border border-cyan-brand/20 text-[10px] font-mono text-cyan-brand shadow-[inset_0_1px_4px_rgba(6,182,212,0.05)]">
-            <span className="font-extrabold uppercase tracking-wider text-[8px] text-cyan-brand/80 block mb-1 flex items-center gap-1">
-              <Cpu size={9} />
+          <div className="mt-2 p-2.5 rounded-lg bg-black/45 border border-cyan-brand/20 text-[11px] font-mono text-cyan-brand shadow-[inset_0_1px_4px_rgba(6,182,212,0.05)]">
+            <span className="font-extrabold uppercase tracking-wider text-[9px] text-cyan-brand/80 block mb-1.5 flex items-center gap-1">
+              <Cpu size={10} />
               MỤC TIÊU GIẢI MÃ CÚ PHÁP:
             </span>
-            <span className="text-white/80 font-sans leading-normal block">{course.grammarTarget}</span>
+            <span className="text-white/80 font-sans leading-relaxed block">{course.grammarTarget}</span>
           </div>
         )}
 
@@ -241,11 +241,11 @@ const Missions = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
-      <div className="max-w-screen-xl mx-auto px-4 py-6">
+      <div className="max-w-screen-xl mx-auto px-4 py-8">
         <div className="flex gap-6">
           {/* ── Futuristic Cyberpunk Side-dock ── */}
           <aside className="hidden md:flex flex-col w-20 flex-shrink-0 gap-4">
-            <div className="ur-card rounded-2xl p-2.5 flex flex-col items-center gap-1 border-purple-500/20 backdrop-blur-xl bg-black/25 relative overflow-hidden">
+            <div className="ur-card rounded-2xl p-2.5 flex flex-col items-center gap-3 border-purple-500/20 backdrop-blur-xl bg-black/25 relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-purple-brand to-cyan-brand opacity-60" />
               {/* Avatar indicator */}
               <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mb-2 shadow-[inset_0_1px_5px_rgba(255,255,255,0.1)] relative">
@@ -260,7 +260,7 @@ const Missions = () => {
                     key={label}
                     to={to}
                     id={`sidebar-${id}`}
-                    className={`flex flex-col items-center gap-1 py-2 px-1 rounded-xl transition-all duration-300 w-full text-center relative group ${
+                    className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl transition-all duration-300 w-full text-center relative group ${
                       isActive 
                         ? 'bg-purple-brand/15 text-cyan-brand border-l-2 border-cyan-brand rounded-l-none' 
                         : 'hover:bg-white/5 text-white/45 hover:text-white/80'
@@ -292,8 +292,8 @@ const Missions = () => {
                     <Activity size={10} className="animate-pulse" />
                     NHẬT KÝ HỆ THỐNG: HOẠT ĐỘNG // TIẾN TRÌNH GIẢI MÃ CỔNG MẠNG ĐANG CHẠY
                   </div>
-                  <h1 className="text-white text-2xl font-black mt-1 tracking-tight uppercase">
-                    Cổng Kết Nối Đặc Vụ:{' '}
+                  <h1 className="text-white text-2xl font-black mt-1 tracking-normal uppercase">
+                    Cổng Kết Nối Đặc Vụ:&nbsp;
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#7c3aed] to-cyan-brand">
                       {user?.username || 'AGENT_GUEST'}
                     </span>
