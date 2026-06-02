@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { HelpCircle, BookOpen, AlertTriangle, Zap, Star, Shield } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { useGameStore } from '../../store/useGameStore';

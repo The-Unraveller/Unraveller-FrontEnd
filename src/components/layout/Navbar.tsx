@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, Zap, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, Zap, LogOut, ChevronDown, User, FileText, Star, BookOpen, Flame, ShoppingBag, HelpCircle, Users } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import { getMissions } from '../../services/api';
 
@@ -48,9 +48,11 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
       <div className="max-w-screen-xl mx-auto px-5 py-3 flex items-center gap-3">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0 flex items-center gap-2.5 group" id="navbar-logo">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-glow-gold transition-transform group-hover:scale-105">
-            <span className="text-navy font-black text-xs font-heading">UR</span>
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="The Unraveller" 
+            className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_8px_rgba(124,58,237,0.5)]" 
+          />
         </Link>
 
         {/* Desktop nav */}
@@ -122,78 +124,55 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
 
                 {/* Profile dropdown menu */}
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-52 bg-navy-2 border border-purple-brand/25 rounded-2xl p-2 shadow-glow-purple/20 z-50 animate-slide-up select-none font-mono">
-                    <div className="text-[10px] text-white/30 px-3 py-1.5 border-b border-white/5 uppercase tracking-wider">
-                      Agent Console
-                    </div>
-                    <div className="mt-1 space-y-0.5">
-                      <Link
-                        to="/profile"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>👤</span> Hồ sơ (Profile)
-                      </Link>
-                      <Link
-                        to="/report"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>📊</span> Báo cáo (Report)
-                      </Link>
-                      <Link
-                        to="/score"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>🏆</span> Điểm số (Score)
-                      </Link>
-                      <Link
-                        to="/courses"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>📖</span> Kịch bản (Scenario)
-                      </Link>
-                      <Link
-                        to="/streak"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>🔥</span> Chuỗi ngày (Streak)
-                      </Link>
-                      <Link
-                        to="/market"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>🛒</span> Cửa hàng (Market)
-                      </Link>
-                      <Link
-                        to="/guide"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>ℹ️</span> Hướng dẫn (Guide)
-                      </Link>
-                      <Link
-                        to="/friends"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/70 hover:text-gold hover:bg-white/5 transition-colors"
-                      >
-                        <span>👥</span> Bạn bè (Friends)
-                      </Link>
+                  <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
+                    <div className="bg-navy-2/95 border border-purple-brand/25 rounded-2xl p-2.5 shadow-[0_4px_30px_rgba(124,58,237,0.25)] animate-slide-up select-none font-mono overflow-hidden backdrop-blur-xl relative">
+                      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-purple-brand via-cyan-brand to-purple-brand opacity-80" />
+                      <div className="text-[9px] text-white/30 px-3 py-1.5 border-b border-white/5 uppercase tracking-widest font-black">
+                        AGENT CONSOLE
+                      </div>
+                      <div className="mt-2 space-y-1">
+                        {[
+                          { icon: User, label: 'Hồ sơ', enLabel: 'Profile', to: '/profile' },
+                          { icon: FileText, label: 'Báo cáo', enLabel: 'Report', to: '/report' },
+                          { icon: Star, label: 'Điểm số', enLabel: 'Score', to: '/score' },
+                          { icon: BookOpen, label: 'Kịch bản', enLabel: 'Scenario', to: '/courses' },
+                          { icon: Flame, label: 'Chuỗi ngày', enLabel: 'Streak', to: '/streak' },
+                          { icon: ShoppingBag, label: 'Cửa hàng', enLabel: 'Market', to: '/market' },
+                          { icon: HelpCircle, label: 'Hướng dẫn', enLabel: 'Guide', to: '/guide' },
+                          { icon: Users, label: 'Bạn bè', enLabel: 'Friends', to: '/friends' },
+                        ].map(({ icon: Icon, label, enLabel, to }) => {
+                          const active = pathname === to;
+                          return (
+                            <Link
+                              key={to}
+                              to={to}
+                              onClick={() => setProfileDropdownOpen(false)}
+                              className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all duration-300 relative group ${
+                                active 
+                                  ? 'bg-purple-brand/15 text-cyan-brand border-l-2 border-cyan-brand pl-[10px] rounded-l-none font-bold' 
+                                  : 'text-white/60 hover:text-cyan-brand hover:bg-purple-brand/8 border-l-2 border-transparent hover:border-cyan-brand hover:pl-[10px] hover:rounded-l-none'
+                              }`}
+                            >
+                              <Icon size={13} className={`transition-colors ${active ? 'text-cyan-brand' : 'text-white/45 group-hover:text-cyan-brand'}`} />
+                              <span>{label} ({enLabel})</span>
+                            </Link>
+                          );
+                        })}
+
+                        {/* Integrated premium Logout option inside the dropdown console */}
+                        <div className="w-full h-px bg-white/5 my-1.5" />
+                        <button
+                          onClick={() => useGameStore.getState().logout()}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 border-l-2 border-transparent hover:border-red-500 hover:pl-[10px] hover:rounded-l-none transition-all duration-300 relative group font-mono text-left"
+                        >
+                          <LogOut size={13} className="text-red-500/60 group-hover:text-red-400" />
+                          <span>Đăng xuất (Logout)</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
-              <button
-                onClick={() => useGameStore.getState().logout()}
-                className="p-2 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-all group text-white/60 hover:text-red-500"
-                title="Đăng xuất"
-              >
-                <LogOut size={16} />
-              </button>
             </div>
           ) : (
             <>
