@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Trophy, Award, Search, Sparkles } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
@@ -20,11 +21,11 @@ const Score = () => {
   }, []);
 
   const badgeMock = [
-    { id: 1, name: 'Cafe ordering', desc: 'Pass Stage 1 with coffee shop barista.', earned: true, emoji: '☕' },
-    { id: 2, name: 'Precision agent', desc: 'Complete instructions stage perfectly.', earned: true, emoji: '📋' },
-    { id: 3, name: 'Hacker badge', desc: 'Use items in gameplay successfully.', earned: true, emoji: '⚡' },
-    { id: 4, name: 'Negotiator', desc: 'Reach negotiation completion state.', earned: false, emoji: '💼' },
-    { id: 5, name: 'Gold level', desc: 'Gain 2,500 XP total balance.', earned: false, emoji: '👑' },
+    { id: 1, name: 'Gọi đồ uống tại Cafe', desc: 'Vượt qua Ải 1 trò chuyện với Barista quán cà phê.', earned: true, emoji: '☕' },
+    { id: 2, name: 'Đặc vụ chính xác', desc: 'Hoàn thành màn học làm theo hướng dẫn một cách hoàn hảo.', earned: true, emoji: '📋' },
+    { id: 3, name: 'Huy hiệu Hacker', desc: 'Sử dụng thành công các vật phẩm bổ trợ khi giải mã.', earned: true, emoji: '⚡' },
+    { id: 4, name: 'Nhà đàm phán', desc: 'Đạt được trạng thái hoàn thành đàm phán và thuyết phục.', earned: false, emoji: '💼' },
+    { id: 5, name: 'Cấp bậc Vàng', desc: 'Tích lũy đạt tổng số dư 2,500 XP.', earned: false, emoji: '👑' },
   ];
 
   return (
@@ -32,10 +33,10 @@ const Score = () => {
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-            <Trophy className="text-gold" /> LEADERBOARD & SCOREBOARD
+            <Trophy className="text-gold" /> BẢNG XẾP HẠNG & ĐIỂM SỐ
           </h1>
           <p className="text-white/45 text-xs uppercase tracking-wider mt-1">
-            Global rankings of active field agents and unlocked achievement medals.
+            Bảng xếp hạng toàn cầu của các đặc vụ thực địa hoạt động và huy chương thành tựu đã giải khóa.
           </p>
         </div>
 
@@ -43,10 +44,10 @@ const Score = () => {
           {/* Global Leaderboard */}
           <div className="lg:col-span-2 ur-card p-6 bg-navy-2 border border-white/5">
             <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-              🏆 GLOBAL AGENT RANKINGS
+              🏆 BẢNG XẾP HẠNG ĐẶC VỤ TOÀN CẦU
             </h2>
             {loading ? (
-              <p className="text-white/40 text-xs py-4 text-center">Syncing agent network...</p>
+              <p className="text-white/40 text-xs py-4 text-center">Đang đồng bộ hóa mạng lưới đặc vụ...</p>
             ) : (
               <div className="space-y-2">
                 {leaderboard.map((entry) => (
@@ -65,7 +66,7 @@ const Score = () => {
                       <span className="text-lg">{entry.badge || '👤'}</span>
                       <span className="text-white font-bold text-xs truncate max-w-[150px] sm:max-w-xs">{entry.name}</span>
                       {entry.isYou && (
-                        <span className="text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-brand text-white">YOU</span>
+                        <span className="text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-brand text-white">BẠN</span>
                       )}
                     </div>
                     <span className="text-cyan-brand font-bold text-xs">{entry.xp.toLocaleString()} XP</span>
@@ -78,7 +79,7 @@ const Score = () => {
           {/* Badges unlocked */}
           <div className="lg:col-span-1 ur-card p-6 bg-navy-2 border border-white/5">
             <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-              🏅 ACHIEVEMENT BADGES
+              🏅 HUY HIỆU THÀNH TỰU
             </h2>
             <div className="space-y-3">
               {badgeMock.map((b) => (

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Terminal, Shield, Cpu, MessageSquare, Play } from 'lucide-react';
 
@@ -21,33 +21,33 @@ const LandingPage = () => {
           UNRAVELLER
         </h1>
         <p className="text-spy-green text-xl mb-12 uppercase tracking-[0.2em]">
-          Solve the crime, decode the message. Speak to win.
+          Phá giải vụ án, giải mã thông điệp. Viết chuẩn để chiến thắng.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <FeatureCard 
             icon={<MessageSquare className="w-8 h-8" />} 
-            title="AI Interrogation" 
-            desc="Chat with unique NPCs. Your words shape their trust." 
+            title="Tra hỏi bằng AI" 
+            desc="Trò chuyện với các nhân vật độc đáo. Lời nói của bạn quyết định mức độ tin cậy." 
           />
           <FeatureCard 
             icon={<Shield className="w-8 h-8" />} 
-            title="Suspicion Meter" 
-            desc="Watch your tone. Grammatical errors raise suspicion." 
+            title="Thanh đo Nghi ngờ" 
+            desc="Chú ý cách diễn đạt. Lỗi chính tả & ngữ pháp sẽ làm tăng sự nghi ngờ." 
           />
           <FeatureCard 
             icon={<Cpu className="w-8 h-8" />} 
-            title="Agent Training" 
-            desc="Improve English through high-stakes missions." 
+            title="Huấn luyện Đặc vụ" 
+            desc="Cải thiện tiếng Anh thông qua các nhiệm vụ đầy thử thách kịch tính." 
           />
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
           <Link to="/auth" className="group relative px-8 py-4 bg-spy-green text-black font-bold uppercase transition-all hover:bg-white hover:scale-105 flex items-center gap-2">
-            <Play className="fill-black" /> Start Mission
+            <Play className="fill-black" /> Bắt đầu Nhiệm vụ
           </Link>
           <Link to="/about" className="px-8 py-4 border border-spy-green text-spy-green uppercase hover:bg-spy-green hover:text-black transition-all">
-            The Project
+            Về dự án
           </Link>
         </div>
       </main>

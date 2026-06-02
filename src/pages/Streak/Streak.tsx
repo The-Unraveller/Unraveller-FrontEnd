@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Flame, Calendar, Trophy, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { useGameStore } from '../../store/useGameStore';
@@ -7,14 +7,14 @@ const Streak = () => {
   const { user } = useGameStore();
 
   const milestones = [
-    { target: 3, label: '3-Day Scout', reward: 50, icon: '🔥' },
-    { target: 7, label: '7-Day Specialist', reward: 150, icon: '🏃‍♂️' },
-    { target: 14, label: 'Fortnight Shadow', reward: 300, icon: '🕵️‍♂️' },
-    { target: 30, label: '30-Day Spectre', reward: 1000, icon: '👑' },
+    { target: 3, label: 'Đặc vụ 3 Ngày', reward: 50, icon: '🔥' },
+    { target: 7, label: 'Chuyên gia 7 Ngày', reward: 150, icon: '🏃‍♂️' },
+    { target: 14, label: 'Bóng ma 14 Ngày', reward: 300, icon: '🕵️‍♂️' },
+    { target: 30, label: 'Huyền thoại 30 Ngày', reward: 1000, icon: '👑' },
   ];
 
   // Mock days grid
-  const daysOfWeek = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  const daysOfWeek = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
   const mockDays = Array.from({ length: 28 }).map((_, idx) => ({
     dayNumber: idx + 1,
     active: idx < (user?.streakCount || 0) || [2, 5, 6, 8, 12, 13].includes(idx),
@@ -26,10 +26,10 @@ const Streak = () => {
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-            <Flame className="text-orange-500 animate-pulse" /> STREAK MONITOR
+            <Flame className="text-orange-500 animate-pulse" /> THEO DÕI CHUỖI NGÀY
           </h1>
           <p className="text-white/45 text-xs uppercase tracking-wider mt-1">
-            Tracking learning frequency and maintaining active operational status.
+            Theo dõi tần suất học tập và duy trì trạng thái hoạt động tích cực.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ const Streak = () => {
           {/* Calendar Grid */}
           <div className="lg:col-span-2 ur-card p-6 bg-navy-2 border border-white/5">
             <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-cyan-brand" /> ACTIVITY LOG (28-DAY GRID)
+              <Calendar className="w-4 h-4 text-cyan-brand" /> LỊCH SỬ HOẠT ĐỘNG (BẢNG 28 NGÀY)
             </h2>
             <div className="grid grid-cols-7 gap-2.5 text-center mb-4">
               {daysOfWeek.map((day) => (
@@ -62,7 +62,7 @@ const Streak = () => {
               ))}
             </div>
             <p className="text-white/30 text-[9px] mt-4 uppercase text-right">
-              Today is marked with a cyan border. Do your daily missions to keep the fire burning!
+              Hôm nay được đánh dấu bằng viền xanh cyan. Hãy làm nhiệm vụ hàng ngày để duy trì ngọn lửa!
             </p>
           </div>
 
@@ -72,17 +72,17 @@ const Streak = () => {
             <div className="ur-card p-6 bg-navy-3 border border-orange-500/20 shadow-[0_0_20px_rgba(249,115,22,0.05)] relative overflow-hidden text-center">
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-orange-500/10 to-transparent pointer-events-none rounded-bl-full" />
               <Flame size={45} className="text-orange-500 mx-auto mb-3 animate-bounce" />
-              <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Current Active Link</p>
-              <h2 className="text-white font-black text-4xl leading-none">{user?.streakCount || 0} DAYS</h2>
+              <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Chuỗi hoạt động hiện tại</p>
+              <h2 className="text-white font-black text-4xl leading-none">{user?.streakCount || 0} NGÀY</h2>
               <p className="text-white/30 text-[9px] mt-2 uppercase tracking-wide">
-                Keep practicing every day to earn streak XP multipliers!
+                Duy trì luyện tập mỗi ngày để nhận hệ số nhân XP chuỗi ngày!
               </p>
             </div>
 
             {/* Milestones progress */}
             <div className="ur-card p-6 bg-navy-2 border border-white/5">
               <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
-                🏆 STREAK MILESTONES
+                🏆 CỘT MỐC CHUỖI NGÀY
               </h3>
               <div className="space-y-3.5">
                 {milestones.map((m) => {
@@ -101,7 +101,7 @@ const Streak = () => {
                         <span className="text-lg">{m.icon}</span>
                         <div>
                           <p className="text-white text-xs font-bold">{m.label}</p>
-                          <p className="text-white/45 text-[9px] uppercase">{m.target} Days target</p>
+                          <p className="text-white/45 text-[9px] uppercase">Mục tiêu {m.target} Ngày</p>
                         </div>
                       </div>
                       <div className="text-right">

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Award, TrendingUp, Lock, Star, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -20,8 +21,8 @@ const mockUserProfile: UserProfileDto = {
 const mockScenarios: ScenarioListDto[] = [
   {
     id: '1',
-    title: 'Coffee Shop Conversations',
-    description: 'Practice ordering, small talk, and natural conversations in a café environment.',
+    title: 'Trò chuyện Quán Cà phê',
+    description: 'Luyện tập gọi món, trò chuyện xã giao và đối thoại tự nhiên trong môi trường quán cà phê.',
     difficulty: 'Easy',
     xpReward: 150,
     isUnlocked: true,
@@ -29,8 +30,8 @@ const mockScenarios: ScenarioListDto[] = [
   },
   {
     id: '2',
-    title: 'Following Instructions',
-    description: 'Listen, understand complex directions, and execute tasks with precision.',
+    title: 'Làm theo Chỉ dẫn',
+    description: 'Lắng nghe, thấu hiểu các chỉ dẫn phức tạp và thực hiện nhiệm vụ với độ chính xác cao.',
     difficulty: 'Easy',
     xpReward: 200,
     isUnlocked: true,
@@ -38,8 +39,8 @@ const mockScenarios: ScenarioListDto[] = [
   },
   {
     id: '3',
-    title: 'Debate & Negotiation',
-    description: 'Argue your position and reach agreements in professional English.',
+    title: 'Biện luận & Đàm phán',
+    description: 'Bảo vệ quan điểm và đạt được thỏa thuận bằng tiếng Anh chuyên nghiệp.',
     difficulty: 'Medium',
     xpReward: 300,
     isUnlocked: true,
@@ -47,8 +48,8 @@ const mockScenarios: ScenarioListDto[] = [
   },
   {
     id: '4',
-    title: 'Job Interview',
-    description: 'Ace an English job interview with proper vocabulary and confidence.',
+    title: 'Phỏng vấn Xin việc',
+    description: 'Vượt qua cuộc phỏng vấn xin việc bằng tiếng Anh với sự tự tin và từ vựng chuẩn xác.',
     difficulty: 'Medium',
     xpReward: 350,
     isUnlocked: false,
@@ -56,8 +57,8 @@ const mockScenarios: ScenarioListDto[] = [
   },
   {
     id: '5',
-    title: 'The Detective',
-    description: 'Solve a mystery by writing detailed reports and interviewing suspects.',
+    title: 'Thám tử Điều tra',
+    description: 'Giải mã vụ án bằng cách viết báo cáo chi tiết và thẩm vấn các nghi phạm.',
     difficulty: 'Hard',
     xpReward: 500,
     isUnlocked: false,
@@ -73,9 +74,15 @@ const DifficultyBadge: React.FC<{ level: string }> = ({ level }) => {
     Hard: 'bg-purple-brand/20 text-purple-brand border border-purple-brand/30',
   };
 
+  const translated: Record<string, string> = {
+    Easy: 'DỄ',
+    Medium: 'TRUNG BÌNH',
+    Hard: 'KHÓ',
+  };
+
   return (
     <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${colors[level] || colors.Easy}`}>
-      {level}
+      {translated[level] || level}
     </span>
   );
 };
@@ -107,7 +114,7 @@ const UserHeader: React.FC<{ profile: UserProfileDto }> = ({ profile }) => {
           <div className="flex-1 min-w-0">
             <h2 className="font-bold text-white text-base truncate">{profile.displayName}</h2>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-xs text-white/50">Level</span>
+              <span className="text-xs text-white/50">Cấp độ</span>
               <span className="text-sm font-black text-gradient-gold">Lv.{profile.currentLevel}</span>
             </div>
           </div>
@@ -122,9 +129,9 @@ const UserHeader: React.FC<{ profile: UserProfileDto }> = ({ profile }) => {
         {/* XP Progress Bar */}
         <div className="relative">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-medium text-white/50">XP Progress</span>
+            <span className="text-xs font-medium text-white/50">Tiến trình XP</span>
             <span className="text-xs font-bold text-xp-orange">
-              {(profile.xpToNextLevel - profile.currentXp).toLocaleString()} XP to Lv.{profile.currentLevel + 1}
+              Còn {(profile.xpToNextLevel - profile.currentXp).toLocaleString()} XP để lên Cấp {profile.currentLevel + 1}
             </span>
           </div>
           <div className="h-2.5 rounded-full bg-white/10 overflow-hidden border border-white/5">
@@ -177,7 +184,7 @@ const ScenarioCard: React.FC<{ scenario: ScenarioListDto; onClick: (id: string) 
               ) : (
                 <div className="flex flex-col items-center gap-1 opacity-40">
                   <Lock size={20} className="text-white" />
-                  <span className="text-[10px] text-white font-semibold">Locked</span>
+                  <span className="text-[10px] text-white font-semibold">Đã khóa</span>
                 </div>
               )}
             </div>
@@ -214,7 +221,7 @@ const ScenarioCard: React.FC<{ scenario: ScenarioListDto; onClick: (id: string) 
             className="text-sm py-2.5"
           >
             <Play size={14} className="mr-1.5 fill-current" />
-            {scenario.isUnlocked ? 'Play' : 'Locked'}
+            {scenario.isUnlocked ? 'Chơi ngay' : 'Đã khóa'}
           </Button>
         </div>
       </Card>
@@ -256,7 +263,7 @@ const DashboardScreen: React.FC = () => {
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-brand to-purple-light flex items-center justify-center shadow-glow-purple">
               <span className="text-3xl">🎭</span>
             </div>
-            <p className="text-white/50 text-sm font-medium">Loading dashboard...</p>
+            <p className="text-white/50 text-sm font-medium">Đang tải bảng điều khiển...</p>
           </motion.div>
         </div>
       </div>
@@ -274,9 +281,9 @@ const DashboardScreen: React.FC = () => {
           {/* Section Header */}
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h1 className="font-heading font-bold text-xl text-white">Your Scenarios</h1>
+              <h1 className="font-heading font-bold text-xl text-white">Kịch Bản Của Bạn</h1>
               <p className="text-white/45 text-sm mt-0.5">
-                {unlockedCount} of {scenarios.length} unlocked
+                Đã mở khóa {unlockedCount} / {scenarios.length}
               </p>
             </div>
             <button className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">

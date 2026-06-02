@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
 
           {/* Links */}
           <div className="flex gap-8 text-white/50 text-sm font-medium">
-            {['Learning', 'Education', 'Storytelling'].map(link => (
+            {['Học tập', 'Giáo dục', 'Nhập vai kể chuyện'].map(link => (
               <span key={link} className="hover:text-white cursor-pointer transition-colors">
                 {link}
               </span>
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/35 text-xs font-medium tracking-wider text-center">
-            COPYRIGHT 2026, DAI NAO THIEN CUNG COMPANY
+            BẢN QUYỀN 2026, ĐẠI NÁO THIÊN CUNG COMPANY
           </p>
           <div className="flex items-center gap-5">
             {[

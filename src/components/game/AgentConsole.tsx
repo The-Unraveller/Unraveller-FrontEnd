@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { Send, Terminal, Loader2 } from 'lucide-react';
 import { Button } from '../common/Button';
 
@@ -28,7 +29,7 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({ onSendMessage, isTyp
             value={inputValue}
             disabled={isTyping}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="TRANSMIT MESSAGE..."
+            placeholder="TRUYỀN TIN NHẮN..."
             className="w-full bg-spy-black border-2 border-spy-green/20 p-6 pl-16 text-spy-green focus:border-spy-green focus:shadow-[0_0_25px_rgba(0,255,65,0.15)] outline-none placeholder:text-spy-green/10 transition-all font-bold tracking-widest uppercase text-sm"
           />
         </div>
@@ -37,13 +38,13 @@ export const AgentConsole: React.FC<AgentConsoleProps> = ({ onSendMessage, isTyp
           disabled={!inputValue.trim() || isTyping}
           className="px-12 py-6 text-sm"
         >
-          {isTyping ? <Loader2 className="animate-spin" /> : 'TRANSMIT'} <Send size={16} />
+          {isTyping ? <Loader2 className="animate-spin" /> : 'TRUYỀN TIN'} <Send size={16} />
         </Button>
       </form>
       <div className="text-center text-[10px] text-gray-700 mt-6 flex items-center justify-center gap-6 font-black uppercase tracking-[0.5em]">
-        <span>ENCRYPTION: AES-256</span>
-        <span>NODE: LOCAL_SEC_GATE</span>
-        <span>LATENCY: 12ms</span>
+        <span>MÃ HÓA: AES-256</span>
+        <span>CỔNG MẠNG: LOCAL_SEC_GATE</span>
+        <span>ĐỘ TRỄ: 12ms</span>
       </div>
     </footer>
   );

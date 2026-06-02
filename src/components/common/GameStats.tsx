@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 interface XPBarProps {
   current: number;
@@ -46,7 +46,7 @@ export const StreakBadge: React.FC<StreakBadgeProps> = ({ count, className = '' 
   <div className={`streak-counter ${className}`}>
     <span className="text-streak-fire text-base leading-none">🔥</span>
     <span className="text-xp-orange font-bold text-sm">{count}</span>
-    <span className="text-white/50 text-xs">day streak</span>
+    <span className="text-white/50 text-xs">ngày</span>
   </div>
 );
 

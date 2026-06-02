@@ -1,27 +1,27 @@
-import React from 'react';
+import * as React from 'react';
 import Layout from '../../components/layout/Layout';
 import { Users } from 'lucide-react';
 
 const teamMembers = [
-  { name: 'Anh Khoa', role: 'Introduction / Lead' },
-  { name: 'Dinh Quang Huy', role: 'Strategy / Design' },
-  { name: 'Pham Viet Dung', role: 'Customer Insight' },
-  { name: 'Nguyen Khanh Le', role: 'Solution Architect' },
-  { name: 'Tuan Khoa', role: 'Execution / Dev' },
+  { name: 'Anh Khoa', role: 'Trưởng nhóm / Giới thiệu' },
+  { name: 'Đinh Quang Huy', role: 'Chiến lược / Thiết kế' },
+  { name: 'Phạm Việt Dũng', role: 'Nghiên cứu khách hàng' },
+  { name: 'Nguyễn Khánh Lê', role: 'Kiến trúc sư giải pháp' },
+  { name: 'Tuấn Khoa', role: 'Lập trình viên / Triển khai' },
 ];
 
 const coreValues = [
   {
-    title: 'Simulation-Based Learning',
-    desc: 'Learners experience English through real-life simulations: social interactions, job interviews, travel, and everyday problem-solving.',
+    title: 'Học qua các tình huống mô phỏng',
+    desc: 'Người học trải nghiệm tiếng Anh thông qua các mô phỏng thực tế: giao tiếp xã hội, phỏng vấn xin việc, du lịch và giải quyết các tình huống hàng ngày.',
   },
   {
-    title: 'Story-driven + Gamification',
-    desc: 'Unlock new storylines, characters, and challenges as you progress — building long-term motivation instead of mindless drilling.',
+    title: 'Hành trình cốt truyện + Game hóa',
+    desc: 'Mở khóa các cốt truyện, nhân vật và thử thách mới khi bạn tiến bộ — xây dựng động lực học lâu dài thay vì chỉ luyện tập một cách máy móc.',
   },
   {
-    title: 'Micro-learning',
-    desc: 'Designed for Gen Z habits: short, flexible sessions you can complete on the go — during a commute or a break.',
+    title: 'Học tập tinh gọn (Micro-learning)',
+    desc: 'Thiết kế phù hợp với thói quen của Gen Z: các bài học ngắn gọn, linh hoạt mà bạn có thể hoàn thành ở bất cứ đâu — khi đi lại hay trong giờ giải lao.',
   },
 ];
 
@@ -38,20 +38,20 @@ const About = () => {
 
         {/* What is The Unraveller */}
         <section className="mb-10 text-center">
-          <h2 className="text-white text-2xl font-bold mb-5">What is The Unraveller?</h2>
+          <h2 className="text-white text-2xl font-bold mb-5">The Unraveller là gì?</h2>
           <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
             <p className="text-white/70 text-sm leading-relaxed">
-              The Unraveller is an English learning app built on <strong className="text-white">simulation-based learning</strong> —
-              designed exclusively for Gen Z in Vietnam. Instead of approaching language through
-              grammar exercises and isolated vocabulary, The Unraveller places users inside vivid,
-              real-world scenarios that make language learning feel natural and exciting.
+              The Unraveller là ứng dụng học tiếng Anh được xây dựng trên phương pháp <strong className="text-white">học qua các tình huống mô phỏng</strong> —
+              thiết kế dành riêng cho thế hệ Gen Z tại Việt Nam. Thay vì tiếp cận ngôn ngữ thông qua
+              các bài tập ngữ pháp và từ vựng rời rạc, The Unraveller đưa người dùng vào các tình huống thực tế sống động
+              để việc tiếp thu ngôn ngữ diễn ra tự nhiên và thú vị nhất.
             </p>
           </div>
         </section>
 
         {/* Core Values */}
         <section className="mb-10">
-          <h2 className="text-white text-2xl font-bold text-center mb-6">Core Values</h2>
+          <h2 className="text-white text-2xl font-bold text-center mb-6">Giá Trị Cốt Lõi</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {coreValues.map((v, i) => (
               <div
@@ -71,23 +71,22 @@ const About = () => {
 
         {/* How to use */}
         <section className="mb-10">
-          <h2 className="text-white text-2xl font-bold text-center mb-5">How It Works</h2>
+          <h2 className="text-white text-2xl font-bold text-center mb-5">Cách Thức Hoạt Động</h2>
           <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
             <p className="text-white/68 text-sm leading-relaxed">
-              The platform is designed like a simulation world where you take on the role of a
-              character navigating life in English. After signing in, a virtual mentor guides
-              you through daily missions. Each lesson is a challenge — listening, speaking, or
-              writing — that earns you XP, unlocks new levels, and builds your skills over time.
+              Nền tảng được thiết kế như một thế giới giả lập, nơi bạn nhập vai vào một nhân vật để khám phá cuộc sống bằng tiếng Anh.
+              Sau khi đăng nhập, một người cố vấn ảo sẽ hướng dẫn bạn thực hiện các nhiệm vụ hàng ngày.
+              Mỗi bài học là một thử thách — nghe, nói hoặc viết — giúp bạn kiếm điểm XP, mở khóa các cấp độ mới và nâng cao kỹ năng của mình theo thời gian.
             </p>
           </div>
         </section>
 
         {/* The Team */}
         <section className="pb-4">
-          <h2 className="text-white text-2xl font-bold text-center mb-1">The Team</h2>
+          <h2 className="text-white text-2xl font-bold text-center mb-1">Đội Ngũ Phát Triển</h2>
           <p className="text-[#f5c842] text-sm italic text-center mb-1 font-medium">Dai Nao Thien Cung Team</p>
           <p className="text-white/50 text-sm text-center mb-7">
-            We are a group of 5 students from FPT University
+            Chúng tôi là nhóm gồm 5 sinh viên đến từ Trường Đại học FPT
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             {teamMembers.map((member, i) => (

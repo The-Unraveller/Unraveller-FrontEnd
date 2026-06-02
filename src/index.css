@@ -521,4 +521,49 @@ input:-webkit-autofill:focus {
   background: linear-gradient(90deg, #f59e0b, #fbbf24) !important;
 }
 
+/* ── Cyberpunk HUD & Hologram Animations ── */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(280px); }
+}
+.animate-scanline {
+  animation: scanline 4s linear infinite;
+}
+
+@keyframes glitch-flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 0.99;
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.4;
+    filter: hue-rotate(90deg) saturate(1.5) blur(0.5px);
+  }
+}
+.animate-hologram {
+  animation: glitch-flicker 5s ease-in-out infinite alternate;
+}
+
+@keyframes radar-pulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+.animate-radar {
+  animation: radar-pulse 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+.text-shadow-cyan {
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+}
+.text-shadow-red {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+.shadow-glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(6, 182, 212, 0.1);
+}
+.shadow-glow-purple {
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2), inset 0 0 15px rgba(124, 58, 237, 0.1);
+}
+
+
 

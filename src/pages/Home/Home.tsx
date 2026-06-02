@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronRight, ChevronDown, Zap, Lock, Star, TrendingUp,
@@ -23,8 +24,8 @@ const scenarios = [
     id: 1,
     stage: 1,
     label: 'STAGE 1',
-    title: 'Coffee Shop Conversations',
-    desc: 'Practice ordering, small talk, and natural conversations in a café environment.',
+    title: 'Trò chuyện Quán Cà phê',
+    desc: 'Luyện tập gọi món, trò chuyện xã giao và đối thoại tự nhiên trong môi trường quán cà phê.',
     img: '/scenario_coffee.png',
     difficulty: 'Beginner',
     diffColor: 'badge-success',
@@ -37,8 +38,8 @@ const scenarios = [
     id: 2,
     stage: 2,
     label: 'STAGE 2',
-    title: 'Following Instructions',
-    desc: 'Listen, understand complex directions, and execute tasks with precision.',
+    title: 'Làm theo Chỉ dẫn',
+    desc: 'Lắng nghe, thấu hiểu các chỉ dẫn phức tạp và thực hiện nhiệm vụ với độ chính xác cao.',
     img: '/scenario_classroom.png',
     difficulty: 'Beginner',
     diffColor: 'badge-success',
@@ -51,8 +52,8 @@ const scenarios = [
     id: 3,
     stage: 3,
     label: 'STAGE 3',
-    title: 'Debate & Negotiation',
-    desc: 'Argue your position and reach agreements in professional English.',
+    title: 'Biện luận & Đàm phán',
+    desc: 'Bảo vệ quan điểm và đạt được thỏa thuận bằng tiếng Anh chuyên nghiệp.',
     img: '',
     difficulty: 'Intermediate',
     diffColor: 'badge-cyan',
@@ -65,8 +66,8 @@ const scenarios = [
     id: 4,
     stage: 4,
     label: 'STAGE 4',
-    title: 'Job Interview',
-    desc: 'Ace an English job interview with proper vocabulary and confidence.',
+    title: 'Phỏng vấn Xin việc',
+    desc: 'Vượt qua cuộc phỏng vấn xin việc bằng tiếng Anh với sự tự tin và từ vựng chuẩn xác.',
     img: '',
     difficulty: 'Intermediate',
     diffColor: 'badge-cyan',
@@ -79,8 +80,8 @@ const scenarios = [
     id: 5,
     stage: 5,
     label: 'STAGE 5',
-    title: 'The Detective',
-    desc: 'Solve a mystery by writing detailed reports and interviewing suspects.',
+    title: 'Thám tử Điều tra',
+    desc: 'Giải mã vụ án bằng cách viết báo cáo chi tiết và thẩm vấn các nghi phạm.',
     img: '/scenario_detective.png',
     difficulty: 'Advanced',
     diffColor: 'badge-purple',
@@ -93,23 +94,31 @@ const scenarios = [
 
 const faqs = [
   {
-    q: 'Are Unraveller courses free?',
-    a: <>There are <strong className="text-white">free courses and scenarios</strong> available with 3 tries per day. Upgrade to Plus+ for unlimited access.</>,
+    q: 'Các khóa học của Unraveller có miễn phí không?',
+    a: <>Có các <strong className="text-white">khóa học và kịch bản miễn phí</strong> có sẵn với tối đa 3 lượt chơi thử mỗi ngày. Bạn có thể nâng cấp lên gói Premium để không giới hạn quyền truy cập.</>,
   },
   {
-    q: 'Do I need an account to play?',
-    a: 'Yes — creating an account saves your progress, XP, streak, and badge collection across sessions.',
+    q: 'Tôi có cần tài khoản để chơi không?',
+    a: 'Có — việc tạo tài khoản giúp bạn lưu tiến trình học tập, điểm XP, chuỗi ngày liên tục và bộ sưu tập huy chương của mình qua các phiên học.',
   },
   {
-    q: 'Is this suitable for beginners?',
-    a: 'Absolutely. Stage 1 starts with simple everyday conversations. You progress at your own pace with no pressure.',
+    q: 'Ứng dụng này có phù hợp với người mới bắt đầu không?',
+    a: 'Hoàn toàn phù hợp. Stage 1 bắt đầu bằng các cuộc đối thoại đơn giản hàng ngày. Bạn có thể tiến bộ theo tốc độ của riêng mình mà không gặp áp lực nào.',
   },
 ];
 
 /* ─── Components ─── */
-const DifficultyBadge = ({ label, cls }: { label: string; cls: string }) => (
-  <span className={`badge ${cls}`}>{label}</span>
-);
+const DifficultyBadge = ({ label, cls }: { label: string; cls: string }) => {
+  const translated: Record<string, string> = {
+    Beginner: 'CƠ BẢN',
+    Intermediate: 'TRUNG CẤP',
+    Advanced: 'CAO CẤP',
+    Easy: 'DỄ',
+    Medium: 'TRUNG BÌNH',
+    Hard: 'KHÓ'
+  };
+  return <span className={`badge ${cls}`}>{translated[label] || label}</span>;
+};
 
 const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = ({ s, featured }) => {
   const content = (
@@ -126,7 +135,7 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
             {s.locked ? (
               <div className="flex flex-col items-center gap-2 opacity-30">
                 <Lock size={28} className="text-white" />
-                <span className="text-white text-xs font-semibold">Locked</span>
+                <span className="text-white text-xs font-semibold">Đã khóa</span>
               </div>
             ) : (
               <span className="text-5xl opacity-40">📖</span>
@@ -159,7 +168,7 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
       <div className="p-4 flex flex-col gap-2 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <DifficultyBadge label={s.difficulty} cls={s.diffColor} />
-          {s.completed && <span className="badge badge-success">✓ Done</span>}
+          {s.completed && <span className="badge badge-success">✓ Đã xong</span>}
         </div>
         <h3 className={`font-bold text-white leading-tight font-heading ${featured ? 'text-base' : 'text-sm'}`}>
           {s.title}
@@ -167,7 +176,7 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
         {featured && <p className="text-white/55 text-xs leading-relaxed flex-1">{s.desc}</p>}
         {!s.locked && (
           <div className="flex items-center gap-1 text-purple-soft text-xs font-semibold mt-auto pt-1">
-            {s.completed ? 'Play again' : 'Start now'} <ChevronRight size={12} />
+            {s.completed ? 'Chơi lại' : 'Bắt đầu ngay'} <ChevronRight size={12} />
           </div>
         )}
       </div>
@@ -238,22 +247,21 @@ const Home = () => {
 
         {/* Tagline */}
         <h1 className="font-heading font-black text-3xl md:text-4xl text-white mb-3 leading-tight">
-          Learn English Through{' '}
-          <span className="text-gradient-brand">Real Stories</span>
+          Học Tiếng Anh Qua{' '}
+          <span className="text-gradient-brand">Mô Phỏng Thực Tế</span>
         </h1>
         <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-6">
-          Simulation-based learning for Gen Z. Step inside vivid real-life scenarios — no boring
-          grammar drills, just language that actually matters.
+          Phương pháp học qua mô phỏng dành cho Gen Z. Trải nghiệm các kịch bản đời thực sống động — không có lý thuyết ngữ pháp nhàm chán, chỉ học những gì thực sự hữu ích.
         </p>
 
         {/* Quick stats */}
         {isLoggedIn && (
           <div className="flex items-center justify-center gap-3 flex-wrap mb-6 animate-slide-up">
             <StreakBadge count={streak} />
-            <StatPill icon="⚡" value={`${xp.toLocaleString()} XP`} label="Total XP" color="text-xp-orange" />
-            <StatPill icon="🔋" value={`${user?.energy ?? 100}/${user?.maxEnergy ?? 100}`} label="Energy" color="text-yellow-400" />
-            <StatPill icon="🏅" value={badges} label="Badges" color="text-gold" />
-            <StatPill icon="📖" value={`Lv.${level}`} label="Level" color="text-cyan-brand" />
+            <StatPill icon="⚡" value={`${xp.toLocaleString()} XP`} label="Tổng XP" color="text-xp-orange" />
+            <StatPill icon="🔋" value={`${user?.energy ?? 100}/${user?.maxEnergy ?? 100}`} label="Năng lượng" color="text-yellow-400" />
+            <StatPill icon="🏅" value={badges} label="Huy chương" color="text-gold" />
+            <StatPill icon="📖" value={`Cấp ${level}`} label="Cấp độ" color="text-cyan-brand" />
           </div>
         )}
 
@@ -272,16 +280,16 @@ const Home = () => {
         <div className="flex items-center justify-between mb-7">
           <div>
             <h2 className="font-heading font-bold text-2xl text-white">
-              {isLoggedIn ? 'Your Journey' : "Today's Pick"}
+              {isLoggedIn ? 'Hành Trình Của Bạn' : "Lựa Chọn Hôm Nay"}
             </h2>
             <p className="text-white/45 text-sm mt-0.5">
               {isLoggedIn
-                ? `${completedStages} / ${scenariosList.length} stages completed`
-                : 'Choose a scenario and start speaking'}
+                ? `Đã hoàn thành ${completedStages} / ${scenariosList.length} màn chơi`
+                : 'Hãy chọn một kịch bản và bắt đầu học'}
             </p>
           </div>
           <Link to="/courses" className="flex items-center gap-1 text-purple-soft text-sm font-semibold hover:text-white transition-colors">
-            See all <ChevronRight size={14} />
+            Xem tất cả <ChevronRight size={14} />
           </Link>
         </div>
 
@@ -304,9 +312,9 @@ const Home = () => {
           <div className="gradient-card p-6 rounded-3xl border border-purple-brand/30">
             <div className="grid grid-cols-3 gap-4 text-center">
               {[
-                { icon: '🎮', value: '5+', label: 'Scenarios' },
-                { icon: '🏆', value: '9', label: 'Badges to earn' },
-                { icon: '⚡', value: '3', label: 'Free tries/day' },
+                { icon: '🎮', value: '5+', label: 'Kịch bản' },
+                { icon: '🏆', value: '9', label: 'Huy chương để chinh phục' },
+                { icon: '⚡', value: '3', label: 'Lượt thử miễn phí/ngày' },
               ].map(({ icon, value, label }) => (
                 <div key={label}>
                   <div className="text-2xl mb-1">{icon}</div>
@@ -324,12 +332,12 @@ const Home = () => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pb-10 px-5">
           <Link to="/auth?mode=register">
             <button className="btn btn-primary btn-lg shadow-glow-purple" id="home-cta-primary">
-              🚀 Start for Free
+              🚀 Bắt Đầu Miễn Phí
             </button>
           </Link>
           <Link to="/premium">
             <button className="btn btn-outline" id="home-cta-premium">
-              <TrendingUp size={16} /> View Premium Plans
+              <TrendingUp size={16} /> Xem Các Gói Premium
             </button>
           </Link>
         </div>
@@ -337,7 +345,7 @@ const Home = () => {
 
       {/* ══════ FAQs ══════ */}
       <section className="max-w-screen-md mx-auto px-5 pb-14">
-        <h2 className="font-heading font-bold text-2xl text-white mb-5">FAQs</h2>
+        <h2 className="font-heading font-bold text-2xl text-white mb-5">FAQs - Câu Hỏi Thường Gặp</h2>
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div

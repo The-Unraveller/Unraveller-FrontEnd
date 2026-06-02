@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingBag, Star, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
@@ -30,7 +30,7 @@ const Market = () => {
   const handleBuy = async (itemId: number, priceXp: number, itemName: string) => {
     if (!user) return;
     if (user.xpBalance < priceXp) {
-      toast.error(`Insufficient XP. You need ${priceXp - user.xpBalance} more XP to buy ${itemName}.`);
+      toast.error(`Không đủ XP. Bạn cần thêm ${priceXp - user.xpBalance} XP để mua ${itemName}.`);
       return;
     }
 
@@ -41,15 +41,24 @@ const Market = () => {
       if (response.success) {
         // Update Zustand store immediately so header stats and profile stats sync up!
         updateUser({ xpBalance: response.newXpBalance });
-        toast.success(`Asset acquired: ${itemName} added to inventory. Balance: ${response.newXpBalance} XP.`);
+        toast.success(`Giao dịch thành công: Đã thêm ${itemName} vào kho đặc vụ. Số dư: ${response.newXpBalance} XP.`);
       } else {
-        toast.error(response.message || 'Failed to acquire asset. Try again later.');
+        toast.error(response.message || 'Không thể mua vật phẩm. Vui lòng thử lại sau.');
       }
     } catch (err: any) {
       console.error('Error purchasing item:', err);
-      toast.error(err.response?.data?.message || 'Network error during transaction. Please verify connection.');
+      toast.error(err.response?.data?.message || 'Lỗi mạng khi giao dịch. Vui lòng kiểm tra lại kết nối.');
     } finally {
       setBuyingId(null);
+    }
+  };
+
+  const getTranslatedType = (type: string) => {
+    switch (type) {
+      case 'InGameHint': return 'GỢI Ý AI';
+      case 'BribeNpc': return 'HỐI LỘ NPC';
+      case 'Cosmetic': return 'TRANG TRÍ';
+      default: return type.toUpperCase();
     }
   };
 
@@ -60,10 +69,10 @@ const Market = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-              <span className="text-cyan-brand">🛒</span> THE BLACK MARKET
+              <span className="text-cyan-brand">🛒</span> CHỢ ĐEN HACKER
             </h1>
             <p className="text-white/45 text-xs font-mono uppercase tracking-wider mt-1">
-              Exchange intelligence XP for elite gameplay tools and bypass mechanisms.
+              Đổi điểm kinh nghiệm đặc vụ (XP) để lấy các công cụ hỗ trợ giải mã và vượt qua bảo mật.
             </p>
           </div>
 
@@ -73,24 +82,22 @@ const Market = () => {
               <Star className="w-5 h-5 text-cyan-brand fill-cyan-brand/20" />
             </div>
             <div>
-              <span className="text-white/40 text-[9px] font-mono uppercase block tracking-wider leading-none">Your Balance</span>
+              <span className="text-white/40 text-[9px] font-mono uppercase block tracking-wider leading-none">Số dư hiện tại</span>
               <span className="text-cyan-brand font-black text-xl leading-none font-mono">{user?.xpBalance ?? 0} <span className="text-xs font-bold">XP</span></span>
             </div>
           </div>
         </div>
 
-
-
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
             <Loader2 className="w-10 h-10 text-cyan-brand animate-spin mb-4" />
-            <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Decrypting Shop Catalog...</p>
+            <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang giải mã danh mục chợ đen...</p>
           </div>
         ) : items.length === 0 ? (
           <div className="ur-card p-12 text-center rounded-2xl border border-white/5 bg-navy-2">
             <ShoppingBag className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <p className="text-white/50 text-base font-semibold">The black market has no active listings.</p>
-            <p className="text-white/30 text-xs mt-1">Check back later for newly unlocked assets.</p>
+            <p className="text-white/50 text-base font-semibold">Chợ đen hiện không hoạt động giao dịch.</p>
+            <p className="text-white/30 text-xs mt-1">Vui lòng quay lại sau để cập nhật danh mục vật phẩm mới.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -110,8 +117,8 @@ const Market = () => {
                       <div className="w-12 h-12 rounded-2xl bg-cyan-brand/5 border border-cyan-brand/15 group-hover:border-cyan-brand/35 flex items-center justify-center text-2xl transition-all shadow-glow-cyan/5">
                         {item.emoji}
                       </div>
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50">
-                        {item.type}
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50 font-bold">
+                        {getTranslatedType(item.type)}
                       </span>
                     </div>
 
@@ -119,7 +126,7 @@ const Market = () => {
                     <h3 className="text-white font-bold text-base leading-tight group-hover:text-cyan-brand transition-colors">
                       {item.name}
                     </h3>
-                    <p className="text-white/50 text-xs leading-relaxed mt-2 line-clamp-3">
+                    <p className="text-white/50 text-xs leading-relaxed mt-2 line-clamp-3 font-sans">
                       {item.description}
                     </p>
                   </div>
@@ -127,7 +134,7 @@ const Market = () => {
                   {/* Actions & Cost */}
                   <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
                     <div>
-                      <span className="text-white/30 text-[9px] font-mono uppercase block leading-none">Cost</span>
+                      <span className="text-white/30 text-[9px] font-mono uppercase block leading-none">Chi phí</span>
                       <span className="text-cyan-brand font-black text-base font-mono flex items-center gap-1 mt-1 leading-none">
                         {item.priceXp} <span className="text-[10px] font-bold">XP</span>
                       </span>
@@ -147,14 +154,14 @@ const Market = () => {
                       {isBuying ? (
                         <>
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          Buying...
+                          Đang mua...
                         </>
                       ) : !canAfford ? (
-                        'Locked'
+                        'Không đủ XP'
                       ) : (
                         <>
                           <Sparkles className="w-3.5 h-3.5" />
-                          Acquire
+                          Mua ngay
                         </>
                       )}
                     </button>
