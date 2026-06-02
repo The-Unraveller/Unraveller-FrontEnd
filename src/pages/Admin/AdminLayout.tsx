@@ -33,6 +33,10 @@ const AdminLayout: React.FC = () => {
               {user?.role === 'Admin' ? 'Duyệt nhiệm vụ' : 'Tạo nhiệm vụ'}
             </span>
           </Link>
+          <Link to="/admin/npcs" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-brand/10 transition-all text-white/60 hover:text-white group">
+            <Users className="w-5 h-5 group-hover:text-purple-brand" />
+            <span className="font-medium">Quản lý NPC</span>
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-white/5">

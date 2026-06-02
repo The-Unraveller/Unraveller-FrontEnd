@@ -109,9 +109,19 @@ const AdminUsers: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${u.role === 'Admin' ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white/40'}`}>
-                    {u.role}
-                  </span>
+                  {u.role === 'Admin' ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.1)]">
+                      🛡️ Admin
+                    </span>
+                  ) : u.role === 'Moderator' ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-purple-brand/10 text-purple-light border border-purple-brand/20 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
+                      ⚙️ Moderator
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-cyan-brand/10 text-cyan-brand border border-cyan-brand/20 shadow-[0_0_12px_rgba(6,182,212,0.1)]">
+                      👤 User
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-white/80 font-mono">{u.xpBalance.toLocaleString()}</td>
                 <td className="px-6 py-4 text-white/80">{u.energy}/{u.maxEnergy || 100}</td>
@@ -214,19 +224,31 @@ const AdminUsers: React.FC = () => {
                 />
               </div>
 
-              {/* Role Dropdown selection */}
+              {/* Role Segmented Selection */}
               <div>
-                <label className="text-xs font-semibold text-white/70 block mb-1.5">Security Role</label>
-                <select
-                  className="bg-navy-2 border border-white/10 rounded-2xl px-4 py-2.5 text-sm text-white focus:border-purple-brand outline-none transition-all w-full"
-                  value={editRole}
-                  onChange={(e) => setEditRole(parseInt(e.target.value, 10))}
-                  disabled={isSaving}
-                >
-                  <option value={0}>User (Role 0)</option>
-                  <option value={1}>Moderator (Role 1)</option>
-                  <option value={2}>Admin (Role 2)</option>
-                </select>
+                <label className="text-xs font-semibold text-white/70 block mb-2">Security Role</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: 0, label: 'User', emoji: '👤', style: 'border-cyan-brand/35 text-cyan-brand bg-cyan-brand/10' },
+                    { value: 1, label: 'Moderator', emoji: '⚙️', style: 'border-purple-brand/35 text-purple-light bg-purple-brand/10' },
+                    { value: 2, label: 'Admin', emoji: '🛡️', style: 'border-red-500/35 text-red-400 bg-red-500/10' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setEditRole(opt.value)}
+                      className={`py-3 px-2 rounded-2xl border text-center transition-all duration-200 flex flex-col items-center justify-center gap-1.5 ${
+                        editRole === opt.value
+                          ? `${opt.style} shadow-[0_0_15px_rgba(255,255,255,0.05)] ring-1 ring-white/10`
+                          : 'border-white/5 bg-navy-2 text-white/45 hover:border-white/10 hover:text-white/80'
+                      }`}
+                      disabled={isSaving}
+                    >
+                      <span className="text-lg">{opt.emoji}</span>
+                      <span className="text-xs font-bold leading-none">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* CEFR level selection dropdown */}

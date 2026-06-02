@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Edit3, Plus, Zap, X, Check, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { apiClient } from '../../services/api';
+import { apiClient, getModeratorNpcs, createModeratorNpc } from '../../services/api';
+import type { NpcDto, NpcCreateDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 
 const AdminMissions: React.FC = () => {
@@ -26,9 +27,64 @@ const AdminMissions: React.FC = () => {
     imageUrl: ''
   });
 
+  const [npcs, setNpcs] = useState<NpcDto[]>([]);
+
+  // Sub-modal for quick NPC creation
+  const [isNpcModalOpen, setIsNpcModalOpen] = useState(false);
+  const [npcForm, setNpcForm] = useState({
+    name: '',
+    role: '',
+    npcEmoji: '☕',
+    description: '',
+    personality: ''
+  });
+  const [savingNpc, setSavingNpc] = useState(false);
+
   useEffect(() => {
     fetchMissions();
+    fetchNpcs();
   }, [user]);
+
+  const fetchNpcs = async () => {
+    try {
+      const data = await getModeratorNpcs();
+      setNpcs(data);
+    } catch (err) {
+      console.error("Failed to load NPCs dynamically, using defaults", err);
+      setNpcs([
+        { id: 1, name: 'Barista', role: 'Barista', npcEmoji: '☕', description: '', personality: '' },
+        { id: 2, name: 'Supervisor', role: 'Supervisor', npcEmoji: '📋', description: '', personality: '' },
+        { id: 3, name: 'Chief Detective', role: 'Chief Detective', npcEmoji: '🔍', description: '', personality: '' }
+      ]);
+    }
+  };
+
+  const handleQuickCreateNpc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!npcForm.name.trim() || !npcForm.role.trim()) {
+      toast.error("NPC Name and Role are required");
+      return;
+    }
+    try {
+      setSavingNpc(true);
+      const newNpc = await createModeratorNpc(npcForm);
+      toast.success(`Created NPC: ${newNpc.name}`);
+      setNpcs(prev => [...prev, newNpc]);
+      setEditForm(prev => ({ ...prev, npcId: newNpc.id }));
+      setIsNpcModalOpen(false);
+      setNpcForm({
+        name: '',
+        role: '',
+        npcEmoji: '☕',
+        description: '',
+        personality: ''
+      });
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to create NPC");
+    } finally {
+      setSavingNpc(false);
+    }
+  };
 
   const fetchMissions = async () => {
     if (!user) return;
@@ -342,16 +398,27 @@ const AdminMissions: React.FC = () => {
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs text-white/40 font-medium">Select NPC</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-white/40 font-medium">Select NPC</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsNpcModalOpen(true)}
+                      className="text-[10px] text-purple-light hover:text-white transition-colors font-bold flex items-center gap-0.5"
+                    >
+                      <Plus size={10} /> Thêm nhanh NPC
+                    </button>
+                  </div>
                   <select
                     disabled={submitting}
                     className="w-full bg-navy-3 border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-purple-brand disabled:opacity-50"
                     value={editForm.npcId}
                     onChange={e => setEditForm({...editForm, npcId: parseInt(e.target.value) || 1})}
                   >
-                    <option value="1">Barista (Beginner - ☕)</option>
-                    <option value="2">Supervisor (Intermediate - 📋)</option>
-                    <option value="3">Chief Detective (Advanced - 🔍)</option>
+                    {npcs.map(npc => (
+                      <option key={npc.id} value={npc.id}>
+                        {npc.name} ({npc.role} - {npc.npcEmoji})
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -402,6 +469,127 @@ const AdminMissions: React.FC = () => {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick NPC Create Modal */}
+      {isNpcModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-navy-2 border border-purple-brand/40 rounded-3xl w-full max-w-md p-6 shadow-2xl overflow-y-auto max-h-[85vh] relative">
+            <button 
+              onClick={() => setIsNpcModalOpen(false)} 
+              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+              disabled={savingNpc}
+              type="button"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="mb-4">
+              <h3 className="text-lg font-heading font-bold text-white">➕ Tạo nhanh NPC</h3>
+              <p className="text-white/40 text-[11px] mt-0.5">Tạo nhanh nhân vật mới để sử dụng trong nhiệm vụ này.</p>
+            </div>
+
+            <form onSubmit={handleQuickCreateNpc} className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-1 space-y-1">
+                  <label className="text-[10px] text-white/40 font-semibold block">Emoji</label>
+                  <div className="w-full h-16 rounded-xl bg-navy-3 border border-white/10 flex items-center justify-center text-3xl shadow-inner select-none">
+                    {npcForm.npcEmoji}
+                  </div>
+                </div>
+
+                <div className="col-span-2 space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-white/40 font-semibold block">Tên nhân vật</label>
+                    <input 
+                      type="text"
+                      required
+                      placeholder="e.g. Guard Lee"
+                      className="bg-navy-3 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:border-purple-brand outline-none transition-all w-full"
+                      value={npcForm.name}
+                      onChange={(e) => setNpcForm({ ...npcForm, name: e.target.value })}
+                      disabled={savingNpc}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-white/40 font-semibold block">Vai trò (Role)</label>
+                    <input 
+                      type="text"
+                      required
+                      placeholder="e.g. Gate Guard"
+                      className="bg-navy-3 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:border-purple-brand outline-none transition-all w-full"
+                      value={npcForm.role}
+                      onChange={(e) => setNpcForm({ ...npcForm, role: e.target.value })}
+                      disabled={savingNpc}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Emoji Picker Row */}
+              <div className="space-y-1">
+                <label className="text-[10px] text-white/40 font-semibold block">Chọn Emoji nhanh</label>
+                <div className="flex flex-wrap gap-1 p-2 bg-navy-3 border border-white/10 rounded-xl max-h-16 overflow-y-auto">
+                  {['☕', '📋', '🔍', '💂', '👩‍⚕️', '🕵️', '🤖', '😎', '🦸', '🧑‍🍳', '🧙', '👽'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setNpcForm({ ...npcForm, npcEmoji: emoji })}
+                      className={`text-lg p-0.5 rounded transition-all hover:bg-white/10 ${npcForm.npcEmoji === emoji ? 'bg-purple-brand/20 border border-purple-brand/40 scale-105' : 'opacity-65'}`}
+                      disabled={savingNpc}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] text-white/40 font-semibold block">Mô tả ngữ cảnh (Description)</label>
+                <textarea 
+                  rows={2}
+                  required
+                  placeholder="Mô tả nơi người học gặp NPC..."
+                  className="bg-navy-3 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-brand outline-none transition-all w-full resize-none leading-relaxed"
+                  value={npcForm.description}
+                  onChange={(e) => setNpcForm({ ...npcForm, description: e.target.value })}
+                  disabled={savingNpc}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] text-white/40 font-semibold block">Tính cách & Prompt cho AI (Personality)</label>
+                <textarea 
+                  rows={3}
+                  required
+                  placeholder="Cung cách nói chuyện và quy tắc AI..."
+                  className="bg-navy-3 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-brand outline-none transition-all w-full resize-none leading-relaxed font-mono"
+                  value={npcForm.personality}
+                  onChange={(e) => setNpcForm({ ...npcForm, personality: e.target.value })}
+                  disabled={savingNpc}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsNpcModalOpen(false)}
+                  className="flex-1 px-4 py-2 rounded-xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 text-xs font-semibold transition-all"
+                  disabled={savingNpc}
+                >
+                  Huỷ
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 rounded-xl bg-purple-brand text-white hover:bg-purple-light text-xs font-semibold transition-all flex items-center justify-center gap-2"
+                  disabled={savingNpc}
+                >
+                  {savingNpc ? <Loader2 size={12} className="animate-spin" /> : 'Tạo NPC'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

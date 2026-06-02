@@ -283,3 +283,36 @@ export const getPaymentHistory = async (): Promise<PaymentHistoryDto[]> => {
   const response = await apiClient.get<PaymentHistoryDto[]>(`/Payment/history`);
   return response.data;
 };
+
+// NPCs for Moderator
+export interface NpcDto {
+  id: number;
+  name: string;
+  role: string;
+  npcEmoji: string;
+  description: string;
+  personality: string;
+}
+
+export const getModeratorNpcs = async (): Promise<NpcDto[]> => {
+  const response = await apiClient.get<NpcDto[]>('/Moderator/npcs');
+  return response.data;
+};
+
+export interface NpcCreateDto {
+  name: string;
+  role: string;
+  npcEmoji: string;
+  description: string;
+  personality: string;
+}
+
+export const createModeratorNpc = async (request: NpcCreateDto): Promise<NpcDto> => {
+  const response = await apiClient.post<NpcDto>('/Moderator/npcs', request);
+  return response.data;
+};
+
+export const updateModeratorNpc = async (id: number, request: NpcCreateDto): Promise<{ message: string }> => {
+  const response = await apiClient.put<{ message: string }>(`/Moderator/npcs/${id}`, request);
+  return response.data;
+};

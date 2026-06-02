@@ -24,6 +24,7 @@ import AdminProtectedRoute from './components/common/AdminProtectedRoute';
 import AdminLayout from './pages/Admin/AdminLayout';
 import AdminUsers from './pages/Admin/AdminUsers';
 import AdminMissions from './pages/Admin/AdminMissions';
+import AdminNpcs from './pages/Admin/AdminNpcs';
 import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
@@ -87,6 +88,7 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
           <Route path="users" element={<AdminUsers />} />
           <Route path="missions" element={<AdminMissions />} />
+          <Route path="npcs" element={<AdminNpcs />} />
           <Route index element={<AdminIndexRedirect />} />
         </Route>
 
