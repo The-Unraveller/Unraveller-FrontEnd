@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Flame, Calendar, Trophy, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 
 const Streak = () => {
@@ -23,6 +24,7 @@ const Streak = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Seo title="Chuoi Ngay Hoc Tap" description="Theo doi chuoi ngay hoc tap cua ban trong The Unraveller. Xem lich su hoat dong va muc tieu thanh tuu." keywords="chuoi ngay, streak, hoat dong, thoi gian hoc, tinh than bat nhao" canonical="/streak" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">

@@ -4,6 +4,7 @@ import {
   FileText, Star, BookOpen, Flame, ShoppingBag, HelpCircle, Users, Lock, Play, Shield, Cpu, Activity
 } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 
@@ -241,6 +242,7 @@ const Missions = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
+      <Seo title="Chon Kich Ban Hoc Tap" description="Chon tu 5+ kich ban hoc tap thuc te: quan ca phe, phong van xin viec, tham tu dieu tra. Moi nhiem vu de cao ky nang nghe, noi, doc, viet tieng Anh." keywords="kich ban, nhiem vu, hoc tap, ky nang tieng Anh, quan ca phe, phong van" canonical="/courses" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8">
         {/* ── Main Content Dashboard ── */}
         <div className="min-w-0">

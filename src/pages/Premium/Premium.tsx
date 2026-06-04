@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Check, Shield, AlertCircle, CheckCircle, Zap, Loader2, ExternalLink, Clock } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { createPayOSLink } from '../../services/api';
 
 interface Plan {
@@ -110,6 +111,7 @@ const Premium = () => {
 
   return (
     <Layout isLoggedIn={true}>
+      <Seo title="Goi Dich Vu Premium" description="Nang cap len goi Premium de khong gioi han quyen truy cap vao tat ca kich ban hoc tieng Anh. Chi tu 299000d/thang." keywords="premium, gia dich vu, nang cap, thanh toan, goi Plus, goi Premium" canonical="/premium" noIndex />
       <div className="max-w-screen-xl mx-auto px-6 py-12 app-bg min-h-screen">
         {/* Header Block with Cyberpunk Glow */}
         <div className="text-center mb-12 animate-fade-in">

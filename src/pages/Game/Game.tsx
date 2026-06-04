@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
+import Seo from '../../components/seo/Seo';
 import Footer from '../../components/layout/Footer';
 import { getMissions, sendGameMessage, getUserInventory, useItem, getGameSession, resetGameSession } from '../../services/api';
 import type { UserInventoryDto, GameSessionDto } from '../../services/api';
@@ -458,7 +459,9 @@ const Game = () => {
   const susLabel = suspicion > 70 ? 'CAO 🔴' : suspicion > 45 ? 'TRUNG BÌNH 🟡' : 'THẤP 🟢';
 
   return (
-    <div className="app-bg min-h-screen flex flex-col">
+    <>
+      <Seo title="Dang Choi - Mo Phong Thuc Te" description="Dang trai nghiem kich ban hoc tieng Anh tuong tac voi NPC AI. Kiem tra do tu nhien cua loi noi cua ban." keywords="tro choi, NPC AI, tuong tac, ky nang noi" canonical="/game" noIndex />
+      <div className="app-bg min-h-screen flex flex-col">
       <Navbar isLoggedIn username={useGameStore.getState().user?.username || 'Learner'} />
 
       <main className="max-w-screen-xl mx-auto w-full px-3 py-4 flex-1">
@@ -1028,6 +1031,7 @@ const Game = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

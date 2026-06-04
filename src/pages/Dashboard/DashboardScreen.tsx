@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Seo from '../../components/seo/Seo';
 import { Zap, Award, TrendingUp, Lock, Star, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BottomNav from '../../components/layout/BottomNav';
@@ -253,6 +254,7 @@ const DashboardScreen: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col h-screen app-bg text-white">
+        <Seo title="Kich Ban Cua Ban" description="Quan ly va chon kich ban nhiem vu cua ban." keywords="kich ban, nhiem vu, dashboard, quan ly" canonical="/dashboard" noIndex />
         <div className="flex-1 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -272,6 +274,7 @@ const DashboardScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen app-bg text-white">
+      <Seo title="Kich Ban Cua Ban" description="Quan ly va chon kich ban nhiem vu cua ban." keywords="kich ban, nhiem vu, dashboard, quan ly" canonical="/dashboard" noIndex />
       {/* User Header */}
       <UserHeader profile={profile} />
 

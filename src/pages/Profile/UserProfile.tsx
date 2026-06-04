@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Zap, Flame, Star, Mail, Calendar, Shield, CreditCard, ShoppingBag, Loader2, RefreshCw, Award } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 import { getUserProfile, getUserInventory, getPaymentHistory, updateEnglishLevel, updateUserProfile } from '../../services/api';
 import type { UserInventoryDto, PaymentHistoryDto } from '../../services/api';
@@ -105,6 +106,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <Layout isLoggedIn username="Agent">
+        <Seo title="Ho So Dac Vu" description="Xem va chinh sua ho so ca nhan cua ban trong The Unraveller." keywords="ho so, profile, tai khoan, dac vu" canonical="/profile" noIndex />
         <div className="flex-1 flex flex-col items-center justify-center min-h-[70vh]">
           <Loader2 className="w-10 h-10 text-purple-brand animate-spin mb-4" />
           <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang tải thông tin hồ sơ...</p>
@@ -115,6 +117,7 @@ const UserProfile = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+      <Seo title="Ho So Dac Vu" description="Xem va chinh sua ho so ca nhan cua ban trong The Unraveller." keywords="ho so, profile, tai khoan, dac vu" canonical="/profile" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24">
         {/* Top Header Row with Username & Action Buttons */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">

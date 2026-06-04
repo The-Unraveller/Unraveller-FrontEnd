@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 
 interface Badge {
@@ -57,6 +58,7 @@ const Badges = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
+    <Seo title="Bo Suu Tap Huy Chuong" description="Xem bo suu tap huy chuong cua ban trong The Unraveller. Hoan thanh cac man choi de mo khoa tat ca huy chuong." keywords="huy chuong, bo suu tap, thanh tuu, gamification" canonical="/badges" noIndex />
       <div className="max-w-screen-sm mx-auto px-4 py-8">
         <div className="ur-card rounded-2xl p-6 md:p-8">
           <h1 className="text-white text-2xl font-bold text-center mb-1">Bộ Sưu Tập Của Bạn</h1>

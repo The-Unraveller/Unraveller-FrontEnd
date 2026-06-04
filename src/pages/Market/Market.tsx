@@ -3,6 +3,7 @@ import { ShoppingBag, Star, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 import { getShopItems, buyItem } from '../../services/api';
 import type { ShopItemDto } from '../../services/api';
@@ -64,6 +65,7 @@ const Market = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Seo title="Cho Den Hacker" description="Mua sam vat pham trong cho den hacker The Unraveller bang XP. Hack NPC, su dung goi y va do trang tri." keywords="cho den hacker, shop, mua vat pham, XP, game store" canonical="/market" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24">
         {/* Header Row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
