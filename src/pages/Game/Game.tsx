@@ -141,6 +141,25 @@ const parseFeedback = (feedbackStr: string) => {
   };
 };
 
+const formatRoleplayText = (text: string) => {
+  if (!text) return '';
+  const parts = text.split('*');
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (index % 2 === 1) {
+          return (
+            <span key={index} className="text-white/50 italic font-sans font-normal">
+              {part}
+            </span>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+};
+
 /* ─── Component ─── */
 const Game = () => {
   const { id } = useParams<{ id: string }>();
@@ -682,7 +701,7 @@ const Game = () => {
                             : 'rounded-tr-sm bg-purple-brand/60 border border-purple-light/30 text-white shadow-md'
                         }`}
                       >
-                        {msg.text}
+                        {formatRoleplayText(msg.text)}
 
                         {/* XP badge */}
                         {msg.xp != null && msg.role === 'npc' && (

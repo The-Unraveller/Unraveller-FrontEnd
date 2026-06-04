@@ -434,6 +434,9 @@ const AdminMissions: React.FC = () => {
                     onChange={e => setEditForm({...editForm, description: e.target.value})}
                     placeholder="Enter context that players see when initiating roleplay..."
                   />
+                  <p className="text-[10px] text-white/30 leading-tight">
+                    💡 Mô tả bối cảnh hoặc lời thoại khởi đầu của nhân vật (Ví dụ: *The barista smiles* "Hi! How can I help you today?")
+                  </p>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-white/40 font-medium">NPC Secret Goal</label>
