@@ -226,7 +226,7 @@ const Missions = () => {
             id: m.id,
             stage: m.stage.toUpperCase(),
             title: m.title,
-            desc: m.description || m.goal,
+            desc: ((m.description || m.goal) || '').replace(/\*/g, ''),
             img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
             locked: m.locked,
             stars: idx === 0 ? 3 : idx === 1 ? 2 : 0, // mock match design achievement records
