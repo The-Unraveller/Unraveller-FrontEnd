@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { Users } from 'lucide-react';
 
 const teamMembers = [
@@ -28,6 +29,7 @@ const coreValues = [
 const About = () => {
   return (
     <Layout isLoggedIn={false}>
+      <Seo title="Gioi Thieu The Unraveller" description="The Unraveller la ung dung hoc tieng Anh qua mo phong thuc te danh cho Gen Z Viet Nam. Tim hieu ve doi ngu phat trien, gia tri cot loi va cach thuc hoat dong." keywords="gioi thieu, doi ngu phat trien, FPT University, gia tri cot loi" canonical="/about" />
       <div className="max-w-screen-lg mx-auto px-6 py-8">
         {/* Logo */}
         <div className="flex justify-center mb-4">

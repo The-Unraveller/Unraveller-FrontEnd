@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, TrendingUp, Award, Clock, Star, Zap } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 import { getUserProfile } from '../../services/api';
 
@@ -30,6 +31,7 @@ const Report = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Seo title="Bao Cao Nang Luc" description="Xem bao cao phan tich nang luc tieng anh cua ban trong The Unraveller. Theo doi tien bo ky nang nghe, noi, doc, viet." keywords="bao cao, nang luc, phan tich, tien bo, ky nang tieng anh" canonical="/report" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">

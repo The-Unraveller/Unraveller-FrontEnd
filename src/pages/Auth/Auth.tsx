@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { login, register, loginWithGoogle, getUserProfile } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 
@@ -107,6 +108,7 @@ const Auth = () => {
 
   return (
     <Layout isLoggedIn={false}>
+      <Seo title="Dang Ky / Dang Nhap" description="Dang ky tai khoan hoac dang nhap vao The Unraveller - ung dung hoc tieng anh qua mo phong thuc te." keywords="dang ky, dang nhap, tai khoan, hoc tieng anh" canonical="/auth" noIndex />
       <div className="max-w-screen-xl mx-auto px-6 py-10">
         <div className="flex flex-col lg:flex-row items-center gap-10 min-h-[72vh]">
 

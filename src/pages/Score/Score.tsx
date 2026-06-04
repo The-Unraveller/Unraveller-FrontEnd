@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Trophy, Award, Search, Sparkles } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 import { getLeaderboard } from '../../services/api';
 import type { LeaderboardEntry } from '../../services/api';
@@ -30,6 +31,7 @@ const Score = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Seo title="Bang Xep Hang" description="Xem bang xep hang toan cau cua cac dac vu trong The Unraveller. So sanh diem XP va thanh tuu cua ban voi ban be." keywords="bang xep hang, diem so, leaderboard, XP, thanh tuu, global ranking" canonical="/score" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">

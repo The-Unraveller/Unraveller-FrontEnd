@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, Terminal, RefreshCw, ChevronLeft } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 
 const NotFound = () => {
@@ -10,6 +11,7 @@ const NotFound = () => {
 
   return (
     <Layout isLoggedIn={!!user} username={user?.username}>
+    <Seo title="Trang Khong Ton Tai" description="Trang ban dang tim kiem khong ton tai trong The Unraveller." keywords="404, khong tim thay" canonical="" noIndex />
       <div className="max-w-screen-md mx-auto px-6 py-16 text-center font-mono">
         {/* Animated Security Shield Icon */}
         <div className="flex justify-center mb-8">

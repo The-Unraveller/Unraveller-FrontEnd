@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { apiClient, getModeratorNpcs, createModeratorNpc } from '../../services/api';
 import type { NpcDto, NpcCreateDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import Seo from '../../components/seo/Seo';
 
 const AdminMissions: React.FC = () => {
   const { user } = useGameStore();
@@ -207,6 +208,7 @@ const AdminMissions: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in relative">
+      <Seo title="Quan Ly Nhiem Vu" description="Tao va chinh sua nhiem vu trong The Unraveller." keywords="admin, nhiem vu, kich ban" canonical="/admin/missions" noIndex />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading font-bold text-3xl text-white">

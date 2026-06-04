@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Users, Search, UserPlus, MessageSquare } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 
 const Friends = () => {
@@ -21,6 +22,7 @@ const Friends = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Seo title="Mang Luoi Dac Vu" description="Quan ly mang luoi ban be trong The Unraveller." keywords="ban be, mang luoi, ket noi" canonical="/friends" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">

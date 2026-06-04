@@ -3,6 +3,7 @@ import { Plus, Edit3, X, Loader2, User, Smile, MessageSquare, BookOpen } from 'l
 import { toast } from 'react-toastify';
 import { getModeratorNpcs, createModeratorNpc, updateModeratorNpc } from '../../services/api';
 import type { NpcDto } from '../../services/api';
+import Seo from '../../components/seo/Seo';
 
 const EMOJI_OPTIONS = [
   '☕', '📋', '🔍', '💂', '👩‍⚕️', '🕵️', '🤖', '😎', '🦸', '🧛', '🧑‍🍳', '🧙', '👽', '💀', '💼', '👮', '🧑‍🏫', '🚀'
@@ -99,6 +100,7 @@ const AdminNpcs: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <Seo title="Quan Ly NPC" description="Quan ly nhan vat NPC trong he thong." keywords="admin, NPC, nhan vat" canonical="/admin/npcs" noIndex />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading font-bold text-3xl text-white">Quản lý NPC</h1>

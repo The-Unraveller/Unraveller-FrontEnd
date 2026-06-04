@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { HelmetProvider } from 'react-helmet-async';
 import Home from './pages/Home/Home';
 import Auth from './pages/Auth/Auth';
 import Missions from './pages/Missions/Missions';
@@ -104,21 +105,23 @@ const AppRoutes = () => {
 function App() {
   return (
     <GoogleOAuthProvider clientId="857953455071-06bni6pvv29qabiot2kqt7b8segm5pda.apps.googleusercontent.com">
-      <Router>
-        <AppRoutes />
-      </Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={3500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
+      <HelmetProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+        <ToastContainer
+          position="top-right"
+          autoClose={3500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
+      </HelmetProvider>
     </GoogleOAuthProvider>
   );
 }

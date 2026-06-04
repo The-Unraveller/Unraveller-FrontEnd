@@ -9,6 +9,7 @@ import { StreakBadge, StatPill } from '../../components/common/GameStats';
 import XPBar from '../../components/common/GameStats';
 import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import Seo from '../../components/seo/Seo';
 
 /* ─── Mock user data ─── */
 const USER_PROFILE = {
@@ -235,6 +236,12 @@ const Home = () => {
 
   return (
     <Layout isLoggedIn={isLoggedIn} username={user?.username} showBottomNav={isLoggedIn}>
+    <Seo
+      title="Hoc Tieng Anh Qua Mo Phong Thuc Te"
+      description="Phuong phap hoc tieng anh qua mo phong thuc te danh cho Gen Z Viet Nam. Trai nghiem cac ky nang nghe, noi, doc, viet qua cac tinh huong thuc te song dong."
+      keywords="hoc tieng anh, ung dung hoc tieng anh, gamification, NPC AI, mo phong thuc te, Gen Z, ky nang tieng anh"
+      canonical="/"
+    />
       {/* ══════ HERO ══════ */}
       <section className="max-w-screen-lg mx-auto px-5 pt-10 pb-6 text-center">
         <div className="flex justify-center mb-5">

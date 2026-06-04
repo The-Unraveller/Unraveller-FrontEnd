@@ -5,6 +5,7 @@ import { Users, Search, Edit3, ShieldAlert, Zap, X, Loader2 } from 'lucide-react
 import { toast } from 'react-toastify';
 import { apiClient } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import Seo from '../../components/seo/Seo';
 
 const AdminUsers: React.FC = () => {
   const { user } = useGameStore();
@@ -64,6 +65,7 @@ const AdminUsers: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <Seo title="Quan Ly Nguoi Dung" description="Quan ly tai khoan nguoi dung trong he thong." keywords="admin, quan ly, nguoi dung" canonical="/admin/users" noIndex />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading font-bold text-3xl text-white">User Management</h1>
