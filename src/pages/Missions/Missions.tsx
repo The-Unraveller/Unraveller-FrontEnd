@@ -223,7 +223,8 @@ const Missions = () => {
     getMissions()
       .then((data) => {
         if (data && data.length > 0) {
-          const transformed = data.map((m, idx) => {
+          const sortedMissions = [...data].sort((a, b) => a.id - b.id);
+          const transformed = sortedMissions.map((m, idx) => {
             const progress = user?.missionProgresses?.find(p => p.missionId === m.id);
             let stars = 0;
             if (progress && progress.status === 'Completed') {
