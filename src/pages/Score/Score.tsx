@@ -22,11 +22,41 @@ const Score = () => {
   }, []);
 
   const badgeMock = [
-    { id: 1, name: 'Gọi đồ uống tại Cafe', desc: 'Vượt qua Ải 1 trò chuyện với Barista quán cà phê.', earned: true, emoji: '☕' },
-    { id: 2, name: 'Đặc vụ chính xác', desc: 'Hoàn thành màn học làm theo hướng dẫn một cách hoàn hảo.', earned: true, emoji: '📋' },
-    { id: 3, name: 'Huy hiệu Hacker', desc: 'Sử dụng thành công các vật phẩm bổ trợ khi giải mã.', earned: true, emoji: '⚡' },
-    { id: 4, name: 'Nhà đàm phán', desc: 'Đạt được trạng thái hoàn thành đàm phán và thuyết phục.', earned: false, emoji: '💼' },
-    { id: 5, name: 'Cấp bậc Vàng', desc: 'Tích lũy đạt tổng số dư 2,500 XP.', earned: false, emoji: '👑' },
+    { 
+      id: 1, 
+      name: 'Gọi đồ uống tại Cafe', 
+      desc: 'Vượt qua Ải 1 trò chuyện với Barista quán cà phê.', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 1 && p.status === 'Completed') ?? false, 
+      emoji: '☕' 
+    },
+    { 
+      id: 2, 
+      name: 'Đặc vụ chính xác', 
+      desc: 'Hoàn thành màn học làm theo hướng dẫn (Stage 2).', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 2 && p.status === 'Completed') ?? false, 
+      emoji: '📋' 
+    },
+    { 
+      id: 3, 
+      name: 'Huy hiệu Hacker', 
+      desc: 'Sử dụng thành công các vật phẩm hoặc sở hữu gói Premium.', 
+      earned: user?.isPremium || (user?.missionProgresses?.some(p => p.xpEarned > 50) ?? false), 
+      emoji: '⚡' 
+    },
+    { 
+      id: 4, 
+      name: 'Nhà đàm phán', 
+      desc: 'Hoàn thành màn đàm phán và thuyết phục (Stage 3).', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 3 && p.status === 'Completed') ?? false, 
+      emoji: '💼' 
+    },
+    { 
+      id: 5, 
+      name: 'Cấp bậc Vàng', 
+      desc: 'Tích lũy đạt tổng số dư 2,500 XP trở lên.', 
+      earned: (user?.xpBalance ?? 0) >= 2500, 
+      emoji: '👑' 
+    },
   ];
 
   return (

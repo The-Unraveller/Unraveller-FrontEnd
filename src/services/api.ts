@@ -1,10 +1,10 @@
 import axios from 'axios';
-// Deployed Backend (Render)
-const API_BASE_URL = 'https://unraveller-backend.onrender.com/api';
-
-// Local Backend (for adding new functions/testing)
-// const API_BASE_URL = 'http://localhost:5251/api';
-//for now, we use local backend
+// Dynamic API URL: 
+// 1. Uses VITE_API_URL env variable if defined.
+// 2. In local development (DEV mode), falls back to localhost:5251.
+// 3. In production build, falls back to the deployed Render API.
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV ? 'http://localhost:5251/api' : 'https://unraveller-backend.onrender.com/api');
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -75,6 +75,13 @@ export interface UserProfileDto {
   isPremium: boolean;
   englishLevel: string;
   createdAt: string;
+  missionProgresses?: {
+    missionId: number;
+    currentSuspicion: number;
+    status: string; // 'InProgress' | 'Completed' | 'Failed'
+    turnCount: number;
+    xpEarned: number;
+  }[];
 }
 
 export interface ShopItemDto {
@@ -83,6 +90,7 @@ export interface ShopItemDto {
   description: string;
   type: string; // 'InGameHint', 'BribeNpc', 'Cosmetic'
   priceXp: number;
+  discountPriceXp: number;
   emoji: string;
 }
 

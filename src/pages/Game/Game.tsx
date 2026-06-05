@@ -11,6 +11,7 @@ import Footer from '../../components/layout/Footer';
 import { getMissions, sendGameMessage, getUserInventory, useItem, getGameSession, resetGameSession } from '../../services/api';
 import type { UserInventoryDto, GameSessionDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import GoogleAd from '../../components/ads/GoogleAd';
 
 /* ─── Types ─── */
 interface Message {
@@ -650,6 +651,7 @@ const Game = () => {
                       </div>
                     </div>
 
+                    <GoogleAd type="sidebar" className="mt-4 w-full animate-fade-in" />
                   </div>
                 );
               })()}

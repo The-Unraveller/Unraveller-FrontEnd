@@ -104,7 +104,8 @@ const Market = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {items.map((item) => {
-              const canAfford = (user?.xpBalance ?? 0) >= item.priceXp;
+              const actualPrice = user?.isPremium ? item.discountPriceXp : item.priceXp;
+              const canAfford = (user?.xpBalance ?? 0) >= actualPrice;
               const isBuying = buyingId === item.id;
 
               return (
@@ -137,13 +138,25 @@ const Market = () => {
                   <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
                     <div>
                       <span className="text-white/30 text-[9px] font-mono uppercase block leading-none">Chi phí</span>
-                      <span className="text-cyan-brand font-black text-base font-mono flex items-center gap-1 mt-1 leading-none">
-                        {item.priceXp} <span className="text-[10px] font-bold">XP</span>
-                      </span>
+                      {user?.isPremium ? (
+                        <div className="flex flex-col gap-0.5 mt-1">
+                          <span className="text-white/35 text-[10px] font-mono line-through leading-none block">
+                            {item.priceXp} XP
+                          </span>
+                          <span className="text-cyan-brand font-black text-sm font-mono flex items-center gap-1 leading-none mt-0.5">
+                            {item.discountPriceXp} <span className="text-[9px] font-bold">XP</span>
+                            <span className="text-[8px] text-green-400 font-bold ml-1 bg-green-500/10 px-1 py-0.5 rounded border border-green-500/10">VIP -20%</span>
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-cyan-brand font-black text-base font-mono flex items-center gap-1 mt-1 leading-none">
+                          {item.priceXp} <span className="text-[10px] font-bold">XP</span>
+                        </span>
+                      )}
                     </div>
 
                     <button
-                      onClick={() => handleBuy(item.id, item.priceXp, item.name)}
+                      onClick={() => handleBuy(item.id, actualPrice, item.name)}
                       disabled={isBuying}
                       className={`px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-1.5 ${
                         isBuying
