@@ -12,7 +12,7 @@ import { useGameStore } from '../../store/useGameStore';
 import Seo from '../../components/seo/Seo';
 
 // Thay đổi link tải bộ cài .exe của bạn tại đây sau khi upload lên Google Drive/GitHub
-const DESKTOP_DOWNLOAD_URL = 'https://drive.google.com/file/d/1X-placeholder-for-exe/view?usp=sharing';
+const DESKTOP_DOWNLOAD_URL = 'https://drive.google.com/file/d/17gb41rM8Sdb4Hf7xcapjNOSif47gHo36/view?usp=sharing';
 
 /* ─── Mock user data ─── */
 const USER_PROFILE = {
