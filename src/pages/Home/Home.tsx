@@ -219,7 +219,8 @@ const Home = () => {
     getMissions()
       .then((data) => {
         if (data && data.length > 0) {
-          const transformed = data.map((m, idx) => ({
+          const sortedMissions = [...data].sort((a, b) => a.id - b.id);
+          const transformed = sortedMissions.map((m, idx) => ({
             id: m.id,
             stage: idx + 1,
             label: m.stage.toUpperCase(),

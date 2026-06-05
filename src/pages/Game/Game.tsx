@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ChevronLeft, AlertTriangle, Zap, Send, Check, X, Sparkles
+  ChevronLeft, AlertTriangle, Zap, Send, Check, X, Sparkles, Volume2
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
@@ -183,6 +183,52 @@ const Game = () => {
   const [turnCount, setTurnCount] = useState(0);
   const [inventory, setInventory] = useState<UserInventoryDto[]>([]);
   const [activeHint, setActiveHint] = useState<string | null>(null);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+
+  const speakText = (text: string, index: number) => {
+    if (!('speechSynthesis' in window)) {
+      toast.error('Trình duyệt không hỗ trợ đọc âm thanh (Text-to-Speech).');
+      return;
+    }
+
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9; // Đọc tốc độ hơi chậm để dễ nghe tiếng Anh chuẩn
+
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith('en-') && v.name.includes('Google'))
+      || voices.find(v => v.lang.startsWith('en-') && v.name.includes('Natural'))
+      || voices.find(v => v.lang.startsWith('en-'));
+    if (enVoice) {
+      utterance.voice = enVoice;
+    }
+
+    utterance.onend = () => {
+      setSpeakingIndex(null);
+    };
+
+    utterance.onerror = () => {
+      setSpeakingIndex(null);
+    };
+
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   /* Terminal Syntax Hack Mini-game States */
   const [showTerminalModal, setShowTerminalModal] = useState(false);
@@ -697,13 +743,29 @@ const Game = () => {
                         </div>
                       )}
                       <div
-                        className={`max-w-[82%] px-4 py-3 text-sm leading-relaxed rounded-2xl ${
+                        className={`max-w-[82%] px-4 py-3 text-sm leading-relaxed rounded-2xl relative group ${
                           msg.role === 'npc'
-                            ? 'rounded-tl-sm bg-navy-3/80 border border-purple-brand/20 text-white/90'
+                            ? 'rounded-tl-sm bg-navy-3/80 border border-purple-brand/20 text-white/90 pr-9'
                             : 'rounded-tr-sm bg-purple-brand/60 border border-purple-light/30 text-white shadow-md'
                         }`}
                       >
                         {formatRoleplayText(msg.text)}
+
+                        {/* Speaker Button for Text to Speech */}
+                        {msg.role === 'npc' && (
+                          <button
+                            onClick={() => speakText(msg.text, i)}
+                            className={`absolute top-2.5 right-2.5 p-1 rounded-lg transition-all duration-200 ${
+                              speakingIndex === i
+                                ? 'bg-cyan-brand/20 border border-cyan-brand/50 text-cyan-brand scale-110 animate-pulse opacity-100'
+                                : 'bg-[#0f0c1e]/75 hover:bg-cyan-brand/20 border border-white/5 hover:border-cyan-brand/35 text-white/40 hover:text-cyan-brand opacity-0 group-hover:opacity-100 focus:opacity-100'
+                            }`}
+                            title={speakingIndex === i ? "Dừng đọc" : "Nghe phát âm (TTS)"}
+                            type="button"
+                          >
+                            <Volume2 size={12} />
+                          </button>
+                        )}
 
                         {/* XP badge */}
                         {msg.xp != null && msg.role === 'npc' && (
