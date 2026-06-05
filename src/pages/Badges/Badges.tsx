@@ -12,18 +12,6 @@ interface Badge {
   color: string;
 }
 
-const allBadges: Badge[] = [
-  { id: 1, name: 'Huy hiệu Chiến thắng Đầu tiên', desc: 'Hoàn thành màn chơi đầu tiên của bạn.', earned: true, color: '#f5c842' },
-  { id: 2, name: 'Bậc thầy Cà phê', desc: 'Hoàn thành Stage 1 với số điểm tuyệt đối.', earned: false, color: '#a78bfa' },
-  { id: 3, name: 'Học nhanh siêu tốc', desc: 'Hoàn thành 3 màn chơi trong một ngày.', earned: false, color: '#34d399' },
-  { id: 4, name: 'Thám tử Tinh mắt', desc: 'Hoàn thành màn chơi Thám tử Điều tra.', earned: false, color: '#60a5fa' },
-  { id: 5, name: 'Miệng lưỡi Linh hoạt', desc: 'Đạt điểm A+ trong phần đánh giá nói.', earned: false, color: '#c0c0c0' },
-  { id: 6, name: 'Bậc thầy Chuỗi ngày', desc: 'Duy trì chuỗi học tập liên tục trong 7 ngày.', earned: false, color: '#f97316' },
-  { id: 7, name: 'Giao tiếp Tự tin', desc: 'Vượt qua thành công 5 tình huống giao tiếp xã hội.', earned: false, color: '#ec4899' },
-  { id: 8, name: 'Đặc vụ Ưu tú', desc: 'Hoàn thành tất cả các màn chơi hiện có.', earned: false, color: '#8b5cf6' },
-  { id: 9, name: 'Người kể chuyện', desc: 'Viết một câu chuyện hoàn chỉnh bằng tiếng Anh.', earned: false, color: '#14b8a6' },
-];
-
 const BadgeCell = ({ badge }: { badge: Badge }) => (
   <div
     id={`badge-cell-${badge.id}`}
@@ -53,8 +41,73 @@ const BadgeCell = ({ badge }: { badge: Badge }) => (
 
 const Badges = () => {
   const navigate = useNavigate();
-
   const { user } = useGameStore();
+
+  const badges: Badge[] = [
+    { 
+      id: 1, 
+      name: 'Huy hiệu Chiến thắng Đầu tiên', 
+      desc: 'Hoàn thành màn chơi đầu tiên của bạn.', 
+      earned: user?.missionProgresses?.some(p => p.status === 'Completed') ?? false, 
+      color: '#f5c842' 
+    },
+    { 
+      id: 2, 
+      name: 'Bậc thầy Cà phê', 
+      desc: 'Hoàn thành Stage 1.', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 1 && p.status === 'Completed') ?? false, 
+      color: '#a78bfa' 
+    },
+    { 
+      id: 3, 
+      name: 'Học nhanh siêu tốc', 
+      desc: 'Hoàn thành từ 3 màn chơi trở lên.', 
+      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 3, 
+      color: '#34d399' 
+    },
+    { 
+      id: 4, 
+      name: 'Thám tử Tinh mắt', 
+      desc: 'Hoàn thành màn chơi Thám tử Điều tra (Stage 5).', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 5 && p.status === 'Completed') ?? false, 
+      color: '#60a5fa' 
+    },
+    { 
+      id: 5, 
+      name: 'Đặc vụ Cao cấp (Premium)', 
+      desc: 'Sở hữu tài khoản đặc quyền Premium.', 
+      earned: user?.isPremium ?? false, 
+      color: '#dc2626' 
+    },
+    { 
+      id: 6, 
+      name: 'Bậc thầy Chuỗi ngày', 
+      desc: 'Duy trì chuỗi học tập liên tục từ 7 ngày.', 
+      earned: (user?.streakCount ?? 0) >= 7, 
+      color: '#f97316' 
+    },
+    { 
+      id: 7, 
+      name: 'Giao tiếp Tự tin', 
+      desc: 'Vượt qua thành công 5 màn chơi trở lên.', 
+      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 5, 
+      color: '#ec4899' 
+    },
+    { 
+      id: 8, 
+      name: 'Đặc vụ Ưu tú', 
+      desc: 'Hoàn thành tất cả các màn chơi hiện có.', 
+      earned: user?.missionProgresses?.filter(p => p.status === 'Completed').length === (user?.missionProgresses?.length ?? 0) && (user?.missionProgresses?.length ?? 0) > 0, 
+      color: '#8b5cf6' 
+    },
+    { 
+      id: 9, 
+      name: 'Người kể chuyện', 
+      desc: 'Hoàn thành màn chơi Storytelling (Stage 4).', 
+      earned: user?.missionProgresses?.some(p => p.missionId === 4 && p.status === 'Completed') ?? false, 
+      color: '#14b8a6' 
+    },
+  ];
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
@@ -68,7 +121,7 @@ const Badges = () => {
 
           {/* Badge grid */}
           <div className="grid grid-cols-3 gap-3 mb-8">
-            {allBadges.map(badge => (
+            {badges.map(badge => (
               <BadgeCell key={badge.id} badge={badge} />
             ))}
           </div>

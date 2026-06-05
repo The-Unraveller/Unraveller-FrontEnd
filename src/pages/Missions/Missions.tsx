@@ -7,6 +7,7 @@ import Layout from '../../components/layout/Layout';
 import Seo from '../../components/seo/Seo';
 import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import GoogleAd from '../../components/ads/GoogleAd';
 
 const sidebarItems = [
   { icon: FileText, label: 'Báo cáo', id: 'report', to: '/report' },
@@ -22,8 +23,8 @@ const courses = [
   {
     id: 1,
     stage: 'STAGE 1',
-    title: 'Coffee Shop Conversations',
-    desc: 'Practice ordering, small talk, and social English in a café setting.',
+    title: 'Giao tiếp tại Quán Cà phê',
+    desc: 'Luyện tập gọi món, trò chuyện ngắn và tiếng Anh giao tiếp trong quán cà phê.',
     img: '/scenario_coffee.png',
     locked: false,
     stars: 3,
@@ -32,8 +33,8 @@ const courses = [
   {
     id: 2,
     stage: 'STAGE 2',
-    title: 'Following Instructions',
-    desc: 'Listen carefully, understand tasks, and execute with precision.',
+    title: 'Làm theo Chỉ dẫn',
+    desc: 'Lắng nghe cẩn thận, hiểu nhiệm vụ và thực hiện với độ chính xác cao.',
     img: '/scenario_classroom.png',
     locked: false,
     stars: 2,
@@ -42,8 +43,8 @@ const courses = [
   {
     id: 3,
     stage: 'STAGE 3',
-    title: 'Debate & Negotiation',
-    desc: 'Practice arguing your point and reaching agreements in English.',
+    title: 'Tranh luận & Đàm phán',
+    desc: 'Luyện tập bảo vệ quan điểm và đạt được thỏa thuận bằng tiếng Anh.',
     img: '',
     locked: true,
     stars: 0,
@@ -52,8 +53,8 @@ const courses = [
   {
     id: 4,
     stage: 'STAGE 4',
-    title: 'Storytelling',
-    desc: 'Tell compelling stories in English with rich vocabulary.',
+    title: 'Phỏng vấn Xin việc',
+    desc: 'Vượt qua buổi phỏng vấn xin việc bằng tiếng Anh với vốn từ vựng chuyên nghiệp và tự tin.',
     img: '',
     locked: true,
     stars: 0,
@@ -62,8 +63,8 @@ const courses = [
   {
     id: 5,
     stage: 'STAGE 5',
-    title: 'Detective Writing',
-    desc: 'Describe scenes and solve mysteries in written English.',
+    title: 'Báo cáo Điều tra',
+    desc: 'Mô tả hiện trường vụ án và phá giải các bí ẩn bằng văn bản tiếng Anh.',
     img: '/scenario_detective.png',
     locked: false,
     stars: 0,
@@ -72,8 +73,8 @@ const courses = [
   {
     id: 6,
     stage: 'STAGE 6',
-    title: 'Advanced Roleplay',
-    desc: 'Complex multi-character scenarios with layered objectives.',
+    title: 'Nhập vai Nâng cao',
+    desc: 'Xử lý các tình huống phức tạp có nhiều nhân vật với mục tiêu đa lớp.',
     img: '',
     locked: true,
     stars: 0,
@@ -222,23 +223,50 @@ const Missions = () => {
     getMissions()
       .then((data) => {
         if (data && data.length > 0) {
-          const transformed = data.map((m, idx) => ({
-            id: m.id,
-            stage: m.stage.toUpperCase(),
-            title: m.title,
-            desc: ((m.description || m.goal) || '').replace(/\*/g, ''),
-            img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
-            locked: m.locked,
-            stars: idx === 0 ? 3 : idx === 1 ? 2 : 0, // mock match design achievement records
-            grammarTarget: m.grammarTarget
-          }));
+          const transformed = data.map((m, idx) => {
+            const progress = user?.missionProgresses?.find(p => p.missionId === m.id);
+            let stars = 0;
+            if (progress && progress.status === 'Completed') {
+              if (progress.currentSuspicion < 25) stars = 3;
+              else if (progress.currentSuspicion < 50) stars = 2;
+              else stars = 1;
+            }
+
+            let locked = m.locked;
+            if (user?.isPremium) {
+              locked = false;
+            } else {
+              if (m.id > 3) {
+                locked = true;
+              } else if (m.id === 2) {
+                const step1Completed = user?.missionProgresses?.some(p => p.missionId === 1 && p.status === 'Completed');
+                locked = !step1Completed;
+              } else if (m.id === 3) {
+                const step2Completed = user?.missionProgresses?.some(p => p.missionId === 2 && p.status === 'Completed');
+                locked = !step2Completed;
+              } else {
+                locked = false; // Course 1 is always unlocked
+              }
+            }
+
+            return {
+              id: m.id,
+              stage: m.stage.toUpperCase(),
+              title: m.title,
+              desc: ((m.description || m.goal) || '').replace(/\*/g, ''),
+              img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
+              locked: locked,
+              stars: stars,
+              grammarTarget: m.grammarTarget
+            };
+          });
           setCoursesList(transformed);
         }
       })
       .catch((err) => {
         console.error('Failed to fetch missions:', err);
       });
-  }, []);
+  }, [user]);
 
   return (
     <Layout isLoggedIn username={user?.username || 'Agent'}>
@@ -294,7 +322,7 @@ const Missions = () => {
           </div>
 
           {/* Premium Banner */}
-          <div className="gradient-card border border-[#f5c842]/20 rounded-2xl p-6 relative overflow-hidden backdrop-blur-xl bg-black/25">
+          <div className="gradient-card border border-[#f5c842]/20 rounded-2xl p-6 relative overflow-hidden backdrop-blur-xl bg-black/25 mb-6">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#f5c842]/5 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-[#f5c842]/30 to-transparent" />
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
@@ -318,6 +346,9 @@ const Missions = () => {
               </Link>
             </div>
           </div>
+
+          {/* Google Ad Block */}
+          <GoogleAd className="mb-8 animate-fade-in" />
         </div>
       </div>
     </Layout>

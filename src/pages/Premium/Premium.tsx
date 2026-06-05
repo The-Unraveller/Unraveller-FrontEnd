@@ -20,31 +20,29 @@ interface Plan {
 const plans: Plan[] = [
   {
     id: 'free',
-    name: 'Free',
+    name: 'Gói Miễn Phí',
     price: '0₫',
     priceValue: 0,
     priceLabel: 'Vĩnh viễn',
-    features: ['3 kịch bản mỗi tuần', 'Chuỗi ngày học & XP cơ bản', 'Phản hồi âm thanh giới hạn'],
-    highlighted: false,
-  },
-  {
-    id: 'plus',
-    name: 'Plus+',
-    price: '99,000₫',
-    priceValue: 99000,
-    priceLabel: 'mỗi tháng',
-    features: ['Không giới hạn kịch bản', 'Đầy đủ bảng xếp hạng & chuỗi ngày', 'Mở khóa tất cả chương cốt truyện'],
+    features: ['Năng lượng hồi phục tiêu chuẩn', 'Giới hạn kịch bản mỗi tuần', 'Phản hồi AI cơ bản'],
     highlighted: false,
   },
   {
     id: 'premium',
-    name: 'Premium',
-    price: '299,000₫',
-    priceValue: 299000,
-    priceLabel: 'mỗi tháng',
-    features: ['AI chấm điểm & phản hồi phát âm', 'Chế độ học ngoại tuyến', 'Kịch bản & nội dung độc quyền'],
+    name: 'Premium VIP',
+    price: '199,000₫',
+    priceValue: 199000,
+    priceLabel: 'Mỗi tháng / Toàn bộ đặc quyền',
+    features: [
+      'Không giới hạn năng lượng chơi (0 cost)',
+      'Nhân đôi điểm kinh nghiệm (XP) nhận được',
+      'Giảm giá 20% khi mua vật phẩm Chợ Đen',
+      'Hồi phục năng lượng nhanh gấp đôi (+20/30p)',
+      'AI Coach phân tích phản hồi nâng cao',
+      'Mở khóa toàn bộ kịch bản bảo mật độc quyền'
+    ],
     highlighted: true,
-    badge: '🔥 Gợi ý tốt nhất',
+    badge: '🔥 ĐẶC QUYỀN TỐI CAO',
   },
 ];
 
@@ -135,12 +133,10 @@ const Premium = () => {
                     key={plan.id}
                     id={`plan-${plan.id}`}
                     onClick={() => setSelected(plan.id)}
-                    className={`cursor-pointer rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 w-full md:w-[260px] relative backdrop-blur-md hover:-translate-y-2 hover:scale-[1.02] hover:opacity-100 ${
+                    className={`cursor-pointer rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 w-full md:w-[320px] relative backdrop-blur-md hover:-translate-y-2 hover:scale-[1.02] hover:opacity-100 ${
                       isSelected
                         ? plan.id === 'free'
                           ? 'border-2 border-slate-400 bg-slate-400/10 shadow-[0_0_25px_rgba(148,163,184,0.2)] opacity-100 z-10'
-                          : plan.id === 'plus'
-                          ? 'border-2 border-cyan-brand bg-cyan-brand/10 shadow-glow-cyan opacity-100 z-10'
                           : 'border-2 border-purple-brand bg-purple-brand/10 shadow-glow-purple opacity-100 z-10'
                         : 'border-2 border-purple-brand/20 bg-card/45 opacity-70 hover:border-purple-brand/40 hover:shadow-glow-purple/10'
                     }`}
@@ -155,8 +151,7 @@ const Premium = () => {
                         {plan.name}
                         {isSelected && (
                           <span className={`w-2.5 h-2.5 rounded-full ${
-                            plan.id === 'free' ? 'bg-slate-400' :
-                            plan.id === 'plus' ? 'bg-cyan-brand' : 'bg-purple-brand'
+                            plan.id === 'free' ? 'bg-slate-400' : 'bg-purple-brand'
                           } animate-ping`} />
                         )}
                       </h3>
@@ -165,8 +160,7 @@ const Premium = () => {
                         {plan.features.map((f, i) => (
                           <li key={i} className="text-white/80 text-sm flex items-start gap-3">
                             <Check size={16} className={`mt-0.5 flex-shrink-0 ${
-                              plan.id === 'free' ? 'text-slate-400' :
-                              plan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-brand'
+                              plan.id === 'free' ? 'text-slate-400' : 'text-purple-brand'
                             }`} />
                             <span className="leading-snug">{f}</span>
                           </li>
@@ -252,24 +246,16 @@ const Premium = () => {
 
                 {/* Dynamic Selected Plan Summary Card */}
                 {selectedPlan && selectedPlan.id !== 'free' && (
-                  <div className={`mb-6 p-5 rounded-2xl transition-all duration-300 border ${
-                    selectedPlan.id === 'plus'
-                      ? 'bg-cyan-brand/10 border-cyan-brand/30 shadow-[0_0_15px_rgba(6,182,212,0.08)]'
-                      : 'bg-purple-brand/15 border-purple-brand/35 shadow-[0_0_20px_rgba(124,58,237,0.08)]'
-                  }`}>
+                  <div className="mb-6 p-5 rounded-2xl transition-all duration-300 border bg-purple-brand/15 border-purple-brand/35 shadow-[0_0_20px_rgba(124,58,237,0.08)]">
                     <p className="text-white/45 text-xs uppercase tracking-wider mb-2 font-mono">Gói đang chọn</p>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-white font-black text-lg font-heading">{selectedPlan.name}</p>
-                        <p className={`font-black text-2xl mt-1 ${
-                          selectedPlan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-soft'
-                        }`}>{selectedPlan.price}</p>
+                        <p className="font-black text-2xl mt-1 text-purple-soft">{selectedPlan.price}</p>
                         <p className="text-white/40 text-xs font-mono">{selectedPlan.priceLabel}</p>
                       </div>
-                      <div className={`p-3 rounded-xl ${
-                        selectedPlan.id === 'plus' ? 'bg-cyan-brand/20' : 'bg-purple-brand/20'
-                      }`}>
-                        <Zap size={28} className={selectedPlan.id === 'plus' ? 'text-cyan-brand' : 'text-purple-soft'} />
+                      <div className="p-3 rounded-xl bg-purple-brand/20">
+                        <Zap size={28} className="text-purple-soft" />
                       </div>
                     </div>
                   </div>
@@ -320,11 +306,7 @@ const Premium = () => {
                     type="button"
                     className={`w-full py-4 text-base font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] ${
                       isProcessing ? 'cursor-wait' : ''
-                    } ${
-                      selectedPlan?.id === 'plus'
-                        ? 'bg-gradient-to-r from-cyan-brand to-cyan-light text-navy shadow-glow-cyan hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]'
-                        : 'bg-gradient-purple text-white shadow-glow-purple hover:shadow-[0_0_30px_rgba(124,58,237,0.55)]'
-                    }`}
+                    } bg-gradient-purple text-white shadow-glow-purple hover:shadow-[0_0_30px_rgba(124,58,237,0.55)]`}
                     id="payment-pay-btn"
                     disabled={isProcessing || paymentStatus === 'success'}
                     onClick={handleUpgrade}

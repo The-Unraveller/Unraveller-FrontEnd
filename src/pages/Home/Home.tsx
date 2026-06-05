@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ChevronRight, ChevronDown, Zap, Lock, Star, TrendingUp,
+  ChevronRight, ChevronDown, Zap, Lock, Star, TrendingUp, Download, Monitor,
 } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import { StreakBadge, StatPill } from '../../components/common/GameStats';
@@ -10,6 +10,9 @@ import XPBar from '../../components/common/GameStats';
 import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 import Seo from '../../components/seo/Seo';
+
+// Thay đổi link tải bộ cài .exe của bạn tại đây sau khi upload lên Google Drive/GitHub
+const DESKTOP_DOWNLOAD_URL = 'https://drive.google.com/file/d/1X-placeholder-for-exe/view?usp=sharing';
 
 /* ─── Mock user data ─── */
 const USER_PROFILE = {
@@ -105,6 +108,10 @@ const faqs = [
   {
     q: 'Ứng dụng này có phù hợp với người mới bắt đầu không?',
     a: 'Hoàn toàn phù hợp. Stage 1 bắt đầu bằng các cuộc đối thoại đơn giản hàng ngày. Bạn có thể tiến bộ theo tốc độ của riêng mình mà không gặp áp lực nào.',
+  },
+  {
+    q: 'Làm thế nào để cài đặt và chạy ứng dụng trên máy tính (Desktop App)?',
+    a: <>Bạn chỉ cần click vào các nút <strong className="text-cyan-brand">Tải Bản Desktop (.EXE)</strong> trên trang chủ, tải tệp cài đặt về máy tính Windows, mở file lên và hoàn tất các bước cài đặt nhanh để bắt đầu trải nghiệm game mượt mà và ổn định nhất.</>
   },
 ];
 
@@ -261,6 +268,20 @@ const Home = () => {
           Phương pháp học qua mô phỏng dành cho Gen Z. Trải nghiệm các kịch bản đời thực sống động — không có lý thuyết ngữ pháp nhàm chán, chỉ học những gì thực sự hữu ích.
         </p>
 
+        {/* Hero CTAs */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 max-w-md mx-auto">
+          <Link to={isLoggedIn ? "/courses" : "/auth?mode=register"} className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto btn btn-primary btn-lg shadow-glow-purple flex items-center justify-center gap-2">
+              🚀 {isLoggedIn ? "Vào Phòng Học" : "Bắt Đầu Miễn Phí"}
+            </button>
+          </Link>
+          <a href={DESKTOP_DOWNLOAD_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto no-underline">
+            <button className="w-full sm:w-auto btn btn-outline btn-lg flex items-center justify-center gap-2 border-cyan-brand/40 text-cyan-brand hover:bg-cyan-brand/10 hover:border-cyan-brand shadow-glow-cyan/5">
+              <Monitor size={16} /> Tải Bản Desktop (.EXE)
+            </button>
+          </a>
+        </div>
+
         {/* Quick stats */}
         {isLoggedIn && (
           <div className="flex items-center justify-center gap-3 flex-wrap mb-6 animate-slide-up">
@@ -342,8 +363,13 @@ const Home = () => {
               🚀 Bắt Đầu Miễn Phí
             </button>
           </Link>
+          <a href={DESKTOP_DOWNLOAD_URL} target="_blank" rel="noopener noreferrer" className="no-underline">
+            <button className="btn btn-outline btn-lg flex items-center gap-2 border-cyan-brand/40 text-cyan-brand hover:bg-cyan-brand/10" id="home-cta-desktop">
+              <Monitor size={16} /> Tải Bản Desktop (.EXE)
+            </button>
+          </a>
           <Link to="/premium">
-            <button className="btn btn-outline" id="home-cta-premium">
+            <button className="btn btn-outline btn-lg" id="home-cta-premium">
               <TrendingUp size={16} /> Xem Các Gói Premium
             </button>
           </Link>
