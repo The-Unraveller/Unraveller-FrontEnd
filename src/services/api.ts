@@ -251,7 +251,10 @@ export const resetGameSession = async (missionId: number): Promise<{ message: st
 // Leaderboard
 export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
   try {
-    const res = await apiClient.get<LeaderboardEntry[]>(`/Leaderboard`);
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await apiClient.get<LeaderboardEntry[]>(`/Leaderboard`, { headers });
     return res.data;
   } catch (err) {
     console.error("Failed to fetch leaderboard, returning mock data", err);
@@ -326,6 +329,52 @@ export const createModeratorNpc = async (dto: NpcCreateDto): Promise<NpcDto> => 
 
 export const updateModeratorNpc = async (id: number, dto: NpcCreateDto): Promise<{ message: string }> => {
   const response = await apiClient.put<{ message: string }>(`/Moderator/npcs/${id}`, dto);
+  return response.data;
+};
+
+// ── Admin Shop Items CRUD ──
+
+export interface AdminShopItemDto {
+  id: number;
+  name: string;
+  description: string;
+  type: string;
+  priceXp: number;
+  discountPriceXp: number;
+  emoji: string;
+}
+
+export const getAdminShopItems = async (): Promise<AdminShopItemDto[]> => {
+  const response = await apiClient.get<AdminShopItemDto[]>('/Admin/shop-items');
+  return response.data;
+};
+
+export const createAdminShopItem = async (dto: {
+  name: string;
+  description: string;
+  type: string;
+  priceXp: number;
+  discountPriceXp: number;
+  emoji: string;
+}): Promise<AdminShopItemDto> => {
+  const response = await apiClient.post<AdminShopItemDto>('/Admin/shop-items', dto);
+  return response.data;
+};
+
+export const updateAdminShopItem = async (id: number, dto: {
+  name?: string;
+  description?: string;
+  type?: string;
+  priceXp?: number;
+  discountPriceXp?: number;
+  emoji?: string;
+}): Promise<{ message: string }> => {
+  const response = await apiClient.put<{ message: string }>(`/Admin/shop-items/${id}`, dto);
+  return response.data;
+};
+
+export const deleteAdminShopItem = async (id: number): Promise<{ message: string }> => {
+  const response = await apiClient.delete<{ message: string }>(`/Admin/shop-items/${id}`);
   return response.data;
 };
 
