@@ -27,6 +27,7 @@ import AdminLayout from './pages/Admin/AdminLayout';
 import AdminUsers from './pages/Admin/AdminUsers';
 import AdminMissions from './pages/Admin/AdminMissions';
 import AdminNpcs from './pages/Admin/AdminNpcs';
+import AdminShopItems from './pages/Admin/AdminShopItems';
 import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
@@ -92,6 +93,7 @@ const AppRoutes = () => {
           <Route path="users" element={<AdminUsers />} />
           <Route path="missions" element={<AdminMissions />} />
           <Route path="npcs" element={<AdminNpcs />} />
+          <Route path="shop-items" element={<AdminShopItems />} />
           <Route index element={<AdminIndexRedirect />} />
         </Route>
 
@@ -110,19 +112,19 @@ function App() {
       <HelmetProvider>
         <Router>
           <AppRoutes />
+          <ToastContainer
+            position="top-right"
+            autoClose={3500}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
         </Router>
-        <ToastContainer
-          position="top-right"
-          autoClose={3500}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
       </HelmetProvider>
     </GoogleOAuthProvider>
   );

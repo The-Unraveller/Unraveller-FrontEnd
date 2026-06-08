@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, BookOpen, LogOut, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, LogOut, ShieldCheck, Store } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 
 const AdminLayout: React.FC = () => {
@@ -37,10 +37,14 @@ const AdminLayout: React.FC = () => {
             <Users className="w-5 h-5 group-hover:text-purple-brand" />
             <span className="font-medium">Quản lý NPC</span>
           </Link>
+          <Link to="/admin/shop-items" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-brand/10 transition-all text-white/60 hover:text-white group">
+            <Store className="w-5 h-5 group-hover:text-purple-brand" />
+            <span className="font-medium">Quản lý Shop</span>
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-white/5">
-          <button 
+          <button
             onClick={() => {
               logout();
               navigate('/dashboard');
