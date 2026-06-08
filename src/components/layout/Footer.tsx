@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
               className="border border-purple-700/30 rounded-xl px-4 py-2 text-white/60 text-sm font-medium"
               style={{ background: 'rgba(255,255,255,0.05)' }}
             >
-              Dainaothiencung@gmail.com
+              theunravellerteam@gmail.com
             </div>
           </div>
         </div>
@@ -40,16 +40,23 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/35 text-xs font-medium tracking-wider text-center">
-            BẢN QUYỀN 2026, ĐẠI NÁO THIÊN CUNG COMPANY
+            BẢN QUYỀN 2026, THE UNRAVELLER TEAM
           </p>
           <div className="flex items-center gap-5">
             {[
-              { Icon: Facebook, id: 'footer-facebook' },
-              { Icon: Instagram, id: 'footer-instagram' },
-              { Icon: Twitter, id: 'footer-twitter' },
-              { Icon: Youtube, id: 'footer-youtube' },
-            ].map(({ Icon, id }) => (
-              <a key={id} href="#" id={id} className="text-white/40 hover:text-white transition-colors">
+              { Icon: Facebook, id: 'footer-facebook', href: 'https://www.facebook.com/profile.php?id=61590870502658' },
+              { Icon: Instagram, id: 'footer-instagram', href: 'https://www.instagram.com/theunravellerteam/' },
+              { Icon: Twitter, id: 'footer-twitter', href: '#' },
+              { Icon: Youtube, id: 'footer-youtube', href: '#' },
+            ].map(({ Icon, id, href }) => (
+              <a
+                key={id}
+                href={href}
+                id={id}
+                target={href !== '#' ? '_blank' : undefined}
+                rel={href !== '#' ? 'noopener noreferrer' : undefined}
+                className="text-white/40 hover:text-white transition-colors"
+              >
                 <Icon size={19} />
               </a>
             ))}

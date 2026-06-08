@@ -13,6 +13,7 @@ import Premium from './pages/Premium/Premium';
 import Badges from './pages/Badges/Badges';
 import DashboardScreen from './pages/Dashboard/DashboardScreen';
 import UserProfile from './pages/Profile/UserProfile';
+import CourseCertificate from './pages/Certificate/CourseCertificate';
 import Market from './pages/Market/Market';
 import Report from './pages/Report/Report';
 import Score from './pages/Score/Score';
@@ -67,6 +68,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/about" element={<About />} />
+        <Route path="/certificate/:token" element={<CourseCertificate />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
