@@ -203,6 +203,40 @@ const Result = () => {
             </div>
           </div>
 
+          {/* ── Claim Certificate Box ── */}
+          {isSuccess && (
+            <div
+              className="flex flex-col items-center gap-3 p-5 rounded-2xl mb-5 text-center animate-bounce-in"
+              style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.25)' }}
+            >
+              <Award size={24} className="text-cyan-brand animate-pulse" />
+              <div>
+                <div className="font-heading font-black text-sm text-white uppercase tracking-wider">Chứng nhận hoàn thành đã sẵn sàng!</div>
+                <p className="text-white/50 text-[10px] max-w-sm mt-1 leading-normal font-sans">
+                  Bạn đã giải mã thành công nút mạng này và được cấp mã khóa chứng thực kỹ thuật số riêng biệt.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  const queryToken = searchParams.get('token');
+                  if (queryToken) {
+                    navigate(`/certificate/${queryToken}`);
+                  } else {
+                    const foundProg = user?.missionProgresses?.find(p => p.missionId === parseInt(id || '1', 10));
+                    if (foundProg?.completionToken) {
+                      navigate(`/certificate/${foundProg.completionToken}`);
+                    } else {
+                      navigate(`/certificate/UNRV-SEED-1-1`);
+                    }
+                  }
+                }}
+                className="py-2 px-5 bg-cyan-brand hover:bg-cyan-300 text-black text-xs font-black rounded-xl tracking-widest uppercase transition-all duration-300 shadow-[0_4px_16px_rgba(6,182,212,0.2)] active:scale-95 border border-cyan-brand/35 font-mono"
+              >
+                Nhận Chứng Chỉ & Chia Sẻ
+              </button>
+            </div>
+          )}
+
           {/* ── Mini Leaderboard ── */}
           {showLeader && (
             <div className="mb-6 animate-slide-up">

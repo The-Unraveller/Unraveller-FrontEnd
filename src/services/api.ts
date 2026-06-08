@@ -59,6 +59,7 @@ export interface DialogueResponseDto {
   isLose: boolean;
   turnCount: number;
   xpEarned: number;
+  completionToken?: string;
 }
 
 export interface UserProfileDto {
@@ -81,6 +82,8 @@ export interface UserProfileDto {
     status: string; // 'InProgress' | 'Completed' | 'Failed'
     turnCount: number;
     xpEarned: number;
+    completionToken?: string;
+    completedAt?: string;
   }[];
 }
 
@@ -325,3 +328,29 @@ export const updateModeratorNpc = async (id: number, dto: NpcCreateDto): Promise
   const response = await apiClient.put<{ message: string }>(`/Moderator/npcs/${id}`, dto);
   return response.data;
 };
+
+export interface CertificateDto {
+  token: string;
+  completedAt: string;
+  xpEarned: number;
+  turnCount: number;
+  user: {
+    username: string;
+    englishLevel: string;
+  };
+  mission: {
+    id: number;
+    title: string;
+    goal: string;
+    grammarTarget: string;
+    stage: string;
+    difficulty: string;
+    npcName: string;
+  };
+}
+
+export const getCertificateByToken = async (token: string): Promise<CertificateDto> => {
+  const response = await apiClient.get<CertificateDto>(`/Game/certificate/${token}`);
+  return response.data;
+};
+

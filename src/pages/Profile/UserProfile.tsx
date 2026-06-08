@@ -9,6 +9,15 @@ import { useGameStore } from '../../store/useGameStore';
 import { getUserProfile, getUserInventory, getPaymentHistory, updateEnglishLevel, updateUserProfile } from '../../services/api';
 import type { UserInventoryDto, PaymentHistoryDto } from '../../services/api';
 
+const missionNames: Record<number, string> = {
+  1: "Stage 1: Giao tiếp tại Quán Cà phê",
+  2: "Stage 2: Làm theo Chỉ dẫn",
+  3: "Stage 3: Tranh luận & Đàm phán",
+  4: "Stage 4: Phỏng vấn Xin việc",
+  5: "Stage 5: Báo cáo Điều tra",
+  6: "Stage 6: Nhập vai Nâng cao"
+};
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const { user, setUser } = useGameStore();
@@ -269,6 +278,55 @@ const UserProfile = () => {
 
           {/* Right Column: Inventory Items & Payments History */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Certificates Container */}
+            <div className="ur-card p-6 rounded-2xl border border-white/5 bg-navy-2">
+              <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
+                <Award className="w-4.5 h-4.5 text-cyan-brand" /> CHỨNG CHỈ GIẢI MÃ
+              </h2>
+
+              {(user?.missionProgresses?.filter(p => p.status === 'Completed') || []).length === 0 ? (
+                <div className="p-8 text-center rounded-xl bg-white/5 border border-white/5">
+                  <p className="text-white/40 text-xs font-mono">Bạn chưa sở hữu chứng chỉ giải mã nào.</p>
+                  <p className="text-white/25 text-[10px] font-mono mt-1 uppercase">Hoàn thành các kịch bản với điểm nghi ngờ dưới 50% để nhận chứng nhận</p>
+                  <button
+                    onClick={() => navigate('/courses')}
+                    className="mt-4 px-5 py-2 bg-cyan-brand/20 hover:bg-cyan-brand border border-cyan-brand/40 hover:text-black text-cyan-brand rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all"
+                  >
+                    Giải Mã Ngay
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {(user?.missionProgresses?.filter(p => p.status === 'Completed') || []).map((p) => (
+                    <div
+                      key={p.missionId}
+                      className="p-4 rounded-xl bg-navy-3 border border-white/5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-cyan-brand/35 transition-all animate-fade-in"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-cyan-brand/10 border border-cyan-brand/20 flex items-center justify-center text-lg shadow-[0_0_8px_rgba(6,182,212,0.1)]">
+                          📜
+                        </div>
+                        <div>
+                          <h4 className="text-white text-xs font-bold leading-snug">
+                            {missionNames[p.missionId] || `Kịch bản Stage ${p.missionId}`}
+                          </h4>
+                          <p className="text-white/45 text-[9px] font-mono mt-0.5 uppercase tracking-wide">
+                            Mã: {p.completionToken || `UNRV-SEED-${user?.id || 2}-${p.missionId}`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/certificate/${p.completionToken || `UNRV-SEED-${user?.id || 2}-${p.missionId}`}`)}
+                        className="px-4 py-2 bg-cyan-brand/15 hover:bg-cyan-brand border border-cyan-brand/35 text-cyan-brand hover:text-black rounded-lg text-xs font-bold font-mono uppercase tracking-wider transition-all shadow-[0_0_8px_rgba(6,182,212,0.05)] text-center shrink-0"
+                      >
+                        Xem & Chia Sẻ
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Inventory Container */}
             <div className="ur-card p-6 rounded-2xl border border-white/5 bg-navy-2">
               <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">

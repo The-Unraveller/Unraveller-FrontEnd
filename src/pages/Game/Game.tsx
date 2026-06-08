@@ -465,11 +465,12 @@ const Game = () => {
             setTimeout(() => navigate(`/result/${id}?status=failed`), 1800);
           } else if (res.isWin) {
             setGameOver(true);
-            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + res.xpEarned}`), 1800);
+            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + res.xpEarned}&token=${res.completionToken || ''}`), 1800);
           } else if (newTurn >= 10) {
             setGameOver(true);
             const status = newSus < 50 ? 'success' : 'failed';
-            setTimeout(() => navigate(`/result/${id}?status=${status}&xp=${totalXP + res.xpEarned}`), 1800);
+            const tokStr = status === 'success' ? `&token=${res.completionToken || ''}` : '';
+            setTimeout(() => navigate(`/result/${id}?status=${status}&xp=${totalXP + res.xpEarned}${tokStr}`), 1800);
           }
         }
       })
@@ -507,7 +508,8 @@ const Game = () => {
             setTimeout(() => navigate(`/result/${id}?status=failed`), 1800);
           } else if (newTurn >= 10 && newSus < 50) {
             setGameOver(true);
-            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + xpGain}`), 1800);
+            const mockToken = `UNRV-MOCK-${Math.floor(Math.random() * 900000 + 100000)}`;
+            setTimeout(() => navigate(`/result/${id}?status=success&xp=${totalXP + xpGain}&token=${mockToken}`), 1800);
           }
         }, 1200);
       });
