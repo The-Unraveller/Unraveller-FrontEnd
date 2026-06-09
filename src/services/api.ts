@@ -60,6 +60,8 @@ export interface DialogueResponseDto {
   turnCount: number;
   xpEarned: number;
   completionToken?: string;
+  updatedEnergy?: number;
+  updatedMaxEnergy?: number;
 }
 
 export interface UserProfileDto {

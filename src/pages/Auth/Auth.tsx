@@ -115,7 +115,7 @@ const Auth = () => {
           {/* ── Left: Image panel ── */}
           <div className="w-full lg:w-[52%] relative rounded-2xl overflow-hidden shadow-2xl min-h-80 lg:min-h-[500px] flex-shrink-0">
             <img
-              src="/london_bg.png"
+              src="/start_menu_skyline.png"
               alt="English environment"
               className="w-full h-full object-cover absolute inset-0"
             />

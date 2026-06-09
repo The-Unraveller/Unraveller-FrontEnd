@@ -452,6 +452,14 @@ const Game = () => {
           setSuspicion(newSus);
           setTotalXP(prev => prev + res.xpEarned);
 
+          // Synchronize user energy state from the server response
+          if (res.updatedEnergy !== undefined && res.updatedMaxEnergy !== undefined) {
+            useGameStore.getState().updateUser({
+              energy: res.updatedEnergy,
+              maxEnergy: res.updatedMaxEnergy
+            });
+          }
+
           const npcMsg: Message = {
             role: 'npc',
             text: res.npcResponse,
@@ -577,21 +585,28 @@ const Game = () => {
             >
               {/* Sci-fi Backdrop (Scenario blurred bg) */}
               <div 
-                className="absolute inset-0 bg-cover bg-center filter blur-[4px] opacity-25 scale-105 transition-all duration-700" 
+                className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ${scenario.npcEmoji === '☕' ? 'opacity-100 blur-0 scale-100' : 'filter blur-[4px] opacity-25 scale-105'}`} 
                 style={{ backgroundImage: `url(${scenario.bg})` }} 
               />
-              {/* Holographic scanning scanlines & grid */}
-              <div 
-                className="absolute inset-0 pointer-events-none" 
-                style={{ 
-                  backgroundImage: 'linear-gradient(rgba(18, 16, 35, 0.45) 50%, rgba(0, 0, 0, 0.6) 50%)', 
-                  backgroundSize: '100% 4px' 
-                }} 
-              />
+              {/* Standing NPC in foreground for Coffee Stage */}
+              {scenario.npcEmoji === '☕' && (() => {
+                const getMoodUrl = () => {
+                  if (suspicion <= 30) return '/npc/barista/happy.png';
+                  if (suspicion <= 60) return '/npc/barista/normal.png';
+                  if (suspicion <= 80) return '/npc/barista/suspect.png';
+                  return '/npc/barista/angry.png';
+                };
+                return (
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 md:w-72 h-[320px] md:h-[385px] pointer-events-none z-0">
+                    <img 
+                      src={getMoodUrl()}
+                      alt="Barista standing in foreground"
+                      className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(6,182,212,0.35)] animate-float"
+                    />
+                  </div>
+                );
+              })()}
               <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-transparent to-navy/40 pointer-events-none" />
-              
-              {/* Scanline moving sweep */}
-              <div className="absolute left-0 right-0 h-1 bg-cyan-brand/35 shadow-[0_0_10px_rgba(6,182,212,0.6)] animate-scanline pointer-events-none" />
 
               {/* HUD readout bars */}
               <div className="relative p-4 flex items-center justify-between border-b border-white/5 bg-black/30 backdrop-blur-sm z-10">
@@ -639,27 +654,42 @@ const Game = () => {
                     </div>
 
                     {/* NPC Character Face/Avatar */}
-                    <div 
-                      className="w-36 h-36 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-navy-3/80 shadow-[0_0_30px_rgba(6,182,212,0.15)] relative animate-hologram animate-float transition-all duration-500 group"
-                      style={{ borderColor: emotion.color, boxShadow: `0 0 35px ${emotion.color}35` }}
-                    >
-                      {/* Interactive scanned data points */}
-                      <span className="absolute top-2 left-2 text-[8px] font-mono opacity-40" style={{ color: emotion.color }}>
-                        [EMO_{emotion.key.toUpperCase()}]
-                      </span>
-                      <span className="absolute bottom-2 right-2 text-[8px] font-mono opacity-40" style={{ color: emotion.color }}>
-                        SYS_OK
-                      </span>
+                    {/* NPC Character Face/Avatar */}
+                    {scenario.npcEmoji === '☕' ? (
+                      /* For cafe stage, the NPC is rendered behind the counter (handled via the absolute standing NPC box).
+                         We display a holographic scan frame targeting her. */
+                      <div className="w-36 h-44 flex items-center justify-center relative pointer-events-none">
+                        <div 
+                          className="absolute w-36 h-36 border border-dashed rounded-xl flex flex-col items-center justify-center animate-pulse z-10"
+                          style={{ borderColor: emotion.color, boxShadow: `0 0 20px ${emotion.color}25` }}
+                        >
+                          <span className="absolute top-2 left-2 text-[7px] font-mono opacity-50" style={{ color: emotion.color }}>
+                            LOCK_ON
+                          </span>
+                          <span className="absolute bottom-2 right-2 text-[7px] font-mono opacity-50" style={{ color: emotion.color }}>
+                            [HUD_SCAN]
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Standard Avatar circle for other stages */
+                      <div 
+                        className="w-36 h-36 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-navy-3/80 shadow-[0_0_30px_rgba(6,182,212,0.15)] relative animate-hologram animate-float transition-all duration-500 group"
+                        style={{ borderColor: emotion.color, boxShadow: `0 0 35px ${emotion.color}35` }}
+                      >
+                        {/* Interactive scanned data points */}
+                        <span className="absolute top-2 left-2 text-[8px] font-mono opacity-40" style={{ color: emotion.color }}>
+                          [EMO_{emotion.key.toUpperCase()}]
+                        </span>
+                        <span className="absolute bottom-2 right-2 text-[8px] font-mono opacity-40" style={{ color: emotion.color }}>
+                          SYS_OK
+                        </span>
 
-                      {/* Barista Emoji / Graphic representation */}
-                      <span className="text-7xl filter drop-shadow-[0_0_12px_rgba(255,255,255,0.45)] transform transition-transform duration-500 active:scale-95 cursor-pointer">
-                        {scenario.npcEmoji === '☕' && emotion.key === 'happy' ? '😊' :
-                         scenario.npcEmoji === '☕' && emotion.key === 'normal' ? '☕' :
-                         scenario.npcEmoji === '☕' && emotion.key === 'puzzled' ? '🤔' :
-                         scenario.npcEmoji === '☕' && emotion.key === 'angry' ? '😡' :
-                         emotion.icon}
-                      </span>
-                    </div>
+                        <span className="text-7xl filter drop-shadow-[0_0_12px_rgba(255,255,255,0.45)] transform transition-transform duration-500 active:scale-95 cursor-pointer">
+                          {emotion.icon}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Emotion analyzer summary HUD overlay */}
                     <div className="mt-6 w-full text-center">
