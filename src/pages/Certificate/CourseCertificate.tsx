@@ -127,7 +127,7 @@ const CourseCertificate = () => {
             </div>
 
             {/* Certificate Heading */}
-            <h1 className="text-xl md:text-2xl font-black uppercase text-center tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-white drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]">
+            <h1 className="text-xl md:text-2xl font-black uppercase text-center tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-white drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)] leading-normal py-1">
               Chứng Nhận Giải Mã Nút Mạng
             </h1>
             <p className="text-[10px] text-purple-soft/60 uppercase tracking-widest mt-1 text-center font-bold">

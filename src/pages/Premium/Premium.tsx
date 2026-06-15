@@ -113,7 +113,7 @@ const Premium = () => {
       <div className="max-w-screen-xl mx-auto px-6 py-12 app-bg min-h-screen">
         {/* Header Block with Cyberpunk Glow */}
         <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-transparent bg-clip-text bg-gradient-brand text-5xl font-black mb-4 tracking-widest drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] font-heading">
+          <h2 className="text-transparent bg-clip-text bg-gradient-brand text-5xl font-black mb-4 tracking-widest drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] font-heading leading-normal py-2 inline-block">
             CÁC GÓI DỊCH VỤ
           </h2>
           <div className="ur-divider mb-4"></div>
