@@ -30,8 +30,8 @@ html {
 }
 
 body {
-  background-color: var(--navy);
-  color: #fff;
+  background-color: #f8f9fa;
+  color: #1f2937;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;

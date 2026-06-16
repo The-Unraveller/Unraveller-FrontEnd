@@ -250,6 +250,11 @@ export const resetGameSession = async (missionId: number): Promise<{ message: st
   return response.data;
 };
 
+export const checkMissionAccess = async (missionId: number): Promise<{ isAccessible: boolean; message: string }> => {
+  const response = await apiClient.get<{ isAccessible: boolean; message: string }>(`/Game/check-access/${missionId}`);
+  return response.data;
+};
+
 // Leaderboard
 export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
   try {
