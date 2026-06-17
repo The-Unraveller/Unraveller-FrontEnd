@@ -20,9 +20,9 @@ const Layout: React.FC<LayoutProps> = ({
   showBottomNav,
 }) => {
   return (
-    <div className="app-bg min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-bg-secondary">
       <Navbar isLoggedIn={isLoggedIn} username={username} />
-      <main className={`flex-1 ${showBottomNav ? 'has-bottom-nav' : ''}`}>
+      <main className={`flex-1 ${showBottomNav ? 'pb-16' : ''}`}>
         {children}
       </main>
       {!hideFooter && <Footer />}

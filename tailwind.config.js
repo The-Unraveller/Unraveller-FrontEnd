@@ -46,6 +46,16 @@ export default {
         'spy-red':       '#ff0055',
         'spy-blue':      '#00f0ff',
       },
+      // Minimalist Character.ai-style palette (new)
+      bgColor: {
+        'minimal': '#ffffff',
+        'minimal-secondary': '#f8f9fa',
+        'minimal-card': '#ffffff',
+      },
+      textColor: {
+        'minimal': '#1f2937',
+        'minimal-secondary': '#6b7280',
+      },
       fontFamily: {
         'heading': ['Be Vietnam Pro', 'sans-serif'],
         'body':    ['Inter', 'sans-serif'],
