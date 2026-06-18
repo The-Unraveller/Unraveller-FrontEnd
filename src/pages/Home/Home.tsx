@@ -9,6 +9,16 @@ import { StreakBadge, StatPill } from '../../components/common/GameStats';
 import XPBar from '../../components/common/GameStats';
 import { getMissions } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
+import {
+  getMissionLockStatus,
+  getMissionStars,
+  isMissionCompleted,
+  getDifficultyColor,
+  MissionDomain,
+  getDomainLabel,
+  getDomainIcon,
+} from '../../utils/missionUtils';
+import type { MissionDisplay } from '../../utils/missionUtils';
 import Seo from '../../components/seo/Seo';
 
 // Thay đổi link tải bộ cài .exe của bạn tại đây sau khi upload lên Google Drive/GitHub
@@ -22,79 +32,8 @@ const USER_PROFILE = {
   completedStages: 2,
 };
 
-/* ─── Scenarios ─── */
-const scenarios = [
-  {
-    id: 1,
-    stage: 1,
-    label: 'STAGE 1',
-    title: 'Trò chuyện Quán Cà phê',
-    desc: 'Luyện tập gọi món, trò chuyện xã giao và đối thoại tự nhiên trong môi trường quán cà phê.',
-    img: '/scenario_coffee.png',
-    difficulty: 'Beginner',
-    diffColor: 'badge-success',
-    xpReward: 150,
-    locked: false,
-    completed: true,
-    stars: 3,
-  },
-  {
-    id: 2,
-    stage: 2,
-    label: 'STAGE 2',
-    title: 'Làm theo Chỉ dẫn',
-    desc: 'Lắng nghe, thấu hiểu các chỉ dẫn phức tạp và thực hiện nhiệm vụ với độ chính xác cao.',
-    img: '/scenario_classroom.png',
-    difficulty: 'Beginner',
-    diffColor: 'badge-success',
-    xpReward: 200,
-    locked: false,
-    completed: false,
-    stars: 0,
-  },
-  {
-    id: 3,
-    stage: 3,
-    label: 'STAGE 3',
-    title: 'Biện luận & Đàm phán',
-    desc: 'Bảo vệ quan điểm và đạt được thỏa thuận bằng tiếng Anh chuyên nghiệp.',
-    img: '',
-    difficulty: 'Intermediate',
-    diffColor: 'badge-cyan',
-    xpReward: 300,
-    locked: true,
-    completed: false,
-    stars: 0,
-  },
-  {
-    id: 4,
-    stage: 4,
-    label: 'STAGE 4',
-    title: 'Phỏng vấn Xin việc',
-    desc: 'Vượt qua cuộc phỏng vấn xin việc bằng tiếng Anh với sự tự tin và từ vựng chuẩn xác.',
-    img: '',
-    difficulty: 'Intermediate',
-    diffColor: 'badge-cyan',
-    xpReward: 350,
-    locked: true,
-    completed: false,
-    stars: 0,
-  },
-  {
-    id: 5,
-    stage: 5,
-    label: 'STAGE 5',
-    title: 'Thám tử Điều tra',
-    desc: 'Giải mã vụ án bằng cách viết báo cáo chi tiết và thẩm vấn các nghi phạm.',
-    img: '/scenario_detective.png',
-    difficulty: 'Advanced',
-    diffColor: 'badge-purple',
-    xpReward: 500,
-    locked: true,
-    completed: false,
-    stars: 0,
-  },
-];
+/* ─── Scenarios (populated from API) ─── */
+const scenarios: MissionDisplay[] = [];
 
 const faqs = [
   {
@@ -128,7 +67,7 @@ const DifficultyBadge = ({ label, cls }: { label: string; cls: string }) => {
   return <span className={`badge ${cls}`}>{translated[label] || label}</span>;
 };
 
-const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = ({ s, featured }) => {
+const ScenarioCard: React.FC<{ s: MissionDisplay; featured?: boolean }> = ({ s, featured }) => {
   const content = (
     <div className={`scenario-card ${featured ? 'featured' : ''} flex flex-col h-full`}>
       {/* Image */}
@@ -152,7 +91,9 @@ const ScenarioCard: React.FC<{ s: typeof scenarios[0]; featured?: boolean }> = (
         )}
 
         {/* Stage label */}
-        <span className="absolute top-3 left-3 badge badge-purple text-[10px]">{s.label}</span>
+        <span className="absolute top-3 left-3 badge badge-purple text-[10px]">
+          {getDomainIcon(s.domain)} {getDomainLabel(s.domain)}
+        </span>
 
         {/* Stars (if completed) */}
         {s.completed && (
@@ -213,26 +154,27 @@ const Home = () => {
   const level = Math.floor(xp / 1000) + 1;
   const xpMax = level * 1000;
   const badges = USER_PROFILE.badges;
-  const completedStages = USER_PROFILE.completedStages;
+  const completedStages = user?.missionProgresses?.filter((p) => p.status === 'Completed').length ?? 0;
 
   useEffect(() => {
     getMissions()
       .then((data) => {
         if (data && data.length > 0) {
           const sortedMissions = [...data].sort((a, b) => a.id - b.id);
-          const transformed = sortedMissions.map((m, idx) => ({
+          const transformed = sortedMissions.map((m) => ({
             id: m.id,
-            stage: idx + 1,
-            label: m.stage.toUpperCase(),
+            stage: m.stage.toUpperCase(),
             title: m.title,
-            desc: m.description || m.goal,
-            img: m.imageUrl || (idx === 0 ? '/scenario_coffee.png' : idx === 1 ? '/scenario_classroom.png' : idx === 4 ? '/scenario_detective.png' : ''),
+            desc: (m.description || m.goal || '').replace(/\*/g, ''),
+            img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
             difficulty: m.difficulty,
-            diffColor: m.difficulty === 'Advanced' ? 'badge-purple' : m.difficulty === 'Intermediate' ? 'badge-cyan' : 'badge-success',
+            diffColor: getDifficultyColor(m.difficulty),
             xpReward: m.xpReward,
-            locked: m.locked,
-            completed: idx === 0, // mock progress for display consistency
-            stars: idx === 0 ? 3 : 0,
+            locked: getMissionLockStatus(m.id, user),
+            completed: isMissionCompleted(m.id, user),
+            stars: getMissionStars(m.id, user),
+            grammarTarget: m.grammarTarget,
+            domain: (m.domain ?? 0) as MissionDomain, // fallback to Professional (0) if undefined
           }));
           setScenariosList(transformed);
         }
@@ -240,7 +182,7 @@ const Home = () => {
       .catch((err) => {
         console.error('Failed to load missions from API, using fallback data:', err);
       });
-  }, []);
+  }, [user]);
 
   return (
     <Layout isLoggedIn={isLoggedIn} username={user?.username} showBottomNav={isLoggedIn}>
@@ -322,16 +264,29 @@ const Home = () => {
           </Link>
         </div>
 
-        {/* Featured card (Stage 1 or current stage) */}
-        <div className="mb-5">
-          <ScenarioCard s={scenariosList[0]} featured />
-        </div>
+        {/* Domain sections */}
+        <div className="space-y-6">
+          {[MissionDomain.Professional, MissionDomain.Academic, MissionDomain.Social].map((domain) => {
+            const domainMissions = scenariosList.filter((s) => s.domain === domain);
+            if (domainMissions.length === 0) return null;
 
-        {/* Grid of remaining stages */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {scenariosList.slice(1).map(s => (
-            <ScenarioCard key={s.id} s={s} />
-          ))}
+            return (
+              <div key={domain} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{getDomainIcon(domain)}</span>
+                  <h3 className="font-heading font-bold text-white text-base">{getDomainLabel(domain)}</h3>
+                  <span className="text-xs text-text-muted bg-white/[0.04] border border-white/[0.06] rounded-full px-2 py-0.5">
+                    {domainMissions.length} tình huống
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {domainMissions.map((s) => (
+                    <ScenarioCard key={s.id} s={s} featured={domainMissions[0].id === s.id} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

@@ -1,20 +1,28 @@
 import * as React from 'react';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Shield } from 'lucide-react';
+import { ChatMessage } from './ChatMessage';
 
 interface Message {
   role: 'player' | 'npc';
   text: string;
   timestamp: Date;
+  xp?: number;
+  feedback?: string;
 }
 
 interface ChatHistoryProps {
   messages: Message[];
   isTyping: boolean;
+  /** Tên chủ đề (ví dụ: "Email khiếu nại", "Phỏng vấn xin việc") */
+  topicName?: string;
+  /** Tên NPC (ví dụ: "Mr. Vance", "Barista") */
+  npcName?: string;
+  onSpeak?: (text: string, index: number) => void;
+  speakingIndex?: number | null;
 }
 
-export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping }) => {
+export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping, topicName = 'Hội thoại', npcName = 'NPC', onSpeak, speakingIndex }) => {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,36 +30,35 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping }) 
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-12 scrollbar-hide">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide">
+      <div className="flex items-center justify-center mb-2">
+        <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide">
+          Chủ đề: {topicName}
+        </span>
+      </div>
       <AnimatePresence>
         {messages.map((msg, i) => (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            key={i} 
-            className={`flex ${msg.role === 'player' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div className="max-w-[85%] md:max-w-[70%] space-y-4">
-              <div className={`flex items-center gap-3 mb-2 uppercase text-[10px] font-black tracking-widest ${msg.role === 'player' ? 'flex-row-reverse text-spy-blue' : 'text-spy-green'}`}>
-                {msg.role === 'player' ? <User size={14} /> : <Shield size={14} />}
-                <span>{msg.role === 'player' ? 'ĐẶC VỤ_07' : 'ĐỐI TƯỢNG_MỤC TIÊU'}</span>
-                <span className="opacity-30 font-normal">{msg.timestamp.toLocaleTimeString()}</span>
-              </div>
-              
-              <div className={`p-6 border-2 relative ${msg.role === 'player' ? 'border-spy-blue bg-spy-blue/5 text-spy-blue' : 'border-spy-green bg-spy-green/5 text-white'}`}>
-                {/* Decorative corners for each bubble */}
-                <div className="absolute -top-1 -left-1 w-2 h-2 bg-spy-green/40" />
-                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-spy-green/40" />
-                
-                <p className="text-sm leading-relaxed tracking-wide font-medium">{msg.text}</p>
-              </div>
-            </div>
-          </motion.div>
+          <ChatMessage
+            key={i}
+            message={msg}
+            onSpeak={onSpeak ? (text) => onSpeak(text, i) : undefined}
+            isSpeaking={speakingIndex === i}
+            npcName={npcName}
+          />
         ))}
         {isTyping && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-            <div className="p-6 border border-spy-green bg-spy-green/5 animate-pulse text-[10px] uppercase font-black tracking-[0.2em] text-gray-500">
-              [ ĐANG PHÂN TÍCH TÍN HIỆU... ]
+            <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 bg-indigo-400/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 bg-indigo-400/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 bg-indigo-400/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span className="text-[10px] uppercase font-semibold tracking-widest text-text-muted">
+                  Đang trả lời
+                </span>
+              </div>
             </div>
           </motion.div>
         )}

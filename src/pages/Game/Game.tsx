@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Zap, Send, HelpCircle } from 'lucide-react';
+import { ChevronLeft, Zap, Send, HelpCircle, Lightbulb, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
 import Seo from '../../components/seo/Seo';
@@ -9,9 +9,8 @@ import { getMissions, sendGameMessage, getUserInventory, useItem, getGameSession
 import type { UserInventoryDto, GameSessionDto, WritingFeedbackDto, DialogueResponseDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 import GoogleAd from '../../components/ads/GoogleAd';
-import { ChatMessage } from '../../components/game/ChatMessage';
+import { ChatHistory } from '../../components/game/ChatHistory';
 import WritingFeedbackPanel from '../../components/game/WritingFeedbackPanel';
-import { useMediaQuery } from 'react-responsive';
 
 /* ─── Types ─── */
 interface Message {
@@ -57,6 +56,7 @@ const syntaxPuzzlesMap: Record<number, { question: string; scrambled: string[]; 
 const defaultScenario = {
   title: 'Loading…',
   stage: 'STAGE',
+  topic: 'Hội thoại',
   bg: '/scenario_coffee.png',
   npcName: 'NPC',
   npcEmoji: '🤖',
@@ -65,6 +65,27 @@ const defaultScenario = {
   intro: 'Preparing your mission…',
   choices: ["Hello!", "Ready!"],
   grammarTarget: '',
+};
+
+/* ─── Map stage identifiers → user-friendly topic names ─── */
+const stageToTopic: Record<string, string> = {
+  'COFFEE_SHOP': 'Gọi món Cà phê',
+  'FOLLOW_INSTRUCTIONS': 'Làm theo Chỉ dẫn',
+  'DEBATE_NEGOTIATE': 'Biện luận & Đàm phán',
+  'JOB_INTERVIEW': 'Phỏng vấn Xin việc',
+  'DETECTIVE': 'Điều tra Hiện trường',
+  'EMAIL_COMPLAINT': 'Email khiếu nại',
+  'PERSUADE_TEAM': 'Thuyết phục Đội nhóm',
+  'PRESENTATION': 'Thuyết trình',
+  'CUSTOMER_SERVICE': 'Chăm sóc Khách hàng',
+  'SOCIAL_MEDIA': 'Viết bài Mạng xã hội',
+  'NEGOTIATION': 'Đàm phán Hợp đồng',
+  'ACADEMIC': 'Viết Luận Học thuật',
+  'STAGE 1': 'Quán Cà phê',
+  'STAGE 2': 'Chỉ dẫn Công việc',
+  'STAGE 3': 'Biện luận',
+  'STAGE 4': 'Phỏng vấn',
+  'STAGE 5': 'Điều tra',
 };
 
 const Game = () => {
@@ -88,6 +109,8 @@ const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [writingFeedback, setWritingFeedback] = useState<WritingFeedbackDto | null>(null);
   const [currentTurnScores, setCurrentTurnScores] = useState<WritingFeedbackDto['scores'] | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const chatRef = useRef<HTMLDivElement>(null);
   const { user } = useGameStore();
@@ -270,9 +293,12 @@ const Game = () => {
         const data = await getMissions();
         const found = data.find(m => m.id === missionId);
         if (found) {
+          const stageKey = found.stage?.toUpperCase() || '';
+          const topic = stageToTopic[stageKey] || stageKey || 'Hội thoại';
           const transformed = {
             title: found.title,
-            stage: found.stage.toUpperCase(),
+            stage: stageKey,
+            topic,
             bg: found.imageUrl || '/default-bg.png',
             npcName: found.npcName || 'NPC',
             npcEmoji: found.npcName?.toLowerCase().includes('barista') ? '☕'
@@ -370,6 +396,21 @@ const Game = () => {
 
   const handleChoice = async (choice: string) => { await processMessage(choice); };
 
+  const suggestionMap: Record<number, string[]> = {
+    1: ["Yes, let's go!", "I'm a bit nervous…", "What do we do first?", "Sounds great!"],
+    2: ["Understood, ready!", "Can you repeat that?", "What's the first task?", "I'll do my best."],
+    3: ["I'm ready to debate.", "Let's start the negotiation.", "What is the topic?", "Ready!"],
+    4: ["Good morning, Mr. Vance.", "Let's start the interview.", "I'm ready for the questions.", "Thank you for having me."],
+    5: ["I'm on the case.", "Give me the details.", "Where do I start?", "Understood. Let's solve this."]
+  };
+
+  const toggleSuggestions = () => {
+    if (!showSuggestions && suggestions.length === 0) {
+      setSuggestions(suggestionMap[missionId] || suggestionMap[1]);
+    }
+    setShowSuggestions(prev => !prev);
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     await processMessage(inputValue.trim());
@@ -404,12 +445,12 @@ const Game = () => {
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-navy-2/85 border border-purple-brand/30 rounded-full shadow-[0_0_10px_rgba(124,58,237,0.15)]">
-                <Zap size={14} className="text-warning fill-warning/20 animate-pulse" />
+              <div className="px-3.5 py-1.5 bg-navy-2/85 border border-purple-brand/30 rounded-full shadow-[0_0_10px_rgba(124,58,237,0.15)]">
+                <Zap size={14} className="text-warning fill-warning/20" />
                 <span className="text-xs font-semibold text-white font-mono">{totalXP} XP</span>
               </div>
-              <div className="px-3.5 py-1.5 bg-navy-2/85 border border-cyan-brand/30 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.15)]">
-                <span className="text-xs font-semibold text-cyan-light font-mono">{scenario.stage}</span>
+              <div className="px-3.5 py-1.5 bg-navy-2/85 border border-white/10 rounded-full shadow-sm">
+                <span className="text-xs font-semibold text-indigo-300">{scenario.topic}</span>
               </div>
               {isMobile && (
                 <button
@@ -444,120 +485,140 @@ const Game = () => {
                 )}
               </div>
 
-              {/* Chat Messages */}
+              {/* Chat Messages - sử dụng ChatHistory với topic và npcName */}
               <div className="flex-1 ur-card border-purple-brand/20 p-4 overflow-y-auto shadow-md bg-navy-2/45" ref={chatRef}>
-                <div className="space-y-4">
-                  {messages.map((msg, i) => (
-                    <ChatMessage
-                      key={i}
-                      message={msg}
-                      onSpeak={(text) => speakText(text, i)}
-                      isSpeaking={speakingIndex === i}
-                    />
-                  ))}
+                <ChatHistory
+                  messages={messages}
+                  isTyping={isTyping}
+                  topicName={scenario.topic}
+                  npcName={scenario.npcName}
+                  onSpeak={speakText}
+                  speakingIndex={speakingIndex}
+                />
 
-                  {isTyping && (
-                    <div className="flex items-center gap-2 text-text-muted text-sm font-mono">
-                      <div className="w-2 h-2 bg-purple-brand rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-purple-brand rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-purple-brand rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      <span className="ml-2 text-xs italic">NPC đang nhập tin nhắn...</span>
+                {/* AI Hint */}
+                {activeHint && (
+                  <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3.5">
+                    <div className="flex items-start gap-2">
+                      <HelpCircle size={16} className="text-cyan-brand mt-0.5" />
+                      <p className="text-xs text-text-secondary font-body leading-relaxed">{activeHint}</p>
+                      <button onClick={() => setActiveHint(null)} className="ml-auto text-text-muted hover:text-white text-sm">
+                        ×
+                      </button>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {/* AI Hint */}
-              {activeHint && (
-                <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3.5">
-                  <div className="flex items-start gap-2">
-                    <HelpCircle size={16} className="text-cyan-brand mt-0.5" />
-                    <p className="text-xs text-text-secondary font-body leading-relaxed">{activeHint}</p>
-                    <button onClick={() => setActiveHint(null)} className="ml-auto text-text-muted hover:text-white text-sm">
-                      ×
-                    </button>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Input Form */}
-              <form onSubmit={handleSend} className="flex gap-2">
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  placeholder="Nhập câu trả lời tiếng Anh..."
-                  className="flex-1 px-5 py-3.5 rounded-full bg-navy-3/90 border border-purple-brand/40 text-white placeholder-white/30 focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand outline-none text-sm font-body shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] transition-all"
-                  disabled={isTyping || gameOver}
-                  autoComplete="off"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3.5 bg-gradient-brand hover:shadow-glow-purple hover:scale-[1.02] text-white rounded-full font-semibold transition-all disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none flex items-center justify-center flex-shrink-0"
-                  disabled={isTyping || gameOver || !inputValue.trim()}
-                >
-                  <Send size={18} />
-                </button>
-              </form>
-
-              {/* Turn Progress & Actions */}
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-text-secondary font-mono">
-                  Lượt: {turnCount}/10
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={startTerminalHack}
-                    className="text-xs px-4 py-2 border border-purple-brand/40 text-purple-soft rounded-full hover:bg-purple-brand/10 transition-all font-semibold font-mono"
-                    title="Luyện tập cú pháp"
-                  >
-                    🔌 Luyện cú pháp
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    className="text-xs px-4 py-2 border border-white/10 text-text-secondary rounded-full hover:bg-white/5 transition-all font-semibold font-mono"
-                    title="Làm lại từ đầu"
-                  >
-                    🔄 Làm lại
-                  </button>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="w-full bg-navy-3 border border-white/10 rounded-full h-2.5 overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(255,255,255,0.2)]"
-                  style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%`, backgroundColor: susColor }}
-                />
-              </div>
-
-              <div className="text-center text-xs font-mono uppercase tracking-wider text-text-secondary">
-                {suspicion >= 80 ? '⚠️ Mức nghi ngờ cao' : suspicion >= 50 ? '⚠️ Đang bị theo dõi' : '✅ An toàn'}
-              </div>
-
-              {/* Inventory */}
-              {inventory.length > 0 && (
-                <div className="ur-card border-purple-brand/20 p-3 bg-navy-2/30">
-                  <div className="text-xs text-cyan-brand font-semibold font-mono uppercase tracking-wider mb-2">Hành trang đặc vụ</div>
-                  <div className="flex flex-wrap gap-2">
-                    {inventory.map((item) => (
+                {/* Input Form & Suggestions */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2 p-3 rounded-xl bg-navy-3/60 border border-white/5">
+                    <span className="w-full text-[10px] font-semibold text-indigo-400/70 uppercase tracking-wider mb-1">Gợi ý trả lời:</span>
+                    {suggestions.map((s, i) => (
                       <button
-                        key={item.itemId}
-                        onClick={() => handleUseItem(item.itemId)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-navy-3 border border-purple-brand/30 rounded-lg text-xs hover:border-cyan-brand hover:bg-purple-brand/15 transition-all text-white font-medium"
-                        title={item.description}
+                        key={i}
+                        onClick={() => {
+                          setInputValue(s);
+                          setShowSuggestions(false);
+                        }}
+                        className="px-3 py-1.5 text-xs bg-white/[0.04] border border-white/[0.08] text-white/80 rounded-lg hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all"
                       >
-                        <span className="text-sm">{item.emoji}</span>
-                        <span>{item.name}</span>
-                        <span className="px-1.5 py-0.5 bg-purple-brand/35 text-cyan-light text-[10px] rounded font-mono font-bold">{item.quantity}</span>
+                        {s}
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+                <form onSubmit={handleSend} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
+                    placeholder="Nhập câu trả lời tiếng Anh..."
+                    className="flex-1 px-5 py-3.5 rounded-full bg-navy-3/90 border border-white/[0.08] text-white placeholder-white/30 focus:border-indigo-400/50 focus:ring-1 focus:ring-indigo-400/30 outline-none text-sm font-body shadow-sm transition-all"
+                    disabled={isTyping || gameOver}
+                    autoComplete="off"
+                  />
+                  <button
+                    type="submit"
+                    className="px-6 py-3.5 bg-gradient-to-br from-indigo-500 to-blue-500 hover:shadow-md hover:scale-[1.02] text-white rounded-full font-semibold transition-all disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none flex items-center justify-center flex-shrink-0"
+                    disabled={isTyping || gameOver || !inputValue.trim()}
+                  >
+                    <Send size={18} />
+                  </button>
+                </form>
 
-              <GoogleAd />
+                {/* Action Button - Gợi ý trả lời với pulse */}
+                {!isTyping && !gameOver && (
+                  <div className="flex justify-center">
+                    <button
+                      onClick={toggleSuggestions}
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-text-secondary hover:text-indigo-300 hover:border-indigo-400/30 hover:bg-indigo-500/5 transition-all text-xs font-medium animate-pulse-slow"
+                    >
+                      <Lightbulb size={14} className="text-amber-400/70 group-hover:text-amber-300 transition-colors" />
+                      <span>Gợi ý trả lời</span>
+                      <Sparkles size={12} className="text-indigo-400/50 group-hover:text-indigo-300 transition-colors" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Turn Progress & Actions */}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-text-secondary font-mono">
+                    Lượt: {turnCount}/10
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={startTerminalHack}
+                      className="text-xs px-4 py-2 border border-purple-brand/40 text-purple-soft rounded-full hover:bg-purple-brand/10 transition-all font-semibold font-mono"
+                      title="Luyện tập cú pháp"
+                    >
+                      🔌 Luyện cú pháp
+                    </button>
+                    <button
+                      onClick={handleReset}
+                      className="text-xs px-4 py-2 border border-white/10 text-text-secondary rounded-full hover:bg-white/5 transition-all font-semibold font-mono"
+                      title="Làm lại từ đầu"
+                    >
+                      🔄 Làm lại
+                    </button>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full bg-navy-3 border border-white/10 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(255,255,255,0.2)]"
+                    style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%`, backgroundColor: susColor }}
+                  />
+                </div>
+
+                <div className="text-center text-xs font-mono uppercase tracking-wider text-text-secondary">
+                  {suspicion >= 80 ? '⚠️ Mức nghi ngờ cao' : suspicion >= 50 ? '⚠️ Đang bị theo dõi' : '✅ An toàn'}
+                </div>
+
+                {/* Inventory */}
+                {inventory.length > 0 && (
+                  <div className="ur-card border-purple-brand/20 p-3 bg-navy-2/30">
+                    <div className="text-xs text-cyan-brand font-semibold font-mono uppercase tracking-wider mb-2">Hành trang đặc vụ</div>
+                    <div className="flex flex-wrap gap-2">
+                      {inventory.map((item) => (
+                        <button
+                          key={item.itemId}
+                          onClick={() => handleUseItem(item.itemId)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-navy-3 border border-purple-brand/30 rounded-lg text-xs hover:border-cyan-brand hover:bg-purple-brand/15 transition-all text-white font-medium"
+                          title={item.description}
+                        >
+                          <span className="text-sm">{item.emoji}</span>
+                          <span>{item.name}</span>
+                          <span className="px-1.5 py-0.5 bg-purple-brand/35 text-cyan-light text-[10px] rounded font-mono font-bold">{item.quantity}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <GoogleAd />
+              </div>
             </div>
 
             {/* Right Column - Writing Feedback Panel */}
