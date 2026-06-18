@@ -45,6 +45,14 @@ export default {
         'spy-green':     '#00ff41',
         'spy-red':       '#ff0055',
         'spy-blue':      '#00f0ff',
+
+        // ── Standard UI mappings for Cyberpunk theme ──
+        'accent':          '#7c3aed',
+        'accent-dark':     '#6d28d9',
+        'text-primary':    '#ffffff',
+        'text-secondary':  '#a29fbd',
+        'text-muted':      '#636080',
+        'bg-secondary':    '#080612',
       },
       // Minimalist Character.ai-style palette (new)
       bgColor: {

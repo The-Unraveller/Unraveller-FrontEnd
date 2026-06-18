@@ -11,6 +11,7 @@ import Result from './pages/Result/Result';
 import About from './pages/About/About';
 import Premium from './pages/Premium/Premium';
 import Badges from './pages/Badges/Badges';
+import ProgressPage from './pages/Progress/ProgressPage';
 import DashboardScreen from './pages/Dashboard/DashboardScreen';
 import UserProfile from './pages/Profile/UserProfile';
 import CourseCertificate from './pages/Certificate/CourseCertificate';
@@ -79,6 +80,7 @@ const AppRoutes = () => {
         <Route path="/result-screen/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
         <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
         <Route path="/badges" element={<ProtectedRoute><Badges /></ProtectedRoute>} />
+        <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
         <Route path="/scenario/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />

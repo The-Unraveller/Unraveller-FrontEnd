@@ -44,6 +44,11 @@ export interface MissionDto {
   rejectionReason: string | null;
   createdByUserId: number | null;
   grammarTarget: string;
+  writingObjective: string;
+  domain: number;
+  cefrLevel: number;
+  minTurnsToComplete: number;
+  minAverageScore: number;
 }
 
 export interface DialogueRequestDto {
@@ -53,7 +58,7 @@ export interface DialogueRequestDto {
 
 export interface DialogueResponseDto {
   npcResponse: string;
-  feedback: string;
+  writingFeedback: WritingFeedbackDto;
   newSuspicionLevel: number;
   isWin: boolean;
   isLose: boolean;
@@ -62,6 +67,54 @@ export interface DialogueResponseDto {
   completionToken?: string;
   updatedEnergy?: number;
   updatedMaxEnergy?: number;
+}
+
+export interface WritingScoreDto {
+  grammar: number;
+  vocabulary: number;
+  tone: number;
+  naturalness: number;
+  clarity: number;
+  structure: number;
+}
+
+export interface CorrectionDto {
+  axis: number;
+  original: string;
+  corrected: string;
+  explanation: string;
+}
+
+export interface WritingFeedbackDto {
+  scores: WritingScoreDto;
+  corrections: CorrectionDto[];
+  rewriteSuggestion: string | null;
+  summary: string;
+}
+
+export interface SkillMapDto {
+  currentAverage: WritingScoreDto;
+  historicalTrend: Record<string, number>;
+}
+
+export interface PortfolioEntryDto {
+  missionId: number;
+  missionTitle: string;
+  domain: string;
+  cefrLevel: string;
+  completedAt: string;
+  finalScores: WritingScoreDto;
+  turnsCount: number;
+  totalXp: number;
+}
+
+export interface WeeklyReportDto {
+  weekStartDate: string;
+  averageScore: number;
+  scenariosCompleted: number;
+  topErrorTypes: string[];
+  newVocabularyCount: number;
+  recommendedScenarios: number[];
 }
 
 export interface UserProfileDto {
@@ -252,6 +305,22 @@ export const resetGameSession = async (missionId: number): Promise<{ message: st
 
 export const checkMissionAccess = async (missionId: number): Promise<{ isAccessible: boolean; message: string }> => {
   const response = await apiClient.get<{ isAccessible: boolean; message: string }>(`/Game/check-access/${missionId}`);
+  return response.data;
+};
+
+// Progress
+export const getSkillMap = async (): Promise<SkillMapDto> => {
+  const response = await apiClient.get<SkillMapDto>('/Progress/skill-map');
+  return response.data;
+};
+
+export const getPortfolio = async (): Promise<PortfolioEntryDto[]> => {
+  const response = await apiClient.get<PortfolioEntryDto[]>('/Progress/portfolio');
+  return response.data;
+};
+
+export const getWeeklyReport = async (): Promise<WeeklyReportDto> => {
+  const response = await apiClient.get<WeeklyReportDto>('/Progress/weekly-report');
   return response.data;
 };
 

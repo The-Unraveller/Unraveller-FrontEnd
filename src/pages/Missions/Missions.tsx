@@ -105,41 +105,43 @@ const Missions = () => {
           {coursesList.map((course) => (
             <div
               key={course.id}
-              className={`bg-white rounded-xl border ${course.locked ? 'border-gray-200 opacity-60' : 'border-gray-200 hover:border-accent hover:shadow-md'} transition-all overflow-hidden`}
+              className={`ur-card ur-card-hover border-purple-brand/20 transition-all overflow-hidden flex flex-col ${
+                course.locked ? 'opacity-50' : ''
+              }`}
             >
               {/* Image */}
-              <div className="h-40 bg-gray-100 relative overflow-hidden">
+              <div className="h-40 bg-navy-3/80 relative overflow-hidden border-b border-purple-brand/20">
                 {course.img && !course.locked ? (
                   <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                    <Lock size={32} className="text-gray-400" />
+                  <div className="w-full h-full flex items-center justify-center bg-navy-3/90">
+                    <Lock size={32} className="text-purple-brand/50" />
                   </div>
                 )}
                 <div className="absolute top-3 left-3">
-                  <span className="bg-white/90 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded border border-gray-200">
+                  <span className="badge badge-purple text-[10px] uppercase font-mono">
                     {course.stage}
                   </span>
                 </div>
                 {course.locked && (
-                  <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center">
-                    <Lock size={40} className="text-gray-500" />
+                  <div className="absolute inset-0 bg-navy/60 backdrop-blur-[2px] flex items-center justify-center">
+                    <Lock size={40} className="text-purple-brand/80 drop-shadow-[0_0_12px_rgba(124,58,237,0.6)]" />
                   </div>
                 )}
               </div>
 
               {/* Content */}
-              <div className="p-4 flex flex-col flex-1">
+              <div className="p-5 flex flex-col flex-1">
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-text-primary mb-2">{course.title}</h3>
-                  <p className="text-sm text-text-secondary mb-3 leading-relaxed">{course.desc}</p>
+                  <h3 className="text-lg font-bold text-white mb-2 font-heading">{course.title}</h3>
+                  <p className="text-xs text-text-secondary mb-4 leading-relaxed font-body">{course.desc}</p>
 
                   {course.grammarTarget && !course.locked && (
-                    <div className="bg-accent/5 border border-accent/10 rounded-lg p-3 mb-3">
-                      <div className="text-xs font-semibold text-accent mb-1 uppercase tracking-wide">
+                    <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 mb-4 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
+                      <div className="text-[10px] font-bold text-cyan-brand mb-1.5 uppercase tracking-wider font-mono">
                         Mục tiêu ngữ pháp
                       </div>
-                      <p className="text-sm text-text-primary">{course.grammarTarget}</p>
+                      <p className="text-xs text-text-secondary font-body leading-relaxed">{course.grammarTarget}</p>
                     </div>
                   )}
 
@@ -149,11 +151,11 @@ const Missions = () => {
                       <Star
                         key={i}
                         size={14}
-                        className={i <= course.stars ? 'text-warning fill-warning' : 'text-gray-300'}
+                        className={i <= course.stars ? 'text-warning fill-warning drop-shadow-[0_0_4px_rgba(245,158,11,0.6)]' : 'text-white/10'}
                       />
                     ))}
                     {course.locked && course.stars === 0 && (
-                      <span className="text-xs text-text-muted ml-2">Khóa</span>
+                      <span className="text-[10px] text-text-muted ml-2 font-mono uppercase">Khóa</span>
                     )}
                   </div>
                 </div>
@@ -162,12 +164,12 @@ const Missions = () => {
                 <button
                   onClick={() => handleCardClick(course.id, course.locked)}
                   disabled={course.locked || loadingAccess === course.id}
-                  className={`mt-4 w-full py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
+                  className={`mt-5 w-full btn btn-sm transition-all duration-300 font-semibold tracking-wider font-mono uppercase ${
                     course.locked
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      ? 'bg-navy-3/80 border border-white/10 text-white/30 cursor-not-allowed'
                       : loadingAccess === course.id
-                      ? 'bg-accent/50 text-white cursor-wait'
-                      : 'bg-accent text-white hover:bg-accent-dark'
+                      ? 'bg-purple-brand/50 text-white/50 cursor-wait'
+                      : 'btn-primary shadow-glow-purple hover:scale-[1.02]'
                   }`}
                 >
                   {loadingAccess === course.id ? (
@@ -185,14 +187,15 @@ const Missions = () => {
 
         {/* Premium CTA */}
         {(!user?.isPremium) && (
-          <div className="mt-12 bg-gradient-to-r from-accent/5 to-accent/10 border border-accent/20 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-bold text-text-primary mb-2">Nâng cấp lên Premium</h3>
-            <p className="text-text-secondary mb-4 max-w-2xl mx-auto">
-              Mở khóa tất cả 6 kịch bản, bao gồm cả những kịch bản nâng cao, và trở tên thành thạo với hơn 50+ nhiệm vụ.
+          <div className="mt-12 relative overflow-hidden rounded-2xl border border-purple-brand/40 bg-gradient-to-r from-navy-2 via-purple-brand/10 to-navy-2 p-8 text-center shadow-[0_0_30px_rgba(124,58,237,0.1)]">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-brand"></div>
+            <h3 className="text-lg font-bold text-white mb-2 font-heading tracking-wide">⚡ NÂNG CẤP LÊN PREMIUM VIP</h3>
+            <p className="text-sm text-text-secondary mb-6 max-w-2xl mx-auto leading-relaxed font-body">
+              Mở khóa tất cả 6 kịch bản, bao gồm cả những kịch bản nâng cao, nhận gấp đôi XP và có trợ lý AI Coach cao cấp phân tích chuyên sâu.
             </p>
             <Link
               to="/premium"
-              className="inline-block px-6 py-2.5 bg-accent text-white rounded-lg font-medium hover:bg-accent-dark transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-brand text-white rounded-full font-bold text-sm hover:shadow-glow-purple hover:scale-[1.03] transition-all duration-300"
             >
               Xem gói Premium
             </Link>
