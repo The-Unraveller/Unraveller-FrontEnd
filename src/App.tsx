@@ -64,7 +64,7 @@ const AppRoutes = () => {
   }, [setUser, setAuthenticated]);
 
   return (
-    <div className="min-h-screen bg-spy-black text-spy-green">
+    <div className="min-h-screen bg-spy-black text-white font-body">
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
