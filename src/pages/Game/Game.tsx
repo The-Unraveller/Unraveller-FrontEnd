@@ -10,6 +10,7 @@ import type { UserInventoryDto, GameSessionDto, WritingFeedbackDto, DialogueResp
 import { useGameStore } from '../../store/useGameStore';
 import GoogleAd from '../../components/ads/GoogleAd';
 import { ChatHistory } from '../../components/game/ChatHistory';
+import { SuspicionMeter } from '../../components/game/SuspicionMeter';
 import WritingFeedbackPanel from '../../components/game/WritingFeedbackPanel';
 
 /* ─── Types ─── */
@@ -387,8 +388,9 @@ const Game = () => {
         setGameOver(true);
         toast.success("Nhiệm vụ hoàn thành!");
       }
-    } catch (err) {
-      toast.error("Lỗi: Không thể gửi tin nhắn.");
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || err.message || 'Không thể gửi tin nhắn.';
+      toast.error(`Lỗi: ${errorMsg}`);
     } finally {
       setIsTyping(false);
     }
@@ -563,7 +565,7 @@ const Game = () => {
                 {/* Turn Progress & Actions */}
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-text-secondary font-mono">
-                    Lượt: {turnCount}/10
+                    Lượt đối thoại: <span className="text-white font-bold">{turnCount}/10</span>
                   </div>
 
                   <div className="flex gap-2">
@@ -584,16 +586,17 @@ const Game = () => {
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full bg-navy-3 border border-white/10 rounded-full h-2.5 overflow-hidden">
+                {/* Dialogue Turn progress bar */}
+                <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(255,255,255,0.2)]"
-                    style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%`, backgroundColor: susColor }}
+                    className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
+                    style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
                   />
                 </div>
 
-                <div className="text-center text-xs font-mono uppercase tracking-wider text-text-secondary">
-                  {suspicion >= 80 ? '⚠️ Mức nghi ngờ cao' : suspicion >= 50 ? '⚠️ Đang bị theo dõi' : '✅ An toàn'}
+                {/* Core Suspicion Meter Display */}
+                <div className="border-t border-white/5 pt-2 mt-1 flex justify-center w-full">
+                  <SuspicionMeter level={suspicion} />
                 </div>
 
                 {/* Inventory */}
