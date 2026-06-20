@@ -40,20 +40,19 @@ export function getMissionLockStatus(
   missionId: number,
   user: UserProfileDto | null
 ): boolean {
+  // Not logged in → only mission 1 accessible
   if (!user) return missionId > 1;
+  // Premium → everything unlocked
   if (user.isPremium) return false;
-  if (missionId > 3) return true;
+  // Mission 1 always accessible
   if (missionId === 1) return false;
-
+  // Sequential unlock: mission N unlocks when mission N-1 is completed
   const prevCompleted = (prevId: number) =>
     user.missionProgresses?.some(
       (p) => p.missionId === prevId && p.status === 'Completed'
     ) ?? false;
 
-  if (missionId === 2) return !prevCompleted(1);
-  if (missionId === 3) return !prevCompleted(2);
-
-  return false;
+  return !prevCompleted(missionId - 1);
 }
 
 /** Calculate stars from mission progress (0-3) */

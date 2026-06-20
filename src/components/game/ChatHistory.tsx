@@ -35,10 +35,12 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping, to
   }, [messages, isTyping]);
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide">
-      <div className="flex items-center justify-center mb-2">
-        <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide">
-          Chủ đề: {topicName}
+    // h-full ensures we fill the flex-1 parent; overflow-y-auto enables scrolling
+    <div ref={containerRef} className="h-full overflow-y-auto p-4 md:p-5 space-y-5 scrollbar-hide">
+      {/* Topic label — stays at top */}
+      <div className="flex items-center justify-center">
+        <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] font-semibold tracking-wide">
+          {topicName}
         </span>
       </div>
       <AnimatePresence>
@@ -70,4 +72,4 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping, to
       </AnimatePresence>
     </div>
   );
-};
+};

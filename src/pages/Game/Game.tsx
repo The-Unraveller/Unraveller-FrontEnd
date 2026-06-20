@@ -23,38 +23,6 @@ interface Message {
   feedback?: string;
 }
 
-/* ─── Scenario fallback data ─── */
-const startChoicesMap: Record<number, string[]> = {
-  1: ["I would like to order a cup of coffee, please.", "Could I see the menu, please?", "Do you recommend any house blends today?", "What kind of hot pastries do you have?"],
-  2: ["Understood. What is the first task I need to do?", "I'm ready. Please give me the instructions.", "Can you guide me on what to do first?", "I will do my best to follow the guidelines."],
-  3: ["I'm ready. Let's start the negotiation.", "Can you explain the main points of the agreement?", "I'd like to discuss the terms of this deal.", "Let's look at the topic from both sides."],
-  4: ["Good morning. Thank you for having me today.", "I'm excited to share my experience with you.", "I'm ready for the interview questions.", "Thank you. I'm glad to have this opportunity."],
-  5: ["I'm on the case. What details do we have?", "Let's start by examining the evidence.", "Where was the victim last seen?", "I'll solve this. What's our first clue."]
-};
-
-/* ─── Grammar Syntax Puzzles for Learning Mini-game ─── */
-const syntaxPuzzlesMap: Record<number, { question: string; scrambled: string[]; answer: string; hint: string }[]> = {
-  1: [
-    { question: "Sắp xếp để tạo câu yêu cầu gọi món lịch sự:", scrambled: ["like", "order", "cup", "I", "would", "coffee.", "to", "a", "of"], answer: "I would like to order a cup of coffee.", hint: "Bắt đầu: I would like to..." },
-    { question: "Sắp xếp câu hỏi xin xem thực đơn:", scrambled: ["menu,", "please?", "I", "see", "the", "Could"], answer: "Could I see the menu, please?", hint: "Dùng 'Could I' để hỏi lịch sự." }
-  ],
-  2: [
-    { question: "Sắp xếp câu bị động:", scrambled: ["report", "the", "by", "submitted", "was", "me."], answer: "The report was submitted by me.", hint: "Cấu trúc: S + was/were + V3 + by + O." }
-  ],
-  3: [
-    { question: "Sắp xếp câu điều kiện loại 1:", scrambled: ["If", "help", "me,", "I", "will", "you", "bypass", "the", "server."], answer: "If you help me, I will bypass the server.", hint: "If + S + V, S + will + V" }
-  ],
-  4: [
-    { question: "Sắp xếp câu với 'because':", scrambled: ["because", "I", "applied", "this", "job", "I", "the", "want", "challenges.", "for"], answer: "I applied for this job because I want the challenges.", hint: "Because đứng sau mệnh đề chính." }
-  ],
-  5: [
-    { question: "Sắp xếp câu mô tả hiện trường:", scrambled: ["quickly", "evidence.", "gathered", "The", "detective", "the"], answer: "The detective quickly gathered the evidence.", hint: "Trạng từ đứng trước động từ." }
-  ],
-  6: [
-    { question: "Sắp xếp câu gián tiếp:", scrambled: ["She", "told", "she", "ready", "was", "the", "mission.", "me", "for"], answer: "She told me she was ready for the mission.", hint: "S + told + someone + S + V..." }
-  ]
-};
-
 const defaultScenario = {
   title: 'Loading…',
   stage: 'STAGE',
@@ -66,7 +34,9 @@ const defaultScenario = {
   xpReward: 100,
   intro: 'Preparing your mission…',
   choices: ["Hello!", "Ready!"],
+  syntaxPuzzles: [] as { question: string; scrambled: string[]; answer: string; hint: string }[],
   grammarTarget: '',
+  minTurns: 5,
 };
 
 /* ─── Map stage identifiers → user-friendly topic names ─── */
@@ -190,7 +160,8 @@ const Game = () => {
   const [showPuzzleHint, setShowPuzzleHint] = useState(false);
 
   const startTerminalHack = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[0];
     setCurrentPuzzleIdx(0);
     setSelectedWords([]);
@@ -213,7 +184,8 @@ const Game = () => {
   };
 
   const handleCheckPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[currentPuzzleIdx];
     const userSentence = selectedWords.join(' ');
     const normalize = (str: string) => str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -229,7 +201,8 @@ const Game = () => {
   };
 
   const handleResetPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[currentPuzzleIdx];
     setSelectedWords([]);
     setScrambledWords([...puzzle.scrambled].sort(() => Math.random() - 0.5));
@@ -237,7 +210,8 @@ const Game = () => {
   };
 
   const handleNextPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const nextIdx = currentPuzzleIdx + 1;
     if (nextIdx < puzzles.length) {
       setCurrentPuzzleIdx(nextIdx);
@@ -285,7 +259,7 @@ const Game = () => {
     setSuspicion(sessionData.currentSuspicion);
     setTurnCount(sessionData.turnCount);
     setTotalXP(sessionData.xpEarned);
-    if (sessionData.turnCount >= 10 || sessionData.currentSuspicion >= 100) {
+    if (sessionData.turnCount >= scenario.minTurns || sessionData.currentSuspicion >= 100) {
       setGameOver(true);
     } else {
       setGameOver(false);
@@ -354,9 +328,11 @@ const Game = () => {
                 : found.npcName?.toLowerCase().includes('detective') ? '🔍' : '👤',
             difficulty: found.difficulty || 'Trung bình',
             xpReward: found.xpReward || 50,
-            choices: (found as any).choices || startChoicesMap[missionId] || startChoicesMap[1],
+            choices: found.initialChoices && found.initialChoices.length > 0 ? found.initialChoices : ["Hello!", "Ready!"],
+            syntaxPuzzles: (() => { try { return JSON.parse(found.syntaxPuzzles || '[]'); } catch { return []; } })(),
             intro: found.description || found.goal || '',
             grammarTarget: found.grammarTarget || '',
+            minTurns: found.minTurnsToComplete || 5,
           };
           setScenario(transformed);
 
@@ -444,7 +420,7 @@ const Game = () => {
         setTimeout(() => {
           navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
         }, 2500);
-      } else if (response.turnCount >= 10 || turnCount + 1 >= 10) {
+      } else if (response.turnCount >= scenario.minTurns || turnCount + 1 >= scenario.minTurns) {
         setGameOver(true);
         setIsWin(true);
         if (response.completionToken) setCompletionToken(response.completionToken);
@@ -498,10 +474,11 @@ const Game = () => {
   return (
     <>
       <Seo title="Đang chơi - The Unraveller" description="Trò chơi học tiếng Anh qua chat" noIndex />
-      <div className="min-h-screen lg:h-screen bg-bg-secondary flex flex-col lg:overflow-hidden">
+      {/* Root: lock to viewport, no page scroll — game is a true full-screen app */}
+      <div className="h-[100dvh] bg-bg-secondary flex flex-col overflow-hidden">
         <Navbar isLoggedIn username={user?.username || 'Learner'} />
 
-        <main className="max-w-[1680px] mx-auto w-full px-4 lg:px-8 py-4 lg:py-6 flex-grow flex-1 flex flex-col min-h-0 lg:h-[calc(100vh-64px)] h-auto lg:overflow-hidden">
+        <main className="flex-1 min-h-0 flex flex-col w-full max-w-[1680px] mx-auto px-4 lg:px-8 py-3 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 flex-shrink-0">
             <button
@@ -531,66 +508,68 @@ const Game = () => {
             </div>
           </div>
 
-          {/* Two-column layout */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 lg:overflow-hidden">
-            {/* Left Column - Chat */}
-            <div className="flex flex-col gap-4 min-h-0 h-full overflow-hidden">
-              {/* Mission Info Card */}
-              <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45 flex flex-col sm:flex-row gap-4 items-start">
-                {scenario.bg && (
-                  <div className="w-full sm:w-28 h-20 sm:h-auto rounded-xl overflow-hidden flex-shrink-0 border border-purple-brand/20 bg-navy-3/60">
-                    <img
-                      src={scenario.bg}
-                      alt={scenario.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
+          {/* Two-column layout – fills remaining height */}
+          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
+              {/* Left Column – Chat */}
+              <div className="flex flex-col min-h-0 overflow-hidden gap-2">
+                {/* Mission Info Card – compact, flex-shrink-0 so chat takes the rest */}
+                <div className="flex-shrink-0 ur-card border-purple-brand/20 px-4 py-3 bg-navy-2/45 flex items-center gap-3">
+                  {scenario.bg && (
+                    <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-purple-brand/20">
+                      <img
+                        src={scenario.bg}
+                        alt={scenario.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-sm font-bold text-white font-heading flex items-center gap-1.5 leading-tight">
+                      <span>{scenario.npcEmoji}</span>
+                      {scenario.npcName}
+                      {scenario.grammarTarget && (
+                        <span className="hidden sm:inline text-[9px] font-mono text-cyan-brand bg-cyan-brand/10 border border-cyan-brand/20 px-1.5 py-0.5 rounded uppercase ml-1">
+                          {scenario.difficulty}
+                        </span>
+                      )}
+                    </h1>
+                    <p className="text-[11px] text-text-secondary leading-snug line-clamp-2 mt-0.5">
+                      {scenario.intro ? formatRoleplayVerbs(scenario.intro) : ''}
+                    </p>
                   </div>
-                )}
-                <div className="flex-1">
-                  <h1 className="text-lg font-bold text-white mb-1 font-heading flex items-center gap-2">
-                    <span className="text-xl">{scenario.npcEmoji}</span>
-                    {scenario.npcName}
-                  </h1>
-                  <p className="text-xs text-text-secondary mb-3 font-body leading-relaxed">
-                    {scenario.intro ? formatRoleplayVerbs(scenario.intro) : ''}
-                  </p>
                   {scenario.grammarTarget && (
-                    <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <HelpCircle size={14} className="text-cyan-brand" />
-                        <span className="text-[10px] font-bold text-cyan-brand uppercase tracking-wider font-mono">Mục tiêu ngữ pháp</span>
-                      </div>
-                      <p className="text-xs text-text-secondary font-body leading-relaxed">{scenario.grammarTarget}</p>
+                    <div className="hidden lg:flex flex-shrink-0 items-center gap-1.5 bg-purple-brand/10 border border-purple-brand/30 rounded-lg px-2.5 py-1.5 max-w-[180px]">
+                      <HelpCircle size={11} className="text-cyan-brand flex-shrink-0" />
+                      <span className="text-[10px] text-text-secondary leading-snug line-clamp-2">{scenario.grammarTarget}</span>
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Chat Messages - sử dụng ChatHistory với topic và npcName */}
-              <div className="flex-1 ur-card border-purple-brand/20 p-4 flex flex-col min-h-0 shadow-md bg-navy-2/45 overflow-hidden relative">
-                {scenario.bg && (
-                  <div 
-                    className="absolute inset-0 pointer-events-none opacity-[0.05] bg-cover bg-center" 
-                    style={{ backgroundImage: `url(${scenario.bg})` }}
-                  />
-                )}
-                {/* Scrollable Chat Area */}
-                <div className="flex-1 min-h-0 mb-3 flex flex-col relative z-10">
-                  <ChatHistory
-                    messages={messages}
-                    isTyping={isTyping}
-                    topicName={scenario.topic}
-                    npcName={scenario.npcName}
-                    onSpeak={speakText}
-                    speakingIndex={speakingIndex}
-                  />
-                </div>
+                {/* Chat Messages – fills all remaining vertical space */}
+                <div className="flex-1 min-h-0 ur-card border-purple-brand/20 flex flex-col overflow-hidden relative bg-navy-2/45">
+                  {scenario.bg && (
+                    <div
+                      className="absolute inset-0 pointer-events-none opacity-[0.05] bg-cover bg-center"
+                      style={{ backgroundImage: `url(${scenario.bg})` }}
+                    />
+                  )}
+                  {/* Scrollable message list – flex-1 so it grows */}
+                  <div className="flex-1 min-h-0 relative z-10 overflow-hidden flex flex-col">
+                    <ChatHistory
+                      messages={messages}
+                      isTyping={isTyping}
+                      topicName={scenario.topic}
+                      npcName={scenario.npcName}
+                      onSpeak={speakText}
+                      speakingIndex={speakingIndex}
+                    />
+                  </div>
 
                 {/* Sticky Bottom Area - Controls & Inputs */}
-                <div className="flex-shrink-0 space-y-3 pt-2.5 border-t border-white/5">
+                <div className="flex-shrink-0 space-y-3 p-4 pt-2.5 border-t border-white/5 relative z-10">
                   {/* AI Hint */}
                   {activeHint && (
                     <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3">
@@ -658,7 +637,7 @@ const Game = () => {
                   {/* Turn Progress & Actions */}
                   <div className="flex items-center justify-between text-xs">
                     <div className="text-xs text-text-secondary font-mono">
-                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/10</span>
+                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/{scenario.minTurns}</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -683,7 +662,7 @@ const Game = () => {
                   <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
-                      style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (turnCount / scenario.minTurns) * 100)}%` }}
                     />
                   </div>
 
@@ -710,8 +689,6 @@ const Game = () => {
                     )}
                   </div>
                 </div>
-
-                <GoogleAd />
               </div>
             </div>
 
@@ -758,6 +735,13 @@ const Game = () => {
               </div>
             )}
           </div>
+
+          {/* Ad banner – slim, does not push game content */}
+          {!user?.isPremium && (
+            <div className="flex-shrink-0 pt-2">
+              <GoogleAd type="slim" />
+            </div>
+          )}
         </main>
       </div>
 
@@ -787,7 +771,8 @@ const Game = () => {
 
       {/* Terminal Hack Modal */}
       {showTerminalModal && (() => {
-        const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+        const puzzles = scenario.syntaxPuzzles;
+        if (!puzzles || puzzles.length === 0) return null;
         const puzzle = puzzles[currentPuzzleIdx];
         return (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
@@ -933,7 +918,7 @@ const Game = () => {
               </div>
               <div className="mt-2">
                 <span className="text-[10px] text-text-muted uppercase font-mono block">Lượt đối thoại</span>
-                <span className="text-sm font-semibold text-white font-mono">{turnCount}/10 lượt</span>
+                <span className="text-sm font-semibold text-white font-mono">{turnCount}/{scenario.minTurns} lượt</span>
               </div>
               <div className="mt-2">
                 <span className="text-[10px] text-text-muted uppercase font-mono block">Mức độ nghi ngờ</span>
@@ -964,7 +949,7 @@ const Game = () => {
 
             {/* Actions */}
             <div className="flex flex-col gap-2.5">
-              {isWin && missionId < 3 && (
+              {isWin && (
                 <button
                   onClick={() => {
                     setShowCompletionModal(false);
