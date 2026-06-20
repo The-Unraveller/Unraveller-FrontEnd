@@ -32,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
 
   return (
     <nav className="ur-navbar">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div className="max-w-[1680px] mx-auto px-4 lg:px-8 py-3 flex items-center gap-3">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0 flex items-center gap-2.5 group">
           <img

@@ -25,11 +25,11 @@ interface Message {
 
 /* ─── Scenario fallback data ─── */
 const startChoicesMap: Record<number, string[]> = {
-  1: ["Yes, let's go!", "I'm a bit nervous…", "What do we do first?", "Sounds great!"],
-  2: ["Understood, ready!", "Can you repeat that?", "What's the first task?", "I'll do my best."],
-  3: ["I'm ready to debate.", "Let's start the negotiation.", "What is the topic?", "Ready!"],
-  4: ["Good morning, Mr. Vance.", "Let's start the interview.", "I'm ready for the questions.", "Thank you for having me."],
-  5: ["I'm on the case.", "Give me the details.", "Where do I start?", "Understood. Let's solve this."]
+  1: ["I would like to order a cup of coffee, please.", "Could I see the menu, please?", "Do you recommend any house blends today?", "What kind of hot pastries do you have?"],
+  2: ["Understood. What is the first task I need to do?", "I'm ready. Please give me the instructions.", "Can you guide me on what to do first?", "I will do my best to follow the guidelines."],
+  3: ["I'm ready. Let's start the negotiation.", "Can you explain the main points of the agreement?", "I'd like to discuss the terms of this deal.", "Let's look at the topic from both sides."],
+  4: ["Good morning. Thank you for having me today.", "I'm excited to share my experience with you.", "I'm ready for the interview questions.", "Thank you. I'm glad to have this opportunity."],
+  5: ["I'm on the case. What details do we have?", "Let's start by examining the evidence.", "Where was the victim last seen?", "I'll solve this. What's our first clue."]
 };
 
 /* ─── Grammar Syntax Puzzles for Learning Mini-game ─── */
@@ -113,8 +113,11 @@ const Game = () => {
   const [currentTurnScores, setCurrentTurnScores] = useState<WritingFeedbackDto['scores'] | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isWin, setIsWin] = useState(false);
+  const [isLose, setIsLose] = useState(false);
+  const [completionToken, setCompletionToken] = useState<string | null>(null);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-  const chatRef = useRef<HTMLDivElement>(null);
   const { user, updateUser } = useGameStore();
 
   // Custom hook for mobile detection (avoid react-responsive dependency)
@@ -125,12 +128,24 @@ const Game = () => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      if (!mobile && !showFeedbackPanel) {
-        setShowFeedbackPanel(true);
+      if (!mobile) {
+        if (!showFeedbackPanel) {
+          setShowFeedbackPanel(true);
+        }
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
       }
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
   }, [showFeedbackPanel]);
 
   /* ─── TTS ─── */
@@ -287,9 +302,16 @@ const Game = () => {
       setTurnCount(0);
       setTotalXP(0);
       setGameOver(false);
+      setIsWin(false);
+      setIsLose(false);
+      setCompletionToken(null);
+      setShowCompletionModal(false);
       setWritingFeedback(null);
       setCurrentTurnScores(null);
       setShowResumeModal(false);
+      setActiveHint(null);
+      setShowSuggestions(false);
+      setSuggestions([]);
       toast.success("Đã khởi động lại nhiệm vụ!");
     } catch (err) {
       toast.error("Không thể khởi động lại nhiệm vụ.");
@@ -369,12 +391,7 @@ const Game = () => {
     loadMission();
   }, [missionId, navigate]);
 
-  // Cuộn xuống cuối khung chat tự động
-  useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  }, [messages, isTyping]);
+
 
   /* ─── Hàm xử lý gửi tin nhắn ─── */
   const processMessage = async (text: string) => {
@@ -412,18 +429,26 @@ const Game = () => {
 
       if (response.isLose || response.newSuspicionLevel >= 100) {
         setGameOver(true);
+        setIsLose(true);
+        setShowCompletionModal(true);
         toast.error("Bạn đã bị phát hiện! Nhiệm vụ thất bại.");
         setTimeout(() => {
           navigate(`/result/${missionId}?status=fail`);
         }, 2500);
       } else if (response.isWin) {
         setGameOver(true);
+        setIsWin(true);
+        if (response.completionToken) setCompletionToken(response.completionToken);
+        setShowCompletionModal(true);
         toast.success("Nhiệm vụ hoàn thành xuất sắc!");
         setTimeout(() => {
           navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
         }, 2500);
       } else if (response.turnCount >= 10 || turnCount + 1 >= 10) {
         setGameOver(true);
+        setIsWin(true);
+        if (response.completionToken) setCompletionToken(response.completionToken);
+        setShowCompletionModal(true);
         toast.success("Nhiệm vụ hoàn thành!");
         setTimeout(() => {
           navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
@@ -440,11 +465,11 @@ const Game = () => {
   const handleChoice = async (choice: string) => { await processMessage(choice); };
 
   const suggestionMap: Record<number, string[]> = {
-    1: ["Yes, let's go!", "I'm a bit nervous…", "What do we do first?", "Sounds great!"],
-    2: ["Understood, ready!", "Can you repeat that?", "What's the first task?", "I'll do my best."],
-    3: ["I'm ready to debate.", "Let's start the negotiation.", "What is the topic?", "Ready!"],
-    4: ["Good morning, Mr. Vance.", "Let's start the interview.", "I'm ready for the questions.", "Thank you for having me."],
-    5: ["I'm on the case.", "Give me the details.", "Where do I start?", "Understood. Let's solve this."]
+    1: ["I would like to order a cup of coffee, please.", "Could I see the menu, please?", "Do you recommend any house blends today?", "What kind of hot pastries do you have?"],
+    2: ["Understood. What is the first task I need to do?", "I'm ready. Please give me the instructions.", "Can you guide me on what to do first?", "I will do my best to follow the guidelines."],
+    3: ["I'm ready. Let's start the negotiation.", "Can you explain the main points of the agreement?", "I'd like to discuss the terms of this deal.", "Let's look at the topic from both sides."],
+    4: ["Good morning. Thank you for having me today.", "I'm excited to share my experience with you.", "I'm ready for the interview questions.", "Thank you. I'm glad to have this opportunity."],
+    5: ["I'm on the case. What details do we have?", "Let's start by examining the evidence.", "Where was the victim last seen?", "I'll solve this. What's our first clue."]
   };
 
   const toggleSuggestions = () => {
@@ -473,12 +498,12 @@ const Game = () => {
   return (
     <>
       <Seo title="Đang chơi - The Unraveller" description="Trò chơi học tiếng Anh qua chat" noIndex />
-      <div className="min-h-screen bg-bg-secondary flex flex-col">
+      <div className="min-h-screen lg:h-screen bg-bg-secondary flex flex-col lg:overflow-hidden">
         <Navbar isLoggedIn username={user?.username || 'Learner'} />
 
-        <main className="max-w-7xl mx-auto w-full px-4 py-6 flex-1 flex flex-col">
+        <main className="max-w-[1680px] mx-auto w-full px-4 lg:px-8 py-4 lg:py-6 flex-grow flex-1 flex flex-col min-h-0 lg:h-[calc(100vh-64px)] h-auto lg:overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 flex-shrink-0">
             <button
               onClick={() => navigate('/courses')}
               className="flex items-center gap-1.5 text-text-secondary hover:text-white transition-colors text-sm font-semibold font-mono"
@@ -507,14 +532,21 @@ const Game = () => {
           </div>
 
           {/* Two-column layout */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 lg:overflow-hidden">
             {/* Left Column - Chat */}
-            <div className="flex flex-col gap-4 overflow-hidden">
+            <div className="flex flex-col gap-4 min-h-0 h-full overflow-hidden">
               {/* Mission Info Card */}
-              <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45 flex flex-col sm:flex-row gap-4">
+              <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45 flex flex-col sm:flex-row gap-4 items-start">
                 {scenario.bg && (
                   <div className="w-full sm:w-28 h-20 sm:h-auto rounded-xl overflow-hidden flex-shrink-0 border border-purple-brand/20 bg-navy-3/60">
-                    <img src={scenario.bg} alt={scenario.title} className="w-full h-full object-cover" />
+                    <img
+                      src={scenario.bg}
+                      alt={scenario.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   </div>
                 )}
                 <div className="flex-1">
@@ -522,7 +554,9 @@ const Game = () => {
                     <span className="text-xl">{scenario.npcEmoji}</span>
                     {scenario.npcName}
                   </h1>
-                  <p className="text-xs text-text-secondary mb-3 font-body leading-relaxed">{formatRoleplayVerbs(scenario.intro)}</p>
+                  <p className="text-xs text-text-secondary mb-3 font-body leading-relaxed">
+                    {scenario.intro ? formatRoleplayVerbs(scenario.intro) : ''}
+                  </p>
                   {scenario.grammarTarget && (
                     <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
                       <div className="flex items-center gap-2 mb-1.5">
@@ -536,14 +570,15 @@ const Game = () => {
               </div>
 
               {/* Chat Messages - sử dụng ChatHistory với topic và npcName */}
-              <div className="flex-1 ur-card border-purple-brand/20 p-4 overflow-y-auto shadow-md bg-navy-2/45 relative" ref={chatRef}>
+              <div className="flex-1 ur-card border-purple-brand/20 p-4 flex flex-col min-h-0 shadow-md bg-navy-2/45 overflow-hidden relative">
                 {scenario.bg && (
                   <div 
                     className="absolute inset-0 pointer-events-none opacity-[0.05] bg-cover bg-center" 
                     style={{ backgroundImage: `url(${scenario.bg})` }}
                   />
                 )}
-                <div className="relative z-10 space-y-4">
+                {/* Scrollable Chat Area */}
+                <div className="flex-1 min-h-0 mb-3 flex flex-col relative z-10">
                   <ChatHistory
                     messages={messages}
                     isTyping={isTyping}
@@ -552,138 +587,138 @@ const Game = () => {
                     onSpeak={speakText}
                     speakingIndex={speakingIndex}
                   />
+                </div>
 
-                {/* AI Hint */}
-                {activeHint && (
-                  <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3.5">
-                    <div className="flex items-start gap-2">
-                      <HelpCircle size={16} className="text-cyan-brand mt-0.5" />
-                      <p className="text-xs text-text-secondary font-body leading-relaxed">{activeHint}</p>
-                      <button onClick={() => setActiveHint(null)} className="ml-auto text-text-muted hover:text-white text-sm">
-                        ×
-                      </button>
+                {/* Sticky Bottom Area - Controls & Inputs */}
+                <div className="flex-shrink-0 space-y-3 pt-2.5 border-t border-white/5">
+                  {/* AI Hint */}
+                  {activeHint && (
+                    <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3">
+                      <div className="flex items-start gap-2">
+                        <HelpCircle size={15} className="text-cyan-brand mt-0.5" />
+                        <p className="text-xs text-text-secondary font-body leading-relaxed">{activeHint}</p>
+                        <button onClick={() => setActiveHint(null)} className="ml-auto text-text-muted hover:text-white text-sm">
+                          ×
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Input Form & Suggestions */}
-                {showSuggestions && suggestions.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-2 p-3 rounded-xl bg-navy-3/60 border border-white/5">
-                    <span className="w-full text-[10px] font-semibold text-indigo-400/70 uppercase tracking-wider mb-1">Gợi ý trả lời:</span>
-                    {suggestions.map((s, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setInputValue(s);
-                          setShowSuggestions(false);
-                        }}
-                        className="px-3 py-1.5 text-xs bg-white/[0.04] border border-white/[0.08] text-white/80 rounded-lg hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <form onSubmit={handleSend} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={e => setInputValue(e.target.value)}
-                    placeholder="Nhập câu trả lời tiếng Anh..."
-                    className="flex-1 px-5 py-3.5 rounded-full bg-navy-3/90 border border-white/[0.08] text-white placeholder-white/30 focus:border-indigo-400/50 focus:ring-1 focus:ring-indigo-400/30 outline-none text-sm font-body shadow-sm transition-all"
-                    disabled={isTyping || gameOver}
-                    autoComplete="off"
-                  />
-                  <button
-                    type="submit"
-                    className="px-6 py-3.5 bg-gradient-to-br from-indigo-500 to-blue-500 hover:shadow-md hover:scale-[1.02] text-white rounded-full font-semibold transition-all disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none flex items-center justify-center flex-shrink-0"
-                    disabled={isTyping || gameOver || !inputValue.trim()}
-                  >
-                    <Send size={18} />
-                  </button>
-                </form>
-
-                {/* Action Button - Gợi ý trả lời với pulse */}
-                {!isTyping && !gameOver && (
-                  <div className="flex justify-center">
-                    <button
-                      onClick={toggleSuggestions}
-                      className="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-text-secondary hover:text-indigo-300 hover:border-indigo-400/30 hover:bg-indigo-500/5 transition-all text-xs font-medium animate-pulse-slow"
-                    >
-                      <Lightbulb size={14} className="text-amber-400/70 group-hover:text-amber-300 transition-colors" />
-                      <span>Gợi ý trả lời</span>
-                      <Sparkles size={12} className="text-indigo-400/50 group-hover:text-indigo-300 transition-colors" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Turn Progress & Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-text-secondary font-mono">
-                    Lượt đối thoại: <span className="text-white font-bold">{turnCount}/10</span>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={startTerminalHack}
-                      className="text-xs px-4 py-2 border border-purple-brand/40 text-purple-soft rounded-full hover:bg-purple-brand/10 transition-all font-semibold font-mono"
-                      title="Luyện tập cú pháp"
-                    >
-                      🔌 Luyện cú pháp
-                    </button>
-                    <button
-                      onClick={handleReset}
-                      className="text-xs px-4 py-2 border border-white/10 text-text-secondary rounded-full hover:bg-white/5 transition-all font-semibold font-mono"
-                      title="Làm lại từ đầu"
-                    >
-                      🔄 Làm lại
-                    </button>
-                  </div>
-                </div>
-
-                {/* Dialogue Turn progress bar */}
-                <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
-                    style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
-                  />
-                </div>
-
-                {/* Core Suspicion Meter Display */}
-                <div className="border-t border-white/5 pt-2 mt-1 flex justify-center w-full">
-                  <SuspicionMeter level={suspicion} />
-                </div>
-
-                {/* Inventory */}
-                {inventory.length > 0 && (
-                  <div className="ur-card border-purple-brand/20 p-3 bg-navy-2/30">
-                    <div className="text-xs text-cyan-brand font-semibold font-mono uppercase tracking-wider mb-2">Hành trang hỗ trợ</div>
-                    <div className="flex flex-wrap gap-2">
-                      {inventory.map((item) => (
+                  {/* Input Form & Suggestions */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-navy-3/60 border border-white/5 max-h-24 overflow-y-auto">
+                      <span className="w-full text-[10px] font-semibold text-indigo-400/70 uppercase tracking-wider mb-1">Gợi ý trả lời:</span>
+                      {suggestions.map((s, i) => (
                         <button
-                          key={item.itemId}
-                          onClick={() => handleUseItem(item.itemId)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-navy-3 border border-purple-brand/30 rounded-lg text-xs hover:border-cyan-brand hover:bg-purple-brand/15 transition-all text-white font-medium"
-                          title={item.description}
+                          key={i}
+                          onClick={() => {
+                            setInputValue(s);
+                            setShowSuggestions(false);
+                          }}
+                          className="px-3 py-1.5 text-xs bg-white/[0.04] border border-white/[0.08] text-white/80 rounded-lg hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all text-left"
                         >
-                          <span className="text-sm">{item.emoji}</span>
-                          <span>{item.name}</span>
-                          <span className="px-1.5 py-0.5 bg-purple-brand/35 text-cyan-light text-[10px] rounded font-mono font-bold">{item.quantity}</span>
+                          {s}
                         </button>
                       ))}
                     </div>
+                  )}
+                  <form onSubmit={handleSend} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={e => setInputValue(e.target.value)}
+                      placeholder="Nhập câu trả lời tiếng Anh..."
+                      className="flex-1 px-5 py-3 rounded-full bg-navy-3/90 border border-white/[0.08] text-white placeholder-white/30 focus:border-indigo-400/50 focus:ring-1 focus:ring-indigo-400/30 outline-none text-sm font-body shadow-sm transition-all"
+                      disabled={isTyping || gameOver}
+                      autoComplete="off"
+                    />
+                    <button
+                      type="submit"
+                      className="px-5 py-3 bg-gradient-to-br from-indigo-500 to-blue-500 hover:shadow-md hover:scale-[1.02] text-white rounded-full font-semibold transition-all disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none flex items-center justify-center flex-shrink-0"
+                      disabled={isTyping || gameOver || !inputValue.trim()}
+                    >
+                      <Send size={16} />
+                    </button>
+                  </form>
+
+                  {/* Action Button - Gợi ý trả lời với pulse */}
+                  {!isTyping && !gameOver && turnCount === 0 && (
+                    <div className="flex justify-center">
+                      <button
+                        onClick={toggleSuggestions}
+                        className="group flex items-center gap-2 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] text-text-secondary hover:text-indigo-300 hover:border-indigo-400/30 hover:bg-indigo-500/5 transition-all text-xs font-medium animate-pulse-slow"
+                      >
+                        <Lightbulb size={13} className="text-amber-400/70 group-hover:text-amber-300 transition-colors" />
+                        <span>Gợi ý trả lời</span>
+                        <Sparkles size={11} className="text-indigo-400/50 group-hover:text-indigo-300 transition-colors" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Turn Progress & Actions */}
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="text-xs text-text-secondary font-mono">
+                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/10</span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={startTerminalHack}
+                        className="px-3.5 py-1.5 border border-purple-brand/40 text-purple-soft rounded-full hover:bg-purple-brand/10 transition-all font-semibold font-mono text-[11px]"
+                        title="Luyện tập cú pháp"
+                      >
+                        🔌 Luyện cú pháp
+                      </button>
+                      <button
+                        onClick={handleReset}
+                        className="px-3.5 py-1.5 border border-white/10 text-text-secondary rounded-full hover:bg-white/5 transition-all font-semibold font-mono text-[11px]"
+                        title="Làm lại từ đầu"
+                      >
+                        🔄 Làm lại
+                      </button>
+                    </div>
                   </div>
-                )}
+
+                  {/* Dialogue Turn progress bar */}
+                  <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
+                      style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
+                    />
+                  </div>
+
+                  {/* Suspicion Meter & Inventory */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+                    <div className="flex-shrink-0">
+                      <SuspicionMeter level={suspicion} />
+                    </div>
+                    {inventory.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 justify-end">
+                        {inventory.map((item) => (
+                          <button
+                            key={item.itemId}
+                            onClick={() => handleUseItem(item.itemId)}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-navy-3 border border-purple-brand/30 rounded-lg text-[10px] hover:border-cyan-brand hover:bg-purple-brand/15 transition-all text-white font-medium"
+                            title={item.description}
+                          >
+                            <span>{item.emoji}</span>
+                            <span>{item.name}</span>
+                            <span className="ml-1 px-1 bg-purple-brand/35 text-cyan-light text-[9px] rounded font-mono font-bold">{item.quantity}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <GoogleAd />
-                </div>
               </div>
             </div>
 
             {/* Right Column - Writing Feedback Panel */}
             {(showFeedbackPanel || !isMobile) && (
-              <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="ur-card border-purple-brand/20 shadow-md flex-1 overflow-hidden flex flex-col bg-navy-2/45">
+              <div className="flex-1 overflow-hidden flex flex-col min-h-0 h-full">
+                <div className="ur-card border-purple-brand/20 shadow-md flex-1 overflow-hidden flex flex-col bg-navy-2/45 min-h-0">
                   {writingFeedback ? (
                     <WritingFeedbackPanel feedback={writingFeedback} missionTitle={scenario.title} />
                   ) : (
@@ -724,8 +759,6 @@ const Game = () => {
             )}
           </div>
         </main>
-
-        <Footer />
       </div>
 
       {/* Resume Modal */}
@@ -854,6 +887,113 @@ const Game = () => {
           </div>
         );
       })()}
+
+      {/* Completion Modal */}
+      {showCompletionModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="ur-card bg-navy-2/95 border border-purple-brand/40 p-6 max-w-md w-full shadow-[0_0_50px_rgba(124,58,237,0.35)] text-center relative">
+            <div className={`absolute top-0 left-0 right-0 h-1.5 ${isWin ? 'bg-success' : 'bg-red-500'}`}></div>
+            
+            <div className="text-5xl mb-4 animate-bounce">
+              {isWin ? '🏆' : '💀'}
+            </div>
+            
+            <h3 className="text-xl font-bold text-white mb-2 font-heading tracking-wide">
+              {isWin ? 'NHIỆM VỤ HOÀN THÀNH!' : 'NHIỆM VỤ THẤT BẠI!'}
+            </h3>
+            
+            <p className="text-xs text-text-secondary mb-6 leading-relaxed">
+              {isWin 
+                ? `Chúc mừng bạn đã hoàn thành xuất sắc thử thách trò chuyện với ${scenario.npcName}.`
+                : `Mức độ nghi ngờ của bạn đã vượt quá giới hạn hoặc cuộc hội thoại kết thúc không như ý muốn.`}
+            </p>
+
+            {/* Stars rating based on suspicion level */}
+            {isWin && (
+              <div className="flex justify-center gap-2 mb-6 text-3xl">
+                {suspicion < 25 ? (
+                  <>⭐ ⭐ ⭐</>
+                ) : suspicion < 50 ? (
+                  <>⭐ ⭐ <span className="opacity-30">⭐</span></>
+                ) : (
+                  <>⭐ <span className="opacity-30">⭐ ⭐</span></>
+                )}
+              </div>
+            )}
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 mb-6 bg-navy-3/60 border border-white/5 rounded-xl p-4 text-left">
+              <div>
+                <span className="text-[10px] text-text-muted uppercase font-mono block">Năng lượng tiêu thụ</span>
+                <span className="text-sm font-semibold text-white font-mono">{user?.isPremium ? '0' : '5'} Energy</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-text-muted uppercase font-mono block">Điểm kinh nghiệm</span>
+                <span className="text-sm font-semibold text-warning font-mono">+{totalXP} XP</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-[10px] text-text-muted uppercase font-mono block">Lượt đối thoại</span>
+                <span className="text-sm font-semibold text-white font-mono">{turnCount}/10 lượt</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-[10px] text-text-muted uppercase font-mono block">Mức độ nghi ngờ</span>
+                <span className="text-sm font-semibold font-mono" style={{ color: suspicion > 70 ? '#ef4444' : suspicion > 45 ? '#f59e0b' : '#10b981' }}>
+                  {suspicion}%
+                </span>
+              </div>
+            </div>
+
+            {/* Token */}
+            {isWin && completionToken && (
+              <div className="mb-6 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl flex items-center justify-between text-left">
+                <div className="overflow-hidden">
+                  <span className="text-[9px] text-text-muted uppercase font-mono block">Mã chứng nhận (Token)</span>
+                  <span className="text-xs font-mono font-bold text-indigo-300 truncate block">{completionToken}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(completionToken);
+                    toast.success("Đã sao chép mã chứng nhận!");
+                  }}
+                  className="px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-400/25 hover:border-indigo-400/50 text-indigo-200 text-[10px] font-bold rounded-lg transition-all flex-shrink-0"
+                >
+                  Sao chép
+                </button>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex flex-col gap-2.5">
+              {isWin && missionId < 3 && (
+                <button
+                  onClick={() => {
+                    setShowCompletionModal(false);
+                    navigate(`/game/${missionId + 1}`);
+                  }}
+                  className="w-full py-2.5 bg-gradient-brand text-white rounded-full hover:shadow-glow-purple text-xs font-bold tracking-wider font-mono uppercase transition-all flex items-center justify-center gap-1.5"
+                >
+                  Kịch bản tiếp theo 🚀
+                </button>
+              )}
+              <button
+                onClick={handleReset}
+                className="w-full py-2.5 bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-white rounded-full text-xs font-semibold tracking-wider font-mono uppercase transition-all"
+              >
+                Chơi lại màn này 🔄
+              </button>
+              <button
+                onClick={() => {
+                  setShowCompletionModal(false);
+                  navigate('/courses');
+                }}
+                className="w-full py-2.5 border border-white/10 hover:bg-white/5 text-white/80 rounded-full text-xs font-semibold tracking-wider font-mono uppercase transition-all"
+              >
+                Quay lại danh sách kịch bản
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
