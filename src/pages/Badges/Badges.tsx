@@ -69,7 +69,7 @@ const Badges = () => {
     { 
       id: 1, 
       name: 'Huy hiệu Chiến thắng Đầu tiên', 
-      desc: 'Hoàn thành màn chơi kịch bản đầu tiên của bạn. Chào mừng bạn gia nhập hàng ngũ đặc vụ thực địa!', 
+      desc: 'Hoàn thành kịch bản mô phỏng đầu tiên của bạn. Chào mừng bạn gia nhập cộng đồng người học!', 
       earned: user?.missionProgresses?.some(p => p.status === 'Completed') ?? false, 
       color: '#f5c842',
       emoji: '🏆',
@@ -87,24 +87,24 @@ const Badges = () => {
     { 
       id: 3, 
       name: 'Học nhanh siêu tốc', 
-      desc: 'Giải mã thành công từ 3 kịch bản/nút mạng trở lên trong hệ thống.', 
+      desc: 'Hoàn thành từ 3 kịch bản mô phỏng trở lên trong hệ thống.', 
       earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 3, 
       color: '#34d399',
       emoji: '⚡'
     },
     { 
       id: 4, 
-      name: 'Thám tử Tinh mắt', 
-      desc: 'Hoàn thành xuất sắc kịch bản Viết lách Thám tử (Stage 5: Báo cáo Điều tra).', 
+      name: 'Người báo cáo Chi tiết', 
+      desc: 'Hoàn thành xuất sắc kịch bản Báo cáo Sự cố Công việc (Stage 5).', 
       earned: user?.missionProgresses?.some(p => p.missionId === 5 && p.status === 'Completed') ?? false, 
       color: '#60a5fa',
-      emoji: '🔍',
+      emoji: '📝',
       missionId: 5
     },
     { 
       id: 5, 
-      name: 'Đặc vụ Cao cấp (Premium)', 
-      desc: 'Sở hữu đặc quyền truy cập tối cao (Root) Premium VIP không giới hạn năng lượng.', 
+      name: 'Thành viên Cao cấp (Premium)', 
+      desc: 'Sở hữu đặc quyền hội viên Premium VIP không giới hạn năng lượng.', 
       earned: user?.isPremium ?? false, 
       color: '#dc2626',
       emoji: '🛡️'
@@ -120,15 +120,15 @@ const Badges = () => {
     { 
       id: 7, 
       name: 'Giao tiếp Tự tin', 
-      desc: 'Xâm nhập và vượt qua bộ lọc bảo mật ngôn ngữ của 5 kịch bản trở lên.', 
+      desc: 'Hoàn thành 5 kịch bản mô phỏng trở lên trong hệ thống.', 
       earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 5, 
       color: '#ec4899',
       emoji: '💬'
     },
     { 
       id: 8, 
-      name: 'Đặc vụ Ưu tú', 
-      desc: 'Giải mã thành công toàn bộ tất cả kịch bản có sẵn trên máy chủ The Unraveller.', 
+      name: 'Người học Xuất sắc', 
+      desc: 'Hoàn thành toàn bộ kịch bản mô phỏng có sẵn trên Unraveller.', 
       earned: user?.missionProgresses?.filter(p => p.status === 'Completed').length === (user?.missionProgresses?.length ?? 0) && (user?.missionProgresses?.length ?? 0) > 0, 
       color: '#8b5cf6',
       emoji: '🌌'
@@ -207,9 +207,9 @@ const Badges = () => {
               </svg>
             </div>
             <div>
-              <p className="text-white font-bold text-sm">Hệ Thống Huy Chương Đặc Vụ</p>
+              <p className="text-white font-bold text-sm">Hệ Thống Danh Hiệu Thành Tích</p>
               <p className="text-white/55 text-xs mt-0.5 leading-relaxed font-sans">
-                Các đặc vụ thực địa sau khi giải mã các màn chơi kịch bản an toàn sẽ được gắn huy hiệu đặc trưng tương ứng với các cột mốc thực thi nhiệm vụ.
+                Các học viên sau khi hoàn thành các tình huống giả lập giao tiếp sẽ được nhận huy hiệu đặc trưng tương ứng với các cột mốc tiến trình học tập.
               </p>
             </div>
           </div>

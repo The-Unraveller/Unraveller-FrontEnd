@@ -21,7 +21,7 @@ interface ChatMessageProps {
  * Ví dụ: *laughs*, *sighs nervously*, *nods*
  * Chuyển thành chữ nghiêng thay vì xóa hẳn để giữ ngữ cảnh.
  */
-function formatRoleplayVerbs(text: string): React.ReactNode[] {
+export function formatRoleplayVerbs(text: string): React.ReactNode[] {
   // Regex tìm tất cả các cụm *...*
   const regex = /\*([^*]+)\*/g;
   const parts: React.ReactNode[] = [];

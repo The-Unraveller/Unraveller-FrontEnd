@@ -42,7 +42,7 @@ const Auth = () => {
         const profile = await getUserProfile();
         setUser(profile);
         setAuthenticated(true);
-        toast.success(`Chào mừng đặc vụ ${profile.username} trở lại! Đang thiết lập kết nối an toàn...`);
+        toast.success(`Chào mừng người học ${profile.username} trở lại! Đang tải dữ liệu học tập...`);
         // Role-based redirect: Admin → user management, Moderator → mission editor, Player → courses
         if (profile.role === 'Admin') navigate('/admin/users');
         else if (profile.role === 'Moderator') navigate('/admin/missions');
@@ -57,8 +57,8 @@ const Auth = () => {
         const username = `${firstName} ${lastName}`.trim() || email.split('@')[0];
         await register(username, email, password);
         setMode('login');
-        toast.success('Hồ sơ đặc vụ đã khởi tạo! Vui lòng đăng nhập để thiết lập liên kết.');
-        setError('Hồ sơ đặc vụ đã khởi tạo! Đăng nhập để thiết lập liên kết.');
+        toast.success('Tài khoản người học đã được khởi tạo! Vui lòng đăng nhập để bắt đầu.');
+        setError('Tài khoản người học đã được khởi tạo! Hãy đăng nhập để bắt đầu.');
       }
     } catch (err: any) {
       let errMsg = '';
@@ -85,7 +85,7 @@ const Auth = () => {
       const profile = await getUserProfile();
       setUser(profile);
       setAuthenticated(true);
-      toast.success(`Xác minh Google an toàn. Chào mừng đặc vụ ${profile.username}!`);
+      toast.success(`Xác minh Google thành công. Chào mừng người học ${profile.username}!`);
       // Role-based redirect: Admin → user management, Moderator → mission editor, Player → courses
       if (profile.role === 'Admin') navigate('/admin/users');
       else if (profile.role === 'Moderator') navigate('/admin/missions');
@@ -115,7 +115,7 @@ const Auth = () => {
           {/* ── Left: Image panel ── */}
           <div className="w-full lg:w-[52%] relative rounded-2xl overflow-hidden shadow-2xl min-h-80 lg:min-h-[500px] flex-shrink-0">
             <img
-              src="/start_menu_skyline.png"
+              src="/london_bg.png"
               alt="English environment"
               className="w-full h-full object-cover absolute inset-0"
             />

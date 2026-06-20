@@ -36,10 +36,10 @@ const plans: Plan[] = [
     features: [
       'Không giới hạn năng lượng chơi (0 cost)',
       'Nhân đôi điểm kinh nghiệm (XP) nhận được',
-      'Giảm giá 20% khi mua vật phẩm Chợ Đen',
+      'Giảm giá 20% khi mua vật phẩm Cửa Hàng',
       'Hồi phục năng lượng nhanh gấp đôi (+20/30p)',
       'AI Coach phân tích phản hồi nâng cao',
-      'Mở khóa toàn bộ kịch bản bảo mật độc quyền'
+      'Mở khóa toàn bộ kịch bản giao tiếp độc quyền'
     ],
     highlighted: true,
     badge: '🔥 ĐẶC QUYỀN TỐI CAO',
@@ -118,7 +118,7 @@ const Premium = () => {
           </h2>
           <div className="ur-divider mb-4"></div>
           <p className="text-white/60 text-base max-w-md mx-auto">
-            Chọn gói hội viên giúp mở khóa hành trình học tập ngôn ngữ đặc vụ nâng cao của bạn
+            Chọn gói hội viên giúp mở khóa hành trình luyện tập giao tiếp tiếng Anh nâng cao của bạn
           </p>
         </div>
 

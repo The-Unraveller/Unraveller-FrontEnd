@@ -12,6 +12,7 @@ import GoogleAd from '../../components/ads/GoogleAd';
 import { ChatHistory } from '../../components/game/ChatHistory';
 import { SuspicionMeter } from '../../components/game/SuspicionMeter';
 import WritingFeedbackPanel from '../../components/game/WritingFeedbackPanel';
+import { formatRoleplayVerbs } from '../../components/game/ChatMessage';
 
 /* ─── Types ─── */
 interface Message {
@@ -114,7 +115,7 @@ const Game = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const chatRef = useRef<HTMLDivElement>(null);
-  const { user } = useGameStore();
+  const { user, updateUser } = useGameStore();
 
   // Custom hook for mobile detection (avoid react-responsive dependency)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -269,6 +270,11 @@ const Game = () => {
     setSuspicion(sessionData.currentSuspicion);
     setTurnCount(sessionData.turnCount);
     setTotalXP(sessionData.xpEarned);
+    if (sessionData.turnCount >= 10 || sessionData.currentSuspicion >= 100) {
+      setGameOver(true);
+    } else {
+      setGameOver(false);
+    }
     setShowResumeModal(false);
     toast.success("Đã khôi phục tiến độ!");
   };
@@ -280,6 +286,9 @@ const Game = () => {
       setSuspicion(10);
       setTurnCount(0);
       setTotalXP(0);
+      setGameOver(false);
+      setWritingFeedback(null);
+      setCurrentTurnScores(null);
       setShowResumeModal(false);
       toast.success("Đã khởi động lại nhiệm vụ!");
     } catch (err) {
@@ -287,9 +296,25 @@ const Game = () => {
     }
   };
 
-  /* ─── Load mission & check access ─── */
   useEffect(() => {
     const loadMission = async () => {
+      setIsLoading(true);
+      setScenario(defaultScenario);
+      setMessages([{ role: 'npc', text: defaultScenario.intro, timestamp: new Date() }]);
+      setSuspicion(10);
+      setTotalXP(0);
+      setInputValue('');
+      setIsTyping(false);
+      setGameOver(false);
+      setTurnCount(0);
+      setActiveHint(null);
+      setWritingFeedback(null);
+      setCurrentTurnScores(null);
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setShowResumeModal(false);
+      setSessionData(null);
+
       try {
         const data = await getMissions();
         const found = data.find(m => m.id === missionId);
@@ -349,7 +374,7 @@ const Game = () => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   /* ─── Hàm xử lý gửi tin nhắn ─── */
   const processMessage = async (text: string) => {
@@ -378,15 +403,31 @@ const Game = () => {
       setTurnCount(prev => prev + 1);
       setTotalXP(prev => prev + response.xpEarned);
 
+      if (response.updatedEnergy !== undefined) {
+        updateUser({
+          energy: response.updatedEnergy,
+          maxEnergy: response.updatedMaxEnergy ?? user?.maxEnergy ?? 100
+        });
+      }
+
       if (response.isLose || response.newSuspicionLevel >= 100) {
         setGameOver(true);
         toast.error("Bạn đã bị phát hiện! Nhiệm vụ thất bại.");
+        setTimeout(() => {
+          navigate(`/result/${missionId}?status=fail`);
+        }, 2500);
       } else if (response.isWin) {
         setGameOver(true);
         toast.success("Nhiệm vụ hoàn thành xuất sắc!");
-      } else if (turnCount + 1 >= 10) {
+        setTimeout(() => {
+          navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
+        }, 2500);
+      } else if (response.turnCount >= 10 || turnCount + 1 >= 10) {
         setGameOver(true);
         toast.success("Nhiệm vụ hoàn thành!");
+        setTimeout(() => {
+          navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
+        }, 2500);
       }
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || err.message || 'Không thể gửi tin nhắn.';
@@ -470,33 +511,47 @@ const Game = () => {
             {/* Left Column - Chat */}
             <div className="flex flex-col gap-4 overflow-hidden">
               {/* Mission Info Card */}
-              <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45">
-                <h1 className="text-lg font-bold text-white mb-1 font-heading flex items-center gap-2">
-                  <span className="text-xl">{scenario.npcEmoji}</span>
-                  {scenario.npcName}
-                </h1>
-                <p className="text-xs text-text-secondary mb-3 font-body leading-relaxed">{scenario.intro}</p>
-                {scenario.grammarTarget && (
-                  <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <HelpCircle size={14} className="text-cyan-brand" />
-                      <span className="text-[10px] font-bold text-cyan-brand uppercase tracking-wider font-mono">Mục tiêu ngữ pháp</span>
-                    </div>
-                    <p className="text-xs text-text-secondary font-body leading-relaxed">{scenario.grammarTarget}</p>
+              <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45 flex flex-col sm:flex-row gap-4">
+                {scenario.bg && (
+                  <div className="w-full sm:w-28 h-20 sm:h-auto rounded-xl overflow-hidden flex-shrink-0 border border-purple-brand/20 bg-navy-3/60">
+                    <img src={scenario.bg} alt={scenario.title} className="w-full h-full object-cover" />
                   </div>
                 )}
+                <div className="flex-1">
+                  <h1 className="text-lg font-bold text-white mb-1 font-heading flex items-center gap-2">
+                    <span className="text-xl">{scenario.npcEmoji}</span>
+                    {scenario.npcName}
+                  </h1>
+                  <p className="text-xs text-text-secondary mb-3 font-body leading-relaxed">{formatRoleplayVerbs(scenario.intro)}</p>
+                  {scenario.grammarTarget && (
+                    <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <HelpCircle size={14} className="text-cyan-brand" />
+                        <span className="text-[10px] font-bold text-cyan-brand uppercase tracking-wider font-mono">Mục tiêu ngữ pháp</span>
+                      </div>
+                      <p className="text-xs text-text-secondary font-body leading-relaxed">{scenario.grammarTarget}</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Chat Messages - sử dụng ChatHistory với topic và npcName */}
-              <div className="flex-1 ur-card border-purple-brand/20 p-4 overflow-y-auto shadow-md bg-navy-2/45" ref={chatRef}>
-                <ChatHistory
-                  messages={messages}
-                  isTyping={isTyping}
-                  topicName={scenario.topic}
-                  npcName={scenario.npcName}
-                  onSpeak={speakText}
-                  speakingIndex={speakingIndex}
-                />
+              <div className="flex-1 ur-card border-purple-brand/20 p-4 overflow-y-auto shadow-md bg-navy-2/45 relative" ref={chatRef}>
+                {scenario.bg && (
+                  <div 
+                    className="absolute inset-0 pointer-events-none opacity-[0.05] bg-cover bg-center" 
+                    style={{ backgroundImage: `url(${scenario.bg})` }}
+                  />
+                )}
+                <div className="relative z-10 space-y-4">
+                  <ChatHistory
+                    messages={messages}
+                    isTyping={isTyping}
+                    topicName={scenario.topic}
+                    npcName={scenario.npcName}
+                    onSpeak={speakText}
+                    speakingIndex={speakingIndex}
+                  />
 
                 {/* AI Hint */}
                 {activeHint && (
@@ -602,7 +657,7 @@ const Game = () => {
                 {/* Inventory */}
                 {inventory.length > 0 && (
                   <div className="ur-card border-purple-brand/20 p-3 bg-navy-2/30">
-                    <div className="text-xs text-cyan-brand font-semibold font-mono uppercase tracking-wider mb-2">Hành trang đặc vụ</div>
+                    <div className="text-xs text-cyan-brand font-semibold font-mono uppercase tracking-wider mb-2">Hành trang hỗ trợ</div>
                     <div className="flex flex-wrap gap-2">
                       {inventory.map((item) => (
                         <button
@@ -621,6 +676,7 @@ const Game = () => {
                 )}
 
                 <GoogleAd />
+                </div>
               </div>
             </div>
 

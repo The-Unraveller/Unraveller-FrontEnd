@@ -23,7 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
   const { user, isAuthenticated } = useGameStore();
 
   const displayIsLoggedIn = isLoggedIn || !!user;
-  const displayUsername = user?.username || username || 'ĐẶC VỤ';
+  const displayUsername = user?.username || username || 'NGƯỜI HỌC';
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 

@@ -8,9 +8,9 @@ const Streak = () => {
   const { user } = useGameStore();
 
   const milestones = [
-    { target: 3, label: 'Đặc vụ 3 Ngày', reward: 50, icon: '🔥' },
+    { target: 3, label: 'Bắt đầu 3 Ngày', reward: 50, icon: '🔥' },
     { target: 7, label: 'Chuyên gia 7 Ngày', reward: 150, icon: '🏃‍♂️' },
-    { target: 14, label: 'Bóng ma 14 Ngày', reward: 300, icon: '🕵️‍♂️' },
+    { target: 14, label: 'Kiên trì 14 Ngày', reward: 300, icon: '🕵️‍♂️' },
     { target: 30, label: 'Huyền thoại 30 Ngày', reward: 1000, icon: '👑' },
   ];
 
@@ -23,7 +23,7 @@ const Streak = () => {
   }));
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
     <Seo title="Chuoi Ngay Hoc Tap" description="Theo doi chuoi ngay hoc tap cua ban trong The Unraveller. Xem lich su hoat dong va muc tieu thanh tuu." keywords="chuoi ngay, streak, hoat dong, thoi gian hoc, tinh than bat nhao" canonical="/streak" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
@@ -64,7 +64,7 @@ const Streak = () => {
               ))}
             </div>
             <p className="text-white/30 text-[9px] mt-4 uppercase text-right">
-              Hôm nay được đánh dấu bằng viền xanh cyan. Hãy làm nhiệm vụ hàng ngày để duy trì ngọn lửa!
+              Hôm nay được đánh dấu bằng viền xanh cyan. Hãy hoàn thành kịch bản hàng ngày để duy trì ngọn lửa!
             </p>
           </div>
 

@@ -255,7 +255,7 @@ const Home = () => {
             </h2>
             <p className="text-white/45 text-sm mt-0.5">
               {isLoggedIn
-                ? `Đã hoàn thành ${completedStages} / ${scenariosList.length} màn chơi`
+                ? `Đã hoàn thành ${completedStages} / ${scenariosList.length} kịch bản`
                 : 'Hãy chọn một kịch bản và bắt đầu học'}
             </p>
           </div>
@@ -297,7 +297,7 @@ const Home = () => {
             <div className="grid grid-cols-3 gap-4 text-center">
               {[
                 { icon: '🎮', value: '5+', label: 'Kịch bản' },
-                { icon: '🏆', value: '9', label: 'Huy chương để chinh phục' },
+                { icon: '🏆', value: '9', label: 'Huy hiệu để chinh phục' },
                 { icon: '⚡', value: '3', label: 'Lượt thử miễn phí/ngày' },
               ].map(({ icon, value, label }) => (
                 <div key={label}>

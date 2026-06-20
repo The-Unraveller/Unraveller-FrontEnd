@@ -62,28 +62,28 @@ const AuthPage = () => {
     <div className="min-h-screen bg-spy-black flex items-center justify-center p-4 font-mono text-spy-green">
       <div className="w-full max-w-md border border-spy-green p-8 bg-spy-black/80 relative shadow-[0_0_20px_rgba(0,255,0,0.1)]">
         <div className="absolute top-0 right-0 p-2 text-[10px] opacity-30 flex items-center gap-1">
-          <Shield className="w-3 h-3" /> MỨC ĐỘ BẢO MẬT: ĐÃ MÃ HÓA
+          <Shield className="w-3 h-3" /> HỆ THỐNG XÁC THỰC AN TOÀN
         </div>
 
         <h2 className="text-2xl font-bold mb-12 flex items-center gap-2">
-          <span className="animate-pulse">_</span> {isLogin ? 'YÊU CẦU LIÊN KẾT ĐẶC VỤ?' : 'ĐĂNG KÝ ĐẶC VỤ MỚI'}
+          <span className="animate-pulse">_</span> {isLogin ? 'ĐĂNG NHẬP HỆ THỐNG' : 'ĐĂNG KÝ THÀNH VIÊN MỚI'}
         </h2>
 
         {error && (
           <div className="mb-6 p-3 border border-red-500/50 bg-red-500/10 text-red-500 text-xs uppercase animate-pulse">
-            LỖI_NGHIÊM_TRỌNG: {error}
+            LỖI: {error}
           </div>
         )}
 
         <form className="space-y-6" onSubmit={handleAuth}>
           {!isLogin && (
             <div>
-              <label className="block text-xs uppercase mb-2 text-gray-400">Biệt danh Đặc vụ (Username)</label>
+              <label className="block text-xs uppercase mb-2 text-gray-400">Tên đăng nhập (Username)</label>
               <input
                 type="text"
                 required
                 className="w-full bg-spy-black border border-spy-green/30 p-3 text-spy-green focus:border-spy-green outline-none transition-all"
-                placeholder="AG_DAC_VU_X"
+                placeholder="USERNAME"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -91,19 +91,19 @@ const AuthPage = () => {
           )}
 
           <div>
-            <label className="block text-xs uppercase mb-2 text-gray-400">Mã Đặc vụ (Email)</label>
+            <label className="block text-xs uppercase mb-2 text-gray-400">Địa chỉ Email (Email)</label>
             <input
               type="email"
               required
               className="w-full bg-spy-black border border-spy-green/30 p-3 text-spy-green focus:border-spy-green outline-none transition-all"
-              placeholder="DACVU@UNRAVELLER.IO"
+              placeholder="USER@UNRAVELLER.COM"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="block text-xs uppercase mb-2 text-gray-400">Mật mã Truy cập (Password)</label>
+            <label className="block text-xs uppercase mb-2 text-gray-400">Mật khẩu (Password)</label>
             <input
               type="password"
               required
@@ -119,7 +119,7 @@ const AuthPage = () => {
             disabled={isLoading}
             className="w-full py-4 bg-spy-green text-black font-bold uppercase transition-all hover:bg-white disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {isLoading ? 'ĐANG XỬ LÝ...' : (isLogin ? 'Thiết lập Liên kết' : 'Khởi tạo Hồ sơ')}
+            {isLoading ? 'ĐANG XỬ LÝ...' : (isLogin ? 'Đăng Nhập' : 'Tạo Tài Khoản')}
             {!isLoading && <ChevronRight className="w-4 h-4" />}
           </button>
         </form>
@@ -127,7 +127,7 @@ const AuthPage = () => {
         <div className="mt-8 flex flex-col gap-6">
           <div className="relative flex items-center justify-center">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-spy-green/20"></span></div>
-            <span className="relative px-4 bg-spy-black text-[10px] uppercase text-gray-500">Truy cập Thay thế</span>
+            <span className="relative px-4 bg-spy-black text-[10px] uppercase text-gray-500">Hoặc đăng nhập với</span>
           </div>
 
           <div className="flex justify-center">
@@ -148,7 +148,7 @@ const AuthPage = () => {
               }}
               className="text-xs uppercase hover:text-white transition-all underline underline-offset-4"
             >
-              {isLogin ? "Chưa có Mã? Tạo hồ sơ" : "Đã là Đặc vụ? Đăng nhập"}
+              {isLogin ? "Chưa có tài khoản? Tạo tài khoản" : "Đã có tài khoản? Đăng nhập"}
             </button>
           </div>
         </div>

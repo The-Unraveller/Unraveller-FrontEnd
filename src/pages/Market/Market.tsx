@@ -42,7 +42,7 @@ const Market = () => {
       if (response.success) {
         // Update Zustand store immediately so header stats and profile stats sync up!
         updateUser({ xpBalance: response.newXpBalance });
-        toast.success(`Giao dịch thành công: Đã thêm ${itemName} vào kho đặc vụ. Số dư: ${response.newXpBalance} XP.`);
+        toast.success(`Giao dịch thành công: Đã thêm ${itemName} vào hành trang hỗ trợ. Số dư: ${response.newXpBalance} XP.`);
       } else {
         toast.error(response.message || 'Không thể mua vật phẩm. Vui lòng thử lại sau.');
       }
@@ -57,24 +57,24 @@ const Market = () => {
   const getTranslatedType = (type: string) => {
     switch (type) {
       case 'InGameHint': return 'GỢI Ý AI';
-      case 'BribeNpc': return 'HỐI LỘ NPC';
+      case 'BribeNpc': return 'HỖ TRỢ GIAO TIẾP';
       case 'Cosmetic': return 'TRANG TRÍ';
       default: return type.toUpperCase();
     }
   };
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
-    <Seo title="Cho Den Hacker" description="Mua sam vat pham trong cho den hacker The Unraveller bang XP. Hack NPC, su dung goi y va do trang tri." keywords="cho den hacker, shop, mua vat pham, XP, game store" canonical="/market" noIndex />
+    <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
+    <Seo title="Cua Hang Vat Pham" description="Mua sam vat pham ho tro trong The Unraveller bang XP. Su dung goi y va cac cong cu hoc tap." keywords="cua hang vat pham, shop, mua vat pham, XP, game store" canonical="/market" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24">
         {/* Header Row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-              <span className="text-cyan-brand">🛒</span> CHỢ ĐEN HACKER
+              <span className="text-cyan-brand">🛒</span> CỬA HÀNG VẬT PHẨM
             </h1>
             <p className="text-white/45 text-xs font-mono uppercase tracking-wider mt-1">
-              Đổi điểm kinh nghiệm đặc vụ (XP) để lấy các công cụ hỗ trợ giải mã và vượt qua bảo mật.
+              Đổi điểm tích lũy học tập (XP) để lấy các công cụ hỗ trợ luyện tập giao tiếp và gợi ý đàm thoại.
             </p>
           </div>
 
@@ -93,12 +93,12 @@ const Market = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
             <Loader2 className="w-10 h-10 text-cyan-brand animate-spin mb-4" />
-            <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang giải mã danh mục chợ đen...</p>
+            <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang tải danh mục cửa hàng...</p>
           </div>
         ) : items.length === 0 ? (
           <div className="ur-card p-12 text-center rounded-2xl border border-white/5 bg-navy-2">
             <ShoppingBag className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <p className="text-white/50 text-base font-semibold">Chợ đen hiện không hoạt động giao dịch.</p>
+            <p className="text-white/50 text-base font-semibold">Cửa hàng hiện không hoạt động giao dịch.</p>
             <p className="text-white/30 text-xs mt-1">Vui lòng quay lại sau để cập nhật danh mục vật phẩm mới.</p>
           </div>
         ) : (

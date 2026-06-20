@@ -23,9 +23,9 @@ const medals: Record<string, { name: string; desc: string; color: string; emoji:
     color: '#a78bfa',
   },
   '5': {
-    name: '"Thám Tử Có Mắt Tinh Tường"',
-    emoji: '🔍',
-    desc: 'Được trao khi hoàn thành màn chơi Viết lách Thám tử. Kỹ năng quan sát và diễn đạt của bạn đã giải mã bí ẩn một cách đầy phong cách.',
+    name: '"Người Viết Báo Cáo Chuyên Nghiệp"',
+    emoji: '📝',
+    desc: 'Được trao khi hoàn thành xuất sắc kịch bản Báo cáo Sự cố Công việc. Kỹ năng trình bày và diễn đạt tiếng Anh của bạn đã được khẳng định.',
     color: '#60a5fa',
   },
 };

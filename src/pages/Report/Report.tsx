@@ -30,15 +30,15 @@ const Report = () => {
   ];
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
+    <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
     <Seo title="Bao Cao Nang Luc" description="Xem bao cao phan tich nang luc tieng anh cua ban trong The Unraveller. Theo doi tien bo ky nang nghe, noi, doc, viet." keywords="bao cao, nang luc, phan tich, tien bo, ky nang tieng anh" canonical="/report" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-            <FileText className="text-purple-brand" /> BÁO CÁO NĂNG LỰC ĐẶC VỤ
+            <FileText className="text-purple-brand" /> BÁO CÁO NĂNG LỰC NGƯỜI HỌC
           </h1>
           <p className="text-white/45 text-xs uppercase tracking-wider mt-1">
-            Phân tích các mẫu đối thoại, độ chính xác ngữ pháp và thành tựu từ vựng.
+            Phân tích các mẫu đối thoại, độ chính xác ngữ pháp và thành tựu học tập.
           </p>
         </div>
 
@@ -93,13 +93,13 @@ const Report = () => {
 
               <div className="p-4 rounded-xl bg-white/5 border border-white/5">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white text-xs font-bold uppercase tracking-wider">Kiểm Soát Ngưỡng Nghi Ngờ</span>
+                  <span className="text-white text-xs font-bold uppercase tracking-wider">Kiểm Soát Sai Lệch Giao Tiếp</span>
                   <span className="text-green-400 text-xs font-bold">Xuất sắc (trung bình 10-30%)</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
                   <div className="h-full bg-green-400 rounded-full" style={{ width: '95%' }} />
                 </div>
-                <p className="text-white/40 text-[9px] mt-1.5">Khả năng thích ứng cao trước các câu hỏi của NPC. Mức độ nghi ngờ tăng đột biến được nhanh chóng kiểm soát nhờ sử dụng từ ngữ chính xác.</p>
+                <p className="text-white/40 text-[9px] mt-1.5">Khả năng thích ứng cao trước các câu hỏi từ kịch bản giả lập. Chỉ số sai lệch giao tiếp được kiểm soát tốt nhờ diễn đạt chính xác.</p>
               </div>
             </div>
           </div>

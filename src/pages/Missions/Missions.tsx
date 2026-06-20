@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Seo from '../../components/seo/Seo';
-import { getMissions, checkMissionAccess } from '../../services/api';
+import { getMissions, checkMissionAccess, getUserProfile } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useGameStore } from '../../store/useGameStore';
 import GoogleAd from '../../components/ads/GoogleAd';
@@ -37,7 +37,7 @@ const Missions = () => {
   const navigate = useNavigate();
   const [coursesList, setCoursesList] = useState<CourseCard[]>([]);
   const [loadingAccess, setLoadingAccess] = useState<number | null>(null);
-  const { user } = useGameStore();
+  const { user, setUser } = useGameStore();
 
   const handleCardClick = async (id: number, locked: boolean) => {
     if (locked) return;
@@ -63,6 +63,13 @@ const Missions = () => {
   useEffect(() => {
     const loadMissions = async () => {
       try {
+        try {
+          const profile = await getUserProfile();
+          setUser(profile);
+        } catch (profileErr) {
+          console.error('Failed to sync user profile:', profileErr);
+        }
+
         const data = await getMissions();
         if (data && data.length > 0) {
           const sortedMissions = [...data].sort((a, b) => a.id - b.id);
@@ -92,7 +99,7 @@ const Missions = () => {
   }, [user]);
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'}>
+    <Layout isLoggedIn username={user?.username || 'User'}>
       <Seo title="Chọn kịch bản học tập" description="Chọn từ 5+ kịch bản học tập thực tế" canonical="/courses" noIndex />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
@@ -130,8 +137,12 @@ const Missions = () => {
                       }`}
                     >
                       <div className="h-40 bg-navy-3/80 relative overflow-hidden border-b border-purple-brand/20">
-                        {course.img && !course.locked ? (
-                          <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
+                        {course.img ? (
+                          <img 
+                            src={course.img} 
+                            alt={course.title} 
+                            className={`w-full h-full object-cover ${course.locked ? 'blur-[3px] opacity-25 grayscale' : 'transition-transform duration-500 hover:scale-105'}`} 
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-navy-3/90">
                             <Lock size={32} className="text-purple-brand/50" />
