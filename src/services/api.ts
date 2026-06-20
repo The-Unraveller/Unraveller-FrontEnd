@@ -49,6 +49,8 @@ export interface MissionDto {
   cefrLevel: number;
   minTurnsToComplete: number;
   minAverageScore: number;
+  initialChoices: string[];
+  syntaxPuzzles: string;
 }
 
 export interface DialogueRequestDto {

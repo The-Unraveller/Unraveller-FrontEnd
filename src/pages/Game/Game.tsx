@@ -23,38 +23,6 @@ interface Message {
   feedback?: string;
 }
 
-/* ─── Scenario fallback data ─── */
-const startChoicesMap: Record<number, string[]> = {
-  1: ["I would like to order a cup of coffee, please.", "Could I see the menu, please?", "Do you recommend any house blends today?", "What kind of hot pastries do you have?"],
-  2: ["Understood. What is the first task I need to do?", "I'm ready. Please give me the instructions.", "Can you guide me on what to do first?", "I will do my best to follow the guidelines."],
-  3: ["I'm ready. Let's start the negotiation.", "Can you explain the main points of the agreement?", "I'd like to discuss the terms of this deal.", "Let's look at the topic from both sides."],
-  4: ["Good morning. Thank you for having me today.", "I'm excited to share my experience with you.", "I'm ready for the interview questions.", "Thank you. I'm glad to have this opportunity."],
-  5: ["I'm on the case. What details do we have?", "Let's start by examining the evidence.", "Where was the victim last seen?", "I'll solve this. What's our first clue."]
-};
-
-/* ─── Grammar Syntax Puzzles for Learning Mini-game ─── */
-const syntaxPuzzlesMap: Record<number, { question: string; scrambled: string[]; answer: string; hint: string }[]> = {
-  1: [
-    { question: "Sắp xếp để tạo câu yêu cầu gọi món lịch sự:", scrambled: ["like", "order", "cup", "I", "would", "coffee.", "to", "a", "of"], answer: "I would like to order a cup of coffee.", hint: "Bắt đầu: I would like to..." },
-    { question: "Sắp xếp câu hỏi xin xem thực đơn:", scrambled: ["menu,", "please?", "I", "see", "the", "Could"], answer: "Could I see the menu, please?", hint: "Dùng 'Could I' để hỏi lịch sự." }
-  ],
-  2: [
-    { question: "Sắp xếp câu bị động:", scrambled: ["report", "the", "by", "submitted", "was", "me."], answer: "The report was submitted by me.", hint: "Cấu trúc: S + was/were + V3 + by + O." }
-  ],
-  3: [
-    { question: "Sắp xếp câu điều kiện loại 1:", scrambled: ["If", "help", "me,", "I", "will", "you", "bypass", "the", "server."], answer: "If you help me, I will bypass the server.", hint: "If + S + V, S + will + V" }
-  ],
-  4: [
-    { question: "Sắp xếp câu với 'because':", scrambled: ["because", "I", "applied", "this", "job", "I", "the", "want", "challenges.", "for"], answer: "I applied for this job because I want the challenges.", hint: "Because đứng sau mệnh đề chính." }
-  ],
-  5: [
-    { question: "Sắp xếp câu mô tả hiện trường:", scrambled: ["quickly", "evidence.", "gathered", "The", "detective", "the"], answer: "The detective quickly gathered the evidence.", hint: "Trạng từ đứng trước động từ." }
-  ],
-  6: [
-    { question: "Sắp xếp câu gián tiếp:", scrambled: ["She", "told", "she", "ready", "was", "the", "mission.", "me", "for"], answer: "She told me she was ready for the mission.", hint: "S + told + someone + S + V..." }
-  ]
-};
-
 const defaultScenario = {
   title: 'Loading…',
   stage: 'STAGE',
@@ -66,6 +34,7 @@ const defaultScenario = {
   xpReward: 100,
   intro: 'Preparing your mission…',
   choices: ["Hello!", "Ready!"],
+  syntaxPuzzles: [] as { question: string; scrambled: string[]; answer: string; hint: string }[],
   grammarTarget: '',
   minTurns: 5,
 };
@@ -191,7 +160,8 @@ const Game = () => {
   const [showPuzzleHint, setShowPuzzleHint] = useState(false);
 
   const startTerminalHack = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[0];
     setCurrentPuzzleIdx(0);
     setSelectedWords([]);
@@ -214,7 +184,8 @@ const Game = () => {
   };
 
   const handleCheckPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[currentPuzzleIdx];
     const userSentence = selectedWords.join(' ');
     const normalize = (str: string) => str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -230,7 +201,8 @@ const Game = () => {
   };
 
   const handleResetPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const puzzle = puzzles[currentPuzzleIdx];
     setSelectedWords([]);
     setScrambledWords([...puzzle.scrambled].sort(() => Math.random() - 0.5));
@@ -238,7 +210,8 @@ const Game = () => {
   };
 
   const handleNextPuzzle = () => {
-    const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+    const puzzles = scenario.syntaxPuzzles;
+    if (!puzzles || puzzles.length === 0) return;
     const nextIdx = currentPuzzleIdx + 1;
     if (nextIdx < puzzles.length) {
       setCurrentPuzzleIdx(nextIdx);
@@ -355,7 +328,8 @@ const Game = () => {
                 : found.npcName?.toLowerCase().includes('detective') ? '🔍' : '👤',
             difficulty: found.difficulty || 'Trung bình',
             xpReward: found.xpReward || 50,
-            choices: (found as any).choices || startChoicesMap[missionId] || startChoicesMap[1],
+            choices: found.initialChoices && found.initialChoices.length > 0 ? found.initialChoices : ["Hello!", "Ready!"],
+            syntaxPuzzles: (() => { try { return JSON.parse(found.syntaxPuzzles || '[]'); } catch { return []; } })(),
             intro: found.description || found.goal || '',
             grammarTarget: found.grammarTarget || '',
             minTurns: found.minTurnsToComplete || 5,
@@ -797,7 +771,8 @@ const Game = () => {
 
       {/* Terminal Hack Modal */}
       {showTerminalModal && (() => {
-        const puzzles = syntaxPuzzlesMap[missionId] || syntaxPuzzlesMap[1];
+        const puzzles = scenario.syntaxPuzzles;
+        if (!puzzles || puzzles.length === 0) return null;
         const puzzle = puzzles[currentPuzzleIdx];
         return (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
