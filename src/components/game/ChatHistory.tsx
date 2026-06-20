@@ -23,14 +23,8 @@ interface ChatHistoryProps {
 }
 
 export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping, topicName = 'Hội thoại', npcName = 'NPC', onSpeak, speakingIndex }) => {
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
-
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide">
+    <div className="flex-1 space-y-6">
       <div className="flex items-center justify-center mb-2">
         <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide">
           Chủ đề: {topicName}
@@ -63,7 +57,6 @@ export const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isTyping, to
           </motion.div>
         )}
       </AnimatePresence>
-      <div ref={endRef} />
     </div>
   );
 };

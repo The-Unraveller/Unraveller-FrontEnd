@@ -125,17 +125,17 @@ const UserProfile = () => {
   }
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
-      <Seo title="Ho So Dac Vu" description="Xem va chinh sua ho so ca nhan cua ban trong The Unraveller." keywords="ho so, profile, tai khoan, dac vu" canonical="/profile" noIndex />
+    <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
+      <Seo title="Thong Tin Ca Nhan" description="Xem va chinh sua ho so ca nhan cua ban trong The Unraveller." keywords="ho so, profile, tai khoan, nguoi hoc" canonical="/profile" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24">
         {/* Top Header Row with Username & Action Buttons */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
-              <span className="text-purple-brand">🕵️‍♂️</span> HỒ SƠ ĐẶC VỤ
+              <span className="text-purple-brand">👤</span> THÔNG TIN CÁ NHÂN
             </h1>
             <p className="text-white/45 text-xs font-mono uppercase tracking-wider mt-1">
-              Trạng thái xác thực: Kết nối an toàn
+              Trạng thái tài khoản: Hoạt động
             </p>
           </div>
           <div className="flex gap-3">
@@ -151,7 +151,7 @@ const UserProfile = () => {
               onClick={() => navigate('/courses')}
               className="flex items-center gap-2 px-4 py-2 bg-purple-brand/20 hover:bg-purple-brand text-purple-brand hover:text-white border border-purple-brand/40 hover:border-transparent rounded-xl text-xs font-mono uppercase tracking-wider transition-all font-bold"
             >
-              Bàn Nhiệm Vụ
+              Khóa Học
             </button>
           </div>
         </div>
@@ -171,7 +171,7 @@ const UserProfile = () => {
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-brand to-purple-light flex items-center justify-center text-3xl shadow-glow-purple border border-white/10">
-                  🕵️‍♂️
+                  👤
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white font-bold text-lg leading-tight truncate">{user?.username}</h3>
@@ -201,7 +201,7 @@ const UserProfile = () => {
                   <span className="text-white font-medium truncate max-w-[170px]">{user?.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/40 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Cấp bậc đặc vụ:</span>
+                  <span className="text-white/40 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Cấp độ học lực:</span>
                   <span className="text-cyan-brand font-bold">Cấp {Math.floor((user?.xpBalance || 0) / 1000) + 1}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -444,11 +444,11 @@ const UserProfile = () => {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-mono">
           <div className="w-full max-w-md bg-navy-2 border border-purple-brand/30 p-8 rounded-2xl relative shadow-glow-purple animate-fade-in">
             <h3 className="text-white text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-wider">
-              <span className="text-purple-brand">⚡</span> Cập Nhật Hồ Sơ Agent
+              <span className="text-purple-brand">⚡</span> Cập Nhật Thông Tin Cá Nhân
             </h3>
             <form onSubmit={handleSaveProfile} className="space-y-6">
               <div>
-                <label className="block text-xs uppercase mb-2 text-white/60">Tên đặc vụ (Username)</label>
+                <label className="block text-xs uppercase mb-2 text-white/60">Tên người học (Username)</label>
                 <input
                   type="text"
                   required
@@ -459,7 +459,7 @@ const UserProfile = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase mb-2 text-white/60">Email đặc vụ</label>
+                <label className="block text-xs uppercase mb-2 text-white/60">Email người học</label>
                 <input
                   type="email"
                   required

@@ -31,15 +31,15 @@ const Score = () => {
     },
     { 
       id: 2, 
-      name: 'Đặc vụ chính xác', 
-      desc: 'Hoàn thành màn học làm theo hướng dẫn (Stage 2).', 
+      name: 'Diễn đạt chính xác', 
+      desc: 'Hoàn thành kịch bản báo cáo công việc (Stage 2).', 
       earned: user?.missionProgresses?.some(p => p.missionId === 2 && p.status === 'Completed') ?? false, 
       emoji: '📋' 
     },
     { 
       id: 3, 
-      name: 'Huy hiệu Hacker', 
-      desc: 'Sử dụng thành công các vật phẩm hoặc sở hữu gói Premium.', 
+      name: 'Thành viên Tích cực', 
+      desc: 'Sử dụng thành công các công cụ hỗ trợ hoặc sở hữu gói Premium.', 
       earned: user?.isPremium || (user?.missionProgresses?.some(p => p.xpEarned > 50) ?? false), 
       emoji: '⚡' 
     },
@@ -60,15 +60,15 @@ const Score = () => {
   ];
 
   return (
-    <Layout isLoggedIn username={user?.username || 'Agent'} showBottomNav>
-    <Seo title="Bang Xep Hang" description="Xem bang xep hang toan cau cua cac dac vu trong The Unraveller. So sanh diem XP va thanh tuu cua ban voi ban be." keywords="bang xep hang, diem so, leaderboard, XP, thanh tuu, global ranking" canonical="/score" noIndex />
+    <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
+    <Seo title="Bang Xep Hang" description="Xem bang xep hang toan cau cua cac hoc vien trong The Unraveller. So sanh diem XP va thanh tuu cua ban." keywords="bang xep hang, diem so, leaderboard, XP, global ranking" canonical="/score" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
             <Trophy className="text-gold" /> BẢNG XẾP HẠNG & ĐIỂM SỐ
           </h1>
           <p className="text-white/45 text-xs uppercase tracking-wider mt-1">
-            Bảng xếp hạng toàn cầu của các đặc vụ thực địa hoạt động và huy chương thành tựu đã giải khóa.
+            Bảng xếp hạng toàn cầu của các học viên hoạt động và danh hiệu thành tích đã đạt được.
           </p>
         </div>
 
@@ -76,10 +76,10 @@ const Score = () => {
           {/* Global Leaderboard */}
           <div className="lg:col-span-2 ur-card p-6 bg-navy-2 border border-white/5">
             <h2 className="text-white font-bold text-base tracking-widest uppercase mb-4 flex items-center gap-2">
-              🏆 BẢNG XẾP HẠNG ĐẶC VỤ TOÀN CẦU
+              🏆 BẢNG XẾP HẠNG HỌC VIÊN TOÀN CẦU
             </h2>
             {loading ? (
-              <p className="text-white/40 text-xs py-4 text-center">Đang đồng bộ hóa mạng lưới đặc vụ...</p>
+              <p className="text-white/40 text-xs py-4 text-center">Đang tải danh sách học viên...</p>
             ) : (
               <div className="space-y-2">
                 {leaderboard.map((entry) => (

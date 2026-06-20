@@ -115,9 +115,9 @@ const CourseCertificate = () => {
 
             {/* HUD Status Readouts */}
             <div className="w-full flex justify-between items-center text-[8px] text-cyan-brand/60 uppercase tracking-widest border-b border-white/5 pb-3 mb-6">
-              <span>[ĐẶC VỤ GIẢI MÃ: HOẠT ĐỘNG]</span>
+              <span>[NGƯỜI HỌC GIAO TIẾP: HOẠT ĐỘNG]</span>
               <span>TOKEN: CERT-{cert.mission.id}-{cert.user.username.toUpperCase().substring(0, 5)}</span>
-              <span>HỆ THỐNG XÁC MINH CƠ SỞ DỮ LIỆU</span>
+              <span>HỆ THỐNG XÁC MINH HỌC TẬP</span>
             </div>
 
             {/* Shield / Logo Icon */}
@@ -128,30 +128,30 @@ const CourseCertificate = () => {
 
             {/* Certificate Heading */}
             <h1 className="text-xl md:text-2xl font-black uppercase text-center tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-white drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)] leading-normal py-1">
-              Chứng Nhận Giải Mã Nút Mạng
+              Chứng Nhận Hoàn Thành Tình Huống
             </h1>
             <p className="text-[10px] text-purple-soft/60 uppercase tracking-widest mt-1 text-center font-bold">
-              THE UNRAVELLER // CYBERNETIC COGNITIVE ACADEMY
+              THE UNRAVELLER // REAL COMMUNICATION SIMULATOR
             </p>
 
             <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-purple-brand to-transparent my-6" />
 
             {/* Content Body */}
             <div className="text-center space-y-4 max-w-xl">
-              <p className="text-xs text-white/50 uppercase tracking-wide">XÁC THỰC RẰNG ĐẶC VỤ</p>
+              <p className="text-xs text-white/50 uppercase tracking-wide">XÁC THỰC NGƯỜI HỌC</p>
               
               <h2 className="text-2xl md:text-3xl font-black tracking-normal text-white uppercase bg-clip-text bg-gradient-to-b from-white to-white/70">
                 {cert.user.username}
               </h2>
               
               <p className="text-xs text-white/60 leading-relaxed font-sans max-w-md mx-auto">
-                Đạt trình độ đánh giá <span className="text-cyan-brand font-bold font-mono text-sm border border-cyan-brand/30 px-1.5 py-0.5 rounded bg-cyan-brand/5">{cert.user.englishLevel}</span>, đã xâm nhập thành công và giải mã bộ lọc ngôn ngữ tại máy chủ:
+                Đạt trình độ đánh giá <span className="text-cyan-brand font-bold font-mono text-sm border border-cyan-brand/30 px-1.5 py-0.5 rounded bg-cyan-brand/5">{cert.user.englishLevel}</span>, đã hoàn thành tốt và làm chủ tình huống giao tiếp tại kịch bản:
               </p>
 
               {/* Scenario Card */}
               <div className="my-5 p-4 rounded-2xl bg-gradient-to-br from-purple-950/20 via-black/45 to-[#15122d] border border-purple-500/20 relative shadow-[inset_0_1px_4px_rgba(124,58,237,0.1)]">
                 <span className="absolute top-2.5 left-3 text-[8px] font-bold text-purple-soft/50 font-mono tracking-widest uppercase">STAGE ID: {cert.mission.stage}</span>
-                <span className="absolute top-2.5 right-3 text-[8px] font-bold text-emerald-400/70 font-mono flex items-center gap-0.5"><Activity size={8} /> ĐÃ GIẢI MÃ</span>
+                <span className="absolute top-2.5 right-3 text-[8px] font-bold text-emerald-400/70 font-mono flex items-center gap-0.5"><Activity size={8} /> ĐÃ HOÀN THÀNH</span>
                 
                 <h3 className="text-white text-base font-black mt-3 mb-1">{cert.mission.title}</h3>
                 <p className="text-white/45 text-[10px] italic font-sans max-w-sm mx-auto">{cert.mission.goal}</p>
@@ -208,7 +208,7 @@ const CourseCertificate = () => {
 
             {/* Signature Label */}
             <div className="text-center mt-6 text-[8px] font-mono text-white/20 uppercase tracking-wider">
-              Bảo mật mã hóa xác minh tự động bởi The Unraveller AI Evaluation Protocol v2.5.1
+              Xác minh tự động bởi hệ thống Unraveller AI Evaluation Protocol v2.5.1
             </div>
 
           </div>
@@ -238,7 +238,7 @@ const CourseCertificate = () => {
               onClick={() => navigate('/courses')}
               className="py-3 px-6 bg-[#181335] hover:bg-[#201a47] border border-purple-500/20 hover:border-purple-500/40 text-purple-soft hover:text-white rounded-xl text-xs font-bold uppercase transition-all duration-300 flex items-center gap-2 active:scale-95"
             >
-              <Activity size={14} /> Màn chơi / Kịch bản
+              <Activity size={14} /> Tình huống / Kịch bản
             </button>
 
             <button

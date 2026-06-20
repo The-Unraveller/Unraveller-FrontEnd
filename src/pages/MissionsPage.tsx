@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, Unlock, Play, ChevronRight, User } from 'lucide-react';
 
 const missions = [
-  { id: 1, title: 'The Gatekeeper', desc: 'Thuyết phục bảo vệ cho bạn vào tòa nhà bí mật.', status: 'available', level: 1 },
-  { id: 2, title: 'Data Extraction', desc: 'Hỏi thông tin mật khẩu từ nhân viên thực tập.', status: 'locked', level: 2 },
-  { id: 3, title: 'The Double Agent', desc: 'Nhận biết và đối phó với kẻ phản bội.', status: 'locked', level: 3 },
-  { id: 4, title: 'Final Unravelling', desc: 'Giải mã bí mật cuối cùng của tổ chức.', status: 'locked', level: 4 },
+  { id: 1, title: 'Gọi đồ uống tại Cafe', desc: 'Tương tác với nhân viên pha chế để gọi thức uống phù hợp.', status: 'available', level: 1 },
+  { id: 2, title: 'Báo cáo công việc', desc: 'Báo cáo kết quả dự án với quản lý trực tiếp.', status: 'locked', level: 2 },
+  { id: 3, title: 'Đàm phán nhà cung cấp', desc: 'Thuyết phục nhà cung cấp giảm giá chi phí nguyên vật liệu.', status: 'locked', level: 3 },
+  { id: 4, title: 'Phỏng vấn xin việc', desc: 'Trả lời các câu hỏi tình huống từ hội đồng tuyển dụng.', status: 'locked', level: 4 },
 ];
 
 const MissionsPage = () => {
@@ -18,8 +18,8 @@ const MissionsPage = () => {
         <div className="text-2xl font-bold tracking-tighter">UNRAVELLER // DASHBOARD</div>
         <div className="flex items-center gap-4 text-xs">
           <div className="text-right">
-            <p className="text-gray-500">AGENT_NAME: <span className="text-spy-green">KHOA_PRO</span></p>
-            <p className="text-gray-500">RANK: <span className="text-spy-blue">NOVICE_AGENT</span></p>
+            <p className="text-gray-500">USER_NAME: <span className="text-spy-green">KHOA_PRO</span></p>
+            <p className="text-gray-500">LEVEL: <span className="text-spy-blue">NOVICE_LEARNER</span></p>
           </div>
           <div className="w-10 h-10 border border-spy-green rounded-full flex items-center justify-center">
             <User className="w-6 h-6" />
@@ -29,7 +29,7 @@ const MissionsPage = () => {
 
       <div className="max-w-6xl mx-auto">
         <h2 className="text-xl font-bold uppercase mb-8 flex items-center gap-2">
-          <ChevronRight /> SELECT ACTIVE MISSION
+          <ChevronRight /> CHỌN TÌNH HUỐNG LUYỆN TẬP
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
