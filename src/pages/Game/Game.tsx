@@ -67,6 +67,7 @@ const defaultScenario = {
   intro: 'Preparing your mission…',
   choices: ["Hello!", "Ready!"],
   grammarTarget: '',
+  minTurns: 5,
 };
 
 /* ─── Map stage identifiers → user-friendly topic names ─── */
@@ -285,7 +286,7 @@ const Game = () => {
     setSuspicion(sessionData.currentSuspicion);
     setTurnCount(sessionData.turnCount);
     setTotalXP(sessionData.xpEarned);
-    if (sessionData.turnCount >= 10 || sessionData.currentSuspicion >= 100) {
+    if (sessionData.turnCount >= scenario.minTurns || sessionData.currentSuspicion >= 100) {
       setGameOver(true);
     } else {
       setGameOver(false);
@@ -357,6 +358,7 @@ const Game = () => {
             choices: (found as any).choices || startChoicesMap[missionId] || startChoicesMap[1],
             intro: found.description || found.goal || '',
             grammarTarget: found.grammarTarget || '',
+            minTurns: found.minTurnsToComplete || 5,
           };
           setScenario(transformed);
 
@@ -444,7 +446,7 @@ const Game = () => {
         setTimeout(() => {
           navigate(`/result/${missionId}?status=success&xp=${response.xpEarned}&token=${response.completionToken || ''}`);
         }, 2500);
-      } else if (response.turnCount >= 10 || turnCount + 1 >= 10) {
+      } else if (response.turnCount >= scenario.minTurns || turnCount + 1 >= scenario.minTurns) {
         setGameOver(true);
         setIsWin(true);
         if (response.completionToken) setCompletionToken(response.completionToken);
@@ -532,9 +534,9 @@ const Game = () => {
           </div>
 
           {/* Two-column layout */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 lg:overflow-hidden">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 overflow-hidden">
             {/* Left Column - Chat */}
-            <div className="flex flex-col gap-4 min-h-0 h-full overflow-hidden">
+            <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
               {/* Mission Info Card */}
               <div className="ur-card border-purple-brand/20 p-4 shadow-md bg-navy-2/45 flex flex-col sm:flex-row gap-4 items-start">
                 {scenario.bg && (
@@ -570,15 +572,15 @@ const Game = () => {
               </div>
 
               {/* Chat Messages - sử dụng ChatHistory với topic và npcName */}
-              <div className="flex-1 ur-card border-purple-brand/20 p-4 flex flex-col min-h-0 shadow-md bg-navy-2/45 overflow-hidden relative">
+              <div className="flex-1 ur-card border-purple-brand/20 flex flex-col min-h-0 shadow-md bg-navy-2/45 overflow-hidden relative">
                 {scenario.bg && (
                   <div 
                     className="absolute inset-0 pointer-events-none opacity-[0.05] bg-cover bg-center" 
                     style={{ backgroundImage: `url(${scenario.bg})` }}
                   />
                 )}
-                {/* Scrollable Chat Area */}
-                <div className="flex-1 min-h-0 mb-3 flex flex-col relative z-10">
+                {/* Scrollable Chat Area fills all remaining height */}
+                <div className="flex-1 min-h-0 relative z-10 overflow-hidden flex flex-col">
                   <ChatHistory
                     messages={messages}
                     isTyping={isTyping}
@@ -590,7 +592,7 @@ const Game = () => {
                 </div>
 
                 {/* Sticky Bottom Area - Controls & Inputs */}
-                <div className="flex-shrink-0 space-y-3 pt-2.5 border-t border-white/5">
+                <div className="flex-shrink-0 space-y-3 p-4 pt-2.5 border-t border-white/5 relative z-10">
                   {/* AI Hint */}
                   {activeHint && (
                     <div className="bg-purple-brand/10 border border-purple-brand/30 rounded-xl p-3">
@@ -658,7 +660,7 @@ const Game = () => {
                   {/* Turn Progress & Actions */}
                   <div className="flex items-center justify-between text-xs">
                     <div className="text-xs text-text-secondary font-mono">
-                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/10</span>
+                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/{scenario.minTurns}</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -683,7 +685,7 @@ const Game = () => {
                   <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
-                      style={{ width: `${Math.min(100, (turnCount / 10) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (turnCount / scenario.minTurns) * 100)}%` }}
                     />
                   </div>
 
@@ -710,8 +712,6 @@ const Game = () => {
                     )}
                   </div>
                 </div>
-
-                <GoogleAd />
               </div>
             </div>
 
@@ -758,6 +758,13 @@ const Game = () => {
               </div>
             )}
           </div>
+
+          {/* Ad banner — slim strip below game, does not steal height */}
+          {!user?.isPremium && (
+            <div className="mt-3 flex-shrink-0">
+              <GoogleAd type="slim" />
+            </div>
+          )}
         </main>
       </div>
 
@@ -933,7 +940,7 @@ const Game = () => {
               </div>
               <div className="mt-2">
                 <span className="text-[10px] text-text-muted uppercase font-mono block">Lượt đối thoại</span>
-                <span className="text-sm font-semibold text-white font-mono">{turnCount}/10 lượt</span>
+                <span className="text-sm font-semibold text-white font-mono">{turnCount}/{scenario.minTurns} lượt</span>
               </div>
               <div className="mt-2">
                 <span className="text-[10px] text-text-muted uppercase font-mono block">Mức độ nghi ngờ</span>
@@ -964,7 +971,7 @@ const Game = () => {
 
             {/* Actions */}
             <div className="flex flex-col gap-2.5">
-              {isWin && missionId < 3 && (
+              {isWin && (
                 <button
                   onClick={() => {
                     setShowCompletionModal(false);

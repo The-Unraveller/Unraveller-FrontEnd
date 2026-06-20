@@ -62,41 +62,47 @@ const Missions = () => {
 
   useEffect(() => {
     const loadMissions = async () => {
+      // Sync user profile silently — don't block mission loading on failure
       try {
-        try {
-          const profile = await getUserProfile();
-          setUser(profile);
-        } catch (profileErr) {
-          console.error('Failed to sync user profile:', profileErr);
-        }
+        const profile = await getUserProfile();
+        setUser(profile);
+      } catch (profileErr) {
+        console.error('Failed to sync user profile:', profileErr);
+      }
 
+      // Always attempt to fetch and render missions
+      try {
         const data = await getMissions();
         if (data && data.length > 0) {
           const sortedMissions = [...data].sort((a, b) => a.id - b.id);
+          // Re-read the latest user from store after profile sync
+          const latestUser = useGameStore.getState().user;
           const transformed = sortedMissions.map((m) => ({
             id: m.id,
             stage: m.stage.toUpperCase(),
             title: m.title,
             desc: (m.description || m.goal || '').replace(/\*/g, ''),
             img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
-            locked: getMissionLockStatus(m.id, user),
-            stars: getMissionStars(m.id, user),
-            completed: isMissionCompleted(m.id, user),
+            locked: getMissionLockStatus(m.id, latestUser),
+            stars: getMissionStars(m.id, latestUser),
+            completed: isMissionCompleted(m.id, latestUser),
             grammarTarget: m.grammarTarget,
             difficulty: m.difficulty,
             diffColor: getDifficultyColor(m.difficulty),
             xpReward: m.xpReward,
-            domain: (m.domain ?? 0) as MissionDomain, // fallback to Professional (0)
+            domain: (m.domain ?? 0) as MissionDomain,
           }));
           setCoursesList(transformed);
         }
       } catch (err) {
         console.error('Failed to fetch missions:', err);
+        toast.error('Không thể tải danh sách nhiệm vụ.');
       }
     };
 
     loadMissions();
-  }, [user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Layout isLoggedIn username={user?.username || 'User'}>
