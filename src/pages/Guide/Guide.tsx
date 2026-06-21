@@ -31,7 +31,7 @@ const Guide = () => {
 
   return (
     <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
-    <Seo title="Huong Dan & Nguyen Tac" description="Tim hieu cach choi The Unraveller. Huong dan he thong hoi thoai, cach tang diem XP va cac quy tac can biet." keywords="huong dan, nguyen tac, cach choi, tro giup, FAQ, game rules" canonical="/guide" noIndex />
+      <Seo title="Huong Dan & Nguyen Tac" description="Tim hieu cach choi The Unraveller. Huong dan he thong hoi thoai, cach tang diem XP va cac quy tac can biet." keywords="huong dan, nguyen tac, cach choi, tro giup, FAQ, game rules" canonical="/guide" noIndex />
       <div className="max-w-screen-xl mx-auto px-4 py-8 pb-24 font-mono">
         <div className="mb-8">
           <h1 className="text-white text-3xl font-black tracking-widest uppercase flex items-center gap-2.5">
@@ -77,7 +77,7 @@ const Guide = () => {
             <div className="h-px bg-white/5" />
             <div>
               <h4 className="font-bold text-white uppercase mb-1">Hỏi: Năng lượng ảnh hưởng như thế nào đến lượt chơi?</h4>
-              <p className="text-white/45">Đáp: Mỗi lượt bắt đầu kịch bản hội thoại mới tiêu tốn 20 năng lượng. Năng lượng sẽ tự động hồi phục theo thời gian để cân bằng chu kỳ luyện tập hàng ngày của bạn.</p>
+              <p className="text-white/45">Đáp: Mỗi lượt bắt đầu kịch bản hội thoại mới tiêu tốn 5 năng lượng. Năng lượng sẽ tự động hồi phục theo thời gian để cân bằng chu kỳ luyện tập hàng ngày của bạn.</p>
             </div>
           </div>
         </div>
