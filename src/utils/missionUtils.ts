@@ -49,7 +49,7 @@ export function getMissionLockStatus(
   // Sequential unlock: mission N unlocks when mission N-1 is completed
   const prevCompleted = (prevId: number) =>
     user.missionProgresses?.some(
-      (p) => p.missionId === prevId && p.status === 'Completed'
+      (p) => p.missionId === prevId && (p.status === 'Completed' || p.completedAt != null)
     ) ?? false;
 
   return !prevCompleted(missionId - 1);
@@ -62,9 +62,10 @@ export function getMissionStars(
 ): number {
   if (!user?.missionProgresses) return 0;
   const progress = user.missionProgresses.find(
-    (p) => p.missionId === missionId && p.status === 'Completed'
+    (p) => p.missionId === missionId
   );
   if (!progress) return 0;
+  if (progress.status !== 'Completed' && progress.completedAt == null) return 0;
   if (progress.currentSuspicion < 25) return 3;
   if (progress.currentSuspicion < 50) return 2;
   return 1;
@@ -77,7 +78,7 @@ export function isMissionCompleted(
 ): boolean {
   return (
     user?.missionProgresses?.some(
-      (p) => p.missionId === missionId && p.status === 'Completed'
+      (p) => p.missionId === missionId && (p.status === 'Completed' || p.completedAt != null)
     ) ?? false
   );
 }

@@ -26,14 +26,14 @@ const Score = () => {
       id: 1, 
       name: 'Gọi đồ uống tại Cafe', 
       desc: 'Vượt qua Ải 1 trò chuyện với Barista quán cà phê.', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 1 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 1 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       emoji: '☕' 
     },
     { 
       id: 2, 
       name: 'Diễn đạt chính xác', 
       desc: 'Hoàn thành kịch bản báo cáo công việc (Stage 2).', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 2 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 2 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       emoji: '📋' 
     },
     { 
@@ -47,7 +47,7 @@ const Score = () => {
       id: 4, 
       name: 'Nhà đàm phán', 
       desc: 'Hoàn thành màn đàm phán và thuyết phục (Stage 3).', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 3 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 3 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       emoji: '💼' 
     },
     { 

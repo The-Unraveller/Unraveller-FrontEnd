@@ -63,14 +63,14 @@ const Badges = () => {
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
   // Retrieve the first completed progress if a general badge needs a certificate link fallback
-  const firstCompletedProgress = user?.missionProgresses?.find(p => p.status === 'Completed');
+  const firstCompletedProgress = user?.missionProgresses?.find(p => p.status === 'Completed' || p.completedAt != null);
 
   const badges: Badge[] = [
     { 
       id: 1, 
       name: 'Huy hiệu Chiến thắng Đầu tiên', 
       desc: 'Hoàn thành kịch bản mô phỏng đầu tiên của bạn. Chào mừng bạn gia nhập cộng đồng người học!', 
-      earned: user?.missionProgresses?.some(p => p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.status === 'Completed' || p.completedAt != null) ?? false, 
       color: '#f5c842',
       emoji: '🏆',
       missionId: firstCompletedProgress?.missionId // dynamically bind to first completed mission
@@ -79,7 +79,7 @@ const Badges = () => {
       id: 2, 
       name: 'Bậc thầy Cà phê', 
       desc: 'Hoàn thành xuất sắc Stage 1: Giao tiếp tại Quán Cà phê.', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 1 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 1 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       color: '#a78bfa',
       emoji: '☕',
       missionId: 1
@@ -88,7 +88,7 @@ const Badges = () => {
       id: 3, 
       name: 'Học nhanh siêu tốc', 
       desc: 'Hoàn thành từ 3 kịch bản mô phỏng trở lên trong hệ thống.', 
-      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 3, 
+      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed' || p.completedAt != null).length ?? 0) >= 3, 
       color: '#34d399',
       emoji: '⚡'
     },
@@ -96,7 +96,7 @@ const Badges = () => {
       id: 4, 
       name: 'Người báo cáo Chi tiết', 
       desc: 'Hoàn thành xuất sắc kịch bản Báo cáo Sự cố Công việc (Stage 5).', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 5 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 5 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       color: '#60a5fa',
       emoji: '📝',
       missionId: 5
@@ -121,7 +121,7 @@ const Badges = () => {
       id: 7, 
       name: 'Giao tiếp Tự tin', 
       desc: 'Hoàn thành 5 kịch bản mô phỏng trở lên trong hệ thống.', 
-      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed').length ?? 0) >= 5, 
+      earned: (user?.missionProgresses?.filter(p => p.status === 'Completed' || p.completedAt != null).length ?? 0) >= 5, 
       color: '#ec4899',
       emoji: '💬'
     },
@@ -129,7 +129,7 @@ const Badges = () => {
       id: 8, 
       name: 'Người học Xuất sắc', 
       desc: 'Hoàn thành toàn bộ kịch bản mô phỏng có sẵn trên Unraveller.', 
-      earned: user?.missionProgresses?.filter(p => p.status === 'Completed').length === (user?.missionProgresses?.length ?? 0) && (user?.missionProgresses?.length ?? 0) > 0, 
+      earned: user?.missionProgresses?.filter(p => p.status === 'Completed' || p.completedAt != null).length === (user?.missionProgresses?.length ?? 0) && (user?.missionProgresses?.length ?? 0) > 0, 
       color: '#8b5cf6',
       emoji: '🌌'
     },
@@ -137,7 +137,7 @@ const Badges = () => {
       id: 9, 
       name: 'Người kể chuyện', 
       desc: 'Hoàn thành xuất sắc kịch bản Stage 4: Phỏng vấn Xin việc.', 
-      earned: user?.missionProgresses?.some(p => p.missionId === 4 && p.status === 'Completed') ?? false, 
+      earned: user?.missionProgresses?.some(p => p.missionId === 4 && (p.status === 'Completed' || p.completedAt != null)) ?? false, 
       color: '#14b8a6',
       emoji: '👔',
       missionId: 4
@@ -147,7 +147,7 @@ const Badges = () => {
   // Helper selectors for modal
   const getCompletionProgress = (badge: Badge) => {
     if (!badge.missionId) return null;
-    return user?.missionProgresses?.find(p => p.missionId === badge.missionId && p.status === 'Completed');
+    return user?.missionProgresses?.find(p => p.missionId === badge.missionId && (p.status === 'Completed' || p.completedAt != null));
   };
 
   const getCompletionToken = (badge: Badge) => {

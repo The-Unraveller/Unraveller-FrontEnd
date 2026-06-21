@@ -154,7 +154,7 @@ const Home = () => {
   const level = Math.floor(xp / 1000) + 1;
   const xpMax = level * 1000;
   const badges = USER_PROFILE.badges;
-  const completedStages = user?.missionProgresses?.filter((p) => p.status === 'Completed').length ?? 0;
+  const completedStages = user?.missionProgresses?.filter((p) => p.status === 'Completed' || p.completedAt != null).length ?? 0;
 
   useEffect(() => {
     getMissions()
