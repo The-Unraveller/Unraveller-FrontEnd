@@ -284,9 +284,9 @@ const UserProfile = () => {
                 <Award className="w-4.5 h-4.5 text-cyan-brand" /> CHỨNG CHỈ GIẢI MÃ
               </h2>
 
-              {(user?.missionProgresses?.filter(p => p.status === 'Completed') || []).length === 0 ? (
+              {(user?.missionProgresses?.filter(p => p.status === 'Completed' || p.completedAt != null) || []).length === 0 ? (
                 <div className="p-8 text-center rounded-xl bg-white/5 border border-white/5">
-                  <p className="text-white/40 text-xs font-mono">Bạn chưa sở hữu chứng chỉ giải mã nào.</p>
+                  <p className="text-white/45 text-xs font-mono">Bạn chưa sở hữu chứng chỉ giải mã nào.</p>
                   <p className="text-white/25 text-[10px] font-mono mt-1 uppercase">Hoàn thành các kịch bản với điểm nghi ngờ dưới 50% để nhận chứng nhận</p>
                   <button
                     onClick={() => navigate('/courses')}
@@ -297,7 +297,7 @@ const UserProfile = () => {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {(user?.missionProgresses?.filter(p => p.status === 'Completed') || []).map((p) => (
+                  {(user?.missionProgresses?.filter(p => p.status === 'Completed' || p.completedAt != null) || []).map((p) => (
                     <div
                       key={p.missionId}
                       className="p-4 rounded-xl bg-navy-3 border border-white/5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-cyan-brand/35 transition-all animate-fade-in"
