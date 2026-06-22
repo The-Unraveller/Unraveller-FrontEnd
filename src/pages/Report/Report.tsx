@@ -7,6 +7,8 @@ import Seo from '../../components/seo/Seo';
 import { useGameStore } from '../../store/useGameStore';
 import { getUserProfile } from '../../services/api';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const Report = () => {
   const { user, setUser } = useGameStore();
   const navigate = useNavigate();
@@ -21,6 +23,10 @@ const Report = () => {
       .catch((err) => console.error('Failed to load profile for report:', err))
       .finally(() => setLoading(false));
   }, [setUser]);
+
+  if (loading) {
+    return <PageLoader message="Đang tải báo cáo năng lực..." />;
+  }
 
   const stats = [
     { label: 'Trình độ CEFR', value: user?.englishLevel || 'B1', sub: 'Trình độ hiện tại', icon: Award, color: 'text-purple-brand' },

@@ -9,6 +9,8 @@ import type { SkillMapDto, PortfolioEntryDto, WeeklyReportDto } from '../../serv
 import { useGameStore } from '../../store/useGameStore';
 import { ResponsiveContainer, RadarChart, PolarAngleAxis, PolarRadiusAxis, PolarGrid, Radar, Tooltip, LineChart, CartesianGrid, XAxis, YAxis, Line } from 'recharts';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const ProgressPage = () => {
   const navigate = useNavigate();
   const { user } = useGameStore();
@@ -62,13 +64,7 @@ const ProgressPage = () => {
     : 0;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-spy-black">
-        <div className="text-cyan-brand font-mono text-sm animate-pulse">
-          ⚡ ĐANG GIẢI MÃ DỮ LIỆU TIẾN TRÌNH...
-        </div>
-      </div>
-    );
+    return <PageLoader message="Đang giải mã dữ liệu tiến trình..." />;
   }
 
   return (

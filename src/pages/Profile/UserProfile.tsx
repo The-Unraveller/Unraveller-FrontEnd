@@ -9,6 +9,8 @@ import { useGameStore } from '../../store/useGameStore';
 import { getUserProfile, getUserInventory, getPaymentHistory, updateEnglishLevel, updateUserProfile } from '../../services/api';
 import type { UserInventoryDto, PaymentHistoryDto } from '../../services/api';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const missionNames: Record<number, string> = {
   1: "Stage 1: Giao tiếp tại Quán Cà phê",
   2: "Stage 2: Làm theo Chỉ dẫn",
@@ -113,15 +115,7 @@ const UserProfile = () => {
   }, []);
 
   if (loading) {
-    return (
-      <Layout isLoggedIn username="Agent">
-        <Seo title="Ho So Dac Vu" description="Xem va chinh sua ho so ca nhan cua ban trong The Unraveller." keywords="ho so, profile, tai khoan, dac vu" canonical="/profile" noIndex />
-        <div className="flex-1 flex flex-col items-center justify-center min-h-[70vh]">
-          <Loader2 className="w-10 h-10 text-purple-brand animate-spin mb-4" />
-          <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang tải thông tin hồ sơ...</p>
-        </div>
-      </Layout>
-    );
+    return <PageLoader message="Đang tải thông tin hồ sơ..." />;
   }
 
   return (

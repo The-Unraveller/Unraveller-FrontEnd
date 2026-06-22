@@ -8,6 +8,8 @@ import { useGameStore } from '../../store/useGameStore';
 import { getLeaderboard } from '../../services/api';
 import type { LeaderboardEntry } from '../../services/api';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const Score = () => {
   const { user } = useGameStore();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -20,6 +22,10 @@ const Score = () => {
       .catch((err) => console.error('Failed to load leaderboard:', err))
       .finally(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return <PageLoader message="Đang tải bảng xếp hạng..." />;
+  }
 
   const badgeMock = [
     { 

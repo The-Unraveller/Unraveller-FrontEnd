@@ -33,6 +33,7 @@ import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { PageTransitionLoader } from './components/common/PageTransitionLoader';
 
 // Role-aware redirect for /admin index — Admin → users, Moderator → missions
 const AdminIndexRedirect = () => {
@@ -43,28 +44,34 @@ const AdminIndexRedirect = () => {
 
 // We need a wrapper component to access Zustand store and useEffect
 const AppRoutes = () => {
-  const { setUser, setAuthenticated } = useGameStore();
+  const { setUser, setAuthenticated, setInitializing } = useGameStore();
 
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const profile = await getUserProfile();
-          setUser(profile);
-          setAuthenticated(true);
-        } catch (err) {
-          console.error('Session expired or invalid token', err);
-          localStorage.removeItem('token');
-          setAuthenticated(false);
-        }
+      if (!token) {
+        // Không có token → không cần init
+        setInitializing(false);
+        return;
+      }
+      try {
+        const profile = await getUserProfile();
+        setUser(profile);
+        setAuthenticated(true);
+      } catch (err) {
+        console.error('Session expired or invalid token:', err);
+        localStorage.removeItem('token');
+        setAuthenticated(false);
+      } finally {
+        setInitializing(false); // Luôn kết thúc init dù thành công hay thất bại
       }
     };
     initAuth();
-  }, [setUser, setAuthenticated]);
+  }, []); // Không cần deps — chỉ chạy 1 lần khi mount
 
   return (
     <div className="min-h-screen bg-spy-black text-white font-body">
+      <PageTransitionLoader />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />

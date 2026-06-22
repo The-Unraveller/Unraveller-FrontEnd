@@ -7,6 +7,8 @@ import Seo from '../../components/seo/Seo';
 import { getCertificateByToken } from '../../services/api';
 import type { CertificateDto } from '../../services/api';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const CourseCertificate = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -47,12 +49,7 @@ const CourseCertificate = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0f0c1e] text-white flex flex-col items-center justify-center font-mono">
-        <RefreshCw className="w-8 h-8 text-cyan-brand animate-spin mb-3" />
-        <p className="text-xs uppercase tracking-widest text-cyan-brand animate-pulse">[Đang xác thực token chứng nhận...]</p>
-      </div>
-    );
+    return <PageLoader message="Đang xác thực chứng chỉ..." />;
   }
 
   if (error || !cert) {

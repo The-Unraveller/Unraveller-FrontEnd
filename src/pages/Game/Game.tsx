@@ -6,13 +6,17 @@ import Navbar from '../../components/layout/Navbar';
 import Seo from '../../components/seo/Seo';
 import Footer from '../../components/layout/Footer';
 import { getMissions, sendGameMessage, getUserInventory, useItem, getGameSession, resetGameSession, checkMissionAccess } from '../../services/api';
-import type { UserInventoryDto, GameSessionDto, WritingFeedbackDto, DialogueResponseDto } from '../../services/api';
+import type { UserInventoryDto, GameSessionDto, WritingFeedbackDto, DialogueResponseDto, SubTaskDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 import GoogleAd from '../../components/ads/GoogleAd';
 import { ChatHistory } from '../../components/game/ChatHistory';
 import { SuspicionMeter } from '../../components/game/SuspicionMeter';
 import WritingFeedbackPanel from '../../components/game/WritingFeedbackPanel';
 import { formatRoleplayVerbs } from '../../components/game/ChatMessage';
+import { NpcAvatar } from '../../components/game/NpcAvatar';
+import { ConfettiEffect } from '../../components/game/ConfettiEffect';
+import { SubTaskChecklist } from '../../components/game/SubTaskChecklist';
+import { PageLoader } from '../../components/common/PageLoader';
 
 /* ─── Types ─── */
 interface Message {
@@ -87,6 +91,7 @@ const Game = () => {
   const [isLose, setIsLose] = useState(false);
   const [completionToken, setCompletionToken] = useState<string | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [subTasks, setSubTasks] = useState<SubTaskDto[]>([]);
 
   const { user, updateUser } = useGameStore();
 
@@ -161,7 +166,11 @@ const Game = () => {
 
   const startTerminalHack = () => {
     const puzzles = scenario.syntaxPuzzles;
-    if (!puzzles || puzzles.length === 0) return;
+    if (!puzzles || puzzles.length === 0) {
+      // Thay vì silent fail, báo user biết lý do
+      toast.info('🔌 Kịch bản này chưa có bài luyện cú pháp. Hãy thử kịch bản khác!', { autoClose: 3000 });
+      return;
+    }
     const puzzle = puzzles[0];
     setCurrentPuzzleIdx(0);
     setSelectedWords([]);
@@ -259,6 +268,9 @@ const Game = () => {
     setSuspicion(sessionData.currentSuspicion);
     setTurnCount(sessionData.turnCount);
     setTotalXP(sessionData.xpEarned);
+    if (sessionData.subTasks) {
+      setSubTasks(sessionData.subTasks);
+    }
     if (sessionData.turnCount >= scenario.minTurns || sessionData.currentSuspicion >= 100) {
       setGameOver(true);
     } else {
@@ -275,6 +287,7 @@ const Game = () => {
       setSuspicion(10);
       setTurnCount(0);
       setTotalXP(0);
+      setSubTasks(subTasks.map(st => ({ ...st, isCompleted: false })));
       setGameOver(false);
       setIsWin(false);
       setIsLose(false);
@@ -335,6 +348,7 @@ const Game = () => {
             minTurns: found.minTurnsToComplete || 5,
           };
           setScenario(transformed);
+          setSubTasks(found.subTasks || []);
 
           // Check access before loading session
           const access = await checkMissionAccess(missionId);
@@ -383,6 +397,10 @@ const Game = () => {
       // Store writing feedback for this turn
       setWritingFeedback(response.writingFeedback);
       setCurrentTurnScores(response.writingFeedback.scores);
+
+      if (response.updatedSubTasks) {
+        setSubTasks(response.updatedSubTasks);
+      }
 
       setMessages(prev => [
         ...prev,
@@ -464,16 +482,14 @@ const Game = () => {
   const susColor = suspicion > 70 ? '#ef4444' : suspicion > 45 ? '#f59e0b' : '#10b981';
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-secondary">
-        <div className="text-text-secondary">Đang tải nhiệm vụ...</div>
-      </div>
-    );
+    return <PageLoader message="Đang tải nhiệm vụ..." />;
   }
 
   return (
     <>
       <Seo title="Đang chơi - The Unraveller" description="Trò chơi học tiếng Anh qua chat" noIndex />
+      {/* Confetti khi thắng */}
+      {isWin && <ConfettiEffect />}
       {/* Root: lock to viewport, no page scroll — game is a true full-screen app */}
       <div className="h-[100dvh] bg-bg-secondary flex flex-col overflow-hidden">
         <Navbar isLoggedIn username={user?.username || 'Learner'} />
@@ -514,18 +530,13 @@ const Game = () => {
               <div className="flex flex-col min-h-0 overflow-hidden gap-2">
                 {/* Mission Info Card – compact, flex-shrink-0 so chat takes the rest */}
                 <div className="flex-shrink-0 ur-card border-purple-brand/20 px-4 py-3 bg-navy-2/45 flex items-center gap-3">
-                  {scenario.bg && (
-                    <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-purple-brand/20">
-                      <img
-                        src={scenario.bg}
-                        alt={scenario.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
+                  <NpcAvatar
+                    name={scenario.npcName}
+                    emoji={scenario.npcEmoji}
+                    imageUrl={scenario.bg}
+                    isTyping={isTyping}
+                    size="sm"
+                  />
                   <div className="flex-1 min-w-0">
                     <h1 className="text-sm font-bold text-white font-heading flex items-center gap-1.5 leading-tight">
                       <span>{scenario.npcEmoji}</span>
@@ -541,12 +552,19 @@ const Game = () => {
                     </p>
                   </div>
                   {scenario.grammarTarget && (
-                    <div className="hidden lg:flex flex-shrink-0 items-center gap-1.5 bg-purple-brand/10 border border-purple-brand/30 rounded-lg px-2.5 py-1.5 max-w-[180px]">
+                    <div className="hidden lg:flex flex-shrink-0 items-center gap-1.5 bg-purple-brand/10 border border-purple-brand/30 rounded-lg px-2.5 py-1.5 max-w-[260px]">
                       <HelpCircle size={11} className="text-cyan-brand flex-shrink-0" />
                       <span className="text-[10px] text-text-secondary leading-snug line-clamp-2">{scenario.grammarTarget}</span>
                     </div>
                   )}
                 </div>
+
+                {/* SubTaskChecklist */}
+                {subTasks.length > 0 && (
+                  <div className="flex-shrink-0 px-1">
+                    <SubTaskChecklist subTasks={subTasks} />
+                  </div>
+                )}
 
                 {/* Chat Messages – fills all remaining vertical space */}
                 <div className="flex-1 min-h-0 ur-card border-purple-brand/20 flex flex-col overflow-hidden relative bg-navy-2/45">
@@ -643,10 +661,20 @@ const Game = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={startTerminalHack}
-                        className="px-3.5 py-1.5 border border-purple-brand/40 text-purple-soft rounded-full hover:bg-purple-brand/10 transition-all font-semibold font-mono text-[11px]"
-                        title="Luyện tập cú pháp"
+                        disabled={!scenario.syntaxPuzzles || scenario.syntaxPuzzles.length === 0}
+                        className="px-3.5 py-1.5 border border-purple-brand/40 text-purple-soft rounded-full
+                                   hover:bg-purple-brand/10 transition-all font-semibold font-mono text-[11px]
+                                   disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                        title={
+                          scenario.syntaxPuzzles && scenario.syntaxPuzzles.length > 0
+                            ? 'Luyện tập xếp câu tiếng Anh'
+                            : 'Kịch bản này chưa có bài luyện cú pháp'
+                        }
                       >
                         🔌 Luyện cú pháp
+                        {(!scenario.syntaxPuzzles || scenario.syntaxPuzzles.length === 0) && (
+                          <span className="ml-1 text-[9px] opacity-50">(chưa có)</span>
+                        )}
                       </button>
                       <button
                         onClick={handleReset}

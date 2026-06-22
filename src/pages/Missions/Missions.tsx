@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Seo from '../../components/seo/Seo';
 import { getMissions, checkMissionAccess, getUserProfile } from '../../services/api';
+import type { SubTaskDto, MissionDto } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useGameStore } from '../../store/useGameStore';
 import GoogleAd from '../../components/ads/GoogleAd';
+import { SubTaskChecklist } from '../../components/game/SubTaskChecklist';
+import { PageLoader } from '../../components/common/PageLoader';
 import {
   getMissionLockStatus,
   getMissionStars,
@@ -31,13 +34,36 @@ interface CourseCard {
   diffColor: string;
   xpReward: number;
   domain: MissionDomain;
+  subTasks: SubTaskDto[];
 }
 
 const Missions = () => {
   const navigate = useNavigate();
-  const [coursesList, setCoursesList] = useState<CourseCard[]>([]);
+  const [rawMissions, setRawMissions] = useState<MissionDto[]>([]);
   const [loadingAccess, setLoadingAccess] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { user, setUser } = useGameStore();
+
+  const coursesList = useMemo<CourseCard[]>(() => {
+    if (!rawMissions || rawMissions.length === 0) return [];
+    const sortedMissions = [...rawMissions].sort((a, b) => a.id - b.id);
+    return sortedMissions.map((m) => ({
+      id: m.id,
+      stage: m.stage.toUpperCase(),
+      title: m.title,
+      desc: (m.description || m.goal || '').replace(/\*/g, ''),
+      img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
+      locked: getMissionLockStatus(m.id, user),
+      stars: getMissionStars(m.id, user),
+      completed: isMissionCompleted(m.id, user),
+      grammarTarget: m.grammarTarget,
+      difficulty: m.difficulty,
+      diffColor: getDifficultyColor(m.difficulty),
+      xpReward: m.xpReward,
+      domain: (m.domain ?? 0) as MissionDomain,
+      subTasks: m.subTasks || [],
+    }));
+  }, [rawMissions, user]);
 
   const handleCardClick = async (id: number, locked: boolean) => {
     if (locked) return;
@@ -62,47 +88,37 @@ const Missions = () => {
 
   useEffect(() => {
     const loadMissions = async () => {
-      // Sync user profile silently — don't block mission loading on failure
-      try {
-        const profile = await getUserProfile();
-        setUser(profile);
-      } catch (profileErr) {
-        console.error('Failed to sync user profile:', profileErr);
-      }
+      setIsLoading(true);
+      
+      // Fetch user profile silently in the background to update status
+      getUserProfile()
+        .then((profile) => {
+          setUser(profile);
+        })
+        .catch((profileErr) => {
+          console.error('Failed to sync user profile:', profileErr);
+        });
 
-      // Always attempt to fetch and render missions
       try {
         const data = await getMissions();
-        if (data && data.length > 0) {
-          const sortedMissions = [...data].sort((a, b) => a.id - b.id);
-          // Re-read the latest user from store after profile sync
-          const latestUser = useGameStore.getState().user;
-          const transformed = sortedMissions.map((m) => ({
-            id: m.id,
-            stage: m.stage.toUpperCase(),
-            title: m.title,
-            desc: (m.description || m.goal || '').replace(/\*/g, ''),
-            img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
-            locked: getMissionLockStatus(m.id, latestUser),
-            stars: getMissionStars(m.id, latestUser),
-            completed: isMissionCompleted(m.id, latestUser),
-            grammarTarget: m.grammarTarget,
-            difficulty: m.difficulty,
-            diffColor: getDifficultyColor(m.difficulty),
-            xpReward: m.xpReward,
-            domain: (m.domain ?? 0) as MissionDomain,
-          }));
-          setCoursesList(transformed);
+        if (data) {
+          setRawMissions(data);
         }
       } catch (err) {
         console.error('Failed to fetch missions:', err);
         toast.error('Không thể tải danh sách nhiệm vụ.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadMissions();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (isLoading) {
+    return <PageLoader message="Đang tải danh sách nhiệm vụ..." />;
+  }
 
   return (
     <Layout isLoggedIn username={user?.username || 'User'}>
@@ -177,6 +193,15 @@ const Missions = () => {
                                 Mục tiêu ngữ pháp
                               </div>
                               <p className="text-xs text-text-secondary font-body leading-relaxed">{course.grammarTarget}</p>
+                            </div>
+                          )}
+
+                          {course.subTasks && course.subTasks.length > 0 && !course.locked && (
+                            <div className="mb-4">
+                              <div className="text-[10px] font-bold text-cyan-brand mb-1.5 uppercase tracking-wider font-mono">
+                                Nhiệm vụ con ({course.subTasks.filter(st => st.isCompleted).length}/{course.subTasks.length})
+                              </div>
+                              <SubTaskChecklist subTasks={course.subTasks} compact />
                             </div>
                           )}
 

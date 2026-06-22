@@ -20,29 +20,39 @@ interface Plan {
 const plans: Plan[] = [
   {
     id: 'free',
-    name: 'Gói Miễn Phí',
+    name: 'Explorer',
     price: '0₫',
     priceValue: 0,
-    priceLabel: 'Vĩnh viễn',
-    features: ['Năng lượng hồi phục tiêu chuẩn', 'Giới hạn kịch bản mỗi tuần', 'Phản hồi AI cơ bản'],
+    priceLabel: 'Không cần thẻ tín dụng',
+    features: [
+      '5 kịch bản giao tiếp đầy đủ tính năng',
+      '100 năng lượng mỗi ngày (tự hồi phục)',
+      'AI Feedback sau mỗi lượt chat',
+      'Bài luyện cú pháp Terminal Hack',
+      'Bảng xếp hạng cộng đồng',
+      'Huy chương & thành tích cơ bản',
+    ],
     highlighted: false,
+    badge: '🎒 MIỄN PHÍ MÃI MÃI',
   },
   {
     id: 'premium',
     name: 'Premium VIP',
     price: '199,000₫',
     priceValue: 199000,
-    priceLabel: 'Mỗi tháng / Toàn bộ đặc quyền',
+    priceLabel: 'Mỗi tháng · Hủy bất kỳ lúc nào',
     features: [
-      'Không giới hạn năng lượng chơi (0 cost)',
-      'Nhân đôi điểm kinh nghiệm (XP) nhận được',
-      'Giảm giá 20% khi mua vật phẩm Cửa Hàng',
-      'Hồi phục năng lượng nhanh gấp đôi (+20/30p)',
-      'AI Coach phân tích phản hồi nâng cao',
-      'Mở khóa toàn bộ kịch bản giao tiếp độc quyền'
+      'Năng lượng vô hạn — không giới hạn lượt học',
+      'Gấp đôi XP trên mỗi cuộc hội thoại (2×)',
+      'Mở khóa tất cả 15+ kịch bản độc quyền',
+      'AI Coach phân tích chuyên sâu ngữ pháp',
+      'Tắt toàn bộ quảng cáo',
+      'Giảm 20% khi mua vật phẩm Cửa Hàng',
+      'Hồi năng lượng nhanh gấp đôi',
+      'Badge VIP + Khung avatar đặc biệt ✨',
     ],
     highlighted: true,
-    badge: '🔥 ĐẶC QUYỀN TỐI CAO',
+    badge: '⚡ PHỔ BIẾN NHẤT',
   },
 ];
 
@@ -109,7 +119,7 @@ const Premium = () => {
 
   return (
     <Layout isLoggedIn={true}>
-      <Seo title="Goi Dich Vu Premium" description="Nang cap len goi Premium de khong gioi han quyen truy cap vao tat ca kich ban hoc tieng Anh. Chi tu 299000d/thang." keywords="premium, gia dich vu, nang cap, thanh toan, goi Plus, goi Premium" canonical="/premium" noIndex />
+      <Seo title="Goi Dich Vu Premium" description="Nâng cấp lên gói Premium để không giới hạn quyền truy cập vào tất cả kịch bản học tiếng Anh. Chỉ từ 199.000đ/tháng." keywords="premium, gia dich vu, nang cap, thanh toan, goi Plus, goi Premium" canonical="/premium" noIndex />
       <div className="max-w-screen-xl mx-auto px-6 py-12 app-bg min-h-screen">
         {/* Header Block with Cyberpunk Glow */}
         <div className="text-center mb-12 animate-fade-in">

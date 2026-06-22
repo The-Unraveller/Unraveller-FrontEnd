@@ -30,8 +30,8 @@ html {
 }
 
 body {
-  background-color: #f8f9fa;
-  color: #1f2937;
+  background-color: #0f0c1e;
+  color: #f3f4f6;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
@@ -96,20 +96,22 @@ h6 {
    CARDS
 ══════════════════════════════════ */
 .ur-card {
-  background: rgba(46, 42, 93, 0.5);
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: rgba(26, 22, 64, 0.45);
+  border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 16px;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
 }
 
 .ur-card-hover {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ur-card-hover:hover {
-  border-color: rgba(168, 85, 247, 0.6);
-  box-shadow: 0 8px 40px rgba(124, 58, 237, 0.22);
-  transform: translateY(-3px);
+  border-color: rgba(6, 182, 212, 0.45);
+  box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3), 0 0 20px rgba(6, 182, 212, 0.15);
+  transform: translateY(-4px);
 }
 
 /* Glassmorphism card */
@@ -215,16 +217,18 @@ input:-webkit-autofill:focus {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  background-size: 200% auto;
   color: #fff;
   padding: 12px 28px;
   font-size: 15px;
   box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8b47f5, #a855f7);
-  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.5);
+  background-position: right center;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.45), 0 0 15px rgba(6, 182, 212, 0.25);
   transform: translateY(-2px);
 }
 
@@ -234,6 +238,7 @@ input:-webkit-autofill:focus {
   padding: 12px 28px;
   font-size: 15px;
   box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-cyan:hover:not(:disabled) {
@@ -244,15 +249,17 @@ input:-webkit-autofill:focus {
 .btn-outline {
   background: transparent;
   color: #fff;
-  border: 2px solid rgba(124, 58, 237, 0.5);
+  border: 2px solid rgba(124, 58, 237, 0.4);
   padding: 10px 26px;
   font-size: 15px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-outline:hover:not(:disabled) {
-  border-color: #a855f7;
-  background: rgba(124, 58, 237, 0.12);
-  transform: translateY(-1px);
+  border-color: #06b6d4;
+  background: rgba(6, 182, 212, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
 }
 
 .btn-gold {
@@ -521,7 +528,9 @@ input:-webkit-autofill:focus {
 }
 
 .text-gradient-brand {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  background: linear-gradient(135deg, #7c3aed, #06b6d4, #a855f7, #06b6d4);
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -548,15 +557,14 @@ input:-webkit-autofill:focus {
 
 /* Animate float */
 @keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
 
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animate-float {
@@ -753,4 +761,73 @@ input:-webkit-autofill:focus {
 
 .shadow-glow-purple {
   box-shadow: 0 0 15px rgba(124, 58, 237, 0.2), inset 0 0 15px rgba(124, 58, 237, 0.1);
+}
+
+/* ══════════════════════════════════
+   GAME — NEW ANIMATIONS (Phase 4)
+══════════════════════════════════ */
+
+/* Confetti particle falling animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-12px) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* XP floating pop-up when earning XP */
+@keyframes xp-pop {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-28px) scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-56px) scale(0.7);
+    opacity: 0;
+  }
+}
+.animate-xp-pop {
+  animation: xp-pop 1.4s ease-out forwards;
+  pointer-events: none;
+  position: absolute;
+  z-index: 50;
+}
+
+/* SubTask completion flash */
+@keyframes subtask-complete {
+  0%   { transform: scale(1); background-color: transparent; }
+  40%  { transform: scale(1.03); background-color: rgba(16, 185, 129, 0.12); }
+  100% { transform: scale(1); background-color: transparent; }
+}
+.animate-subtask-complete {
+  animation: subtask-complete 0.55s ease-out;
+}
+
+/* Fade in for typing indicator */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+/* Slide up for modals/toasts */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out forwards;
 }

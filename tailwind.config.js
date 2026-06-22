@@ -65,6 +65,7 @@ export default {
         'minimal-secondary': '#6b7280',
       },
       fontFamily: {
+        'sans':    ['Inter', 'sans-serif'],
         'heading': ['Be Vietnam Pro', 'sans-serif'],
         'body':    ['Inter', 'sans-serif'],
         'mono':    ['JetBrains Mono', 'monospace'],
