@@ -77,11 +77,34 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         <div className="flex items-center gap-4 ml-auto md:ml-0 flex-shrink-0">
           {displayIsLoggedIn ? (
             <div className="flex items-center gap-3">
-              {/* Energy */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-300">
+              {/* Energy pill */}
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:border-warning/30 transition-all">
                 <Zap className="w-3.5 h-3.5 text-warning fill-warning/20" />
-                <span className="text-gray-300">{user?.energy ?? 100}/{user?.maxEnergy ?? 100}</span>
+                <span className="text-gray-300 font-mono">{user?.energy ?? 100}/{user?.maxEnergy ?? 100}</span>
               </div>
+
+              {/* XP pill */}
+              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-xs hover:border-amber-400/40 transition-all">
+                <span className="text-amber-400 text-[11px] font-bold">XP</span>
+                <span className="text-amber-400 font-semibold font-mono">
+                  {(user?.xpBalance ?? 0).toLocaleString()}
+                </span>
+              </div>
+
+              {/* Level badge */}
+              <div className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 bg-cyan-brand/10 border border-cyan-brand/20 rounded-full text-xs hover:border-cyan-brand/40 transition-all">
+                <span className="text-cyan-brand font-bold font-mono text-[11px]">
+                  Lv.{Math.floor((user?.xpBalance ?? 0) / 1000) + 1}
+                </span>
+              </div>
+
+              {/* Streak - only when > 0 */}
+              {(user?.streakCount ?? 0) > 0 && (
+                <div className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-xs hover:border-orange-400/40 transition-all">
+                  <span className="text-base leading-none">🔥</span>
+                  <span className="text-orange-400 font-bold font-mono text-[11px]">{user?.streakCount}</span>
+                </div>
+              )}
 
               <div
                 className="relative"

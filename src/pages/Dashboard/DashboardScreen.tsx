@@ -12,6 +12,8 @@ import type { MissionDto } from '../../services/api';
 import { useGameStore } from '../../store/useGameStore';
 import { getMissionLockStatus, getMissionStars, isMissionCompleted } from '../../utils/missionUtils';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 /* ─── Helper Components ─── */
 const DifficultyBadge: React.FC<{ level: string }> = ({ level }) => {
   const colors: Record<string, string> = {
@@ -264,24 +266,7 @@ const DashboardScreen: React.FC = () => {
   const unlockedCount = scenarios.filter((s) => s.isUnlocked).length;
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col h-screen app-bg text-white">
-        <Seo title="Kịch Bản Của Bạn" description="Quản lý và chọn kịch bản nhiệm vụ của bạn." keywords="kịch bản, nhiệm vụ, dashboard" canonical="/dashboard" noIndex />
-        <div className="flex-1 flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.6 }}
-            className="flex flex-col items-center gap-4"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-brand to-purple-light flex items-center justify-center shadow-glow-purple">
-              <span className="text-3xl">🎭</span>
-            </div>
-            <p className="text-white/50 text-sm font-medium">Đang tải bảng điều khiển...</p>
-          </motion.div>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Đang tải bảng điều khiển..." />;
   }
 
   return (

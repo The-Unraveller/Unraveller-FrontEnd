@@ -27,6 +27,18 @@ apiClient.interceptors.request.use((config) => {
 
 // --- DTOs ---
 
+export interface SubTaskDto {
+  id: number;
+  missionId: number;
+  orderIndex: number;
+  label: string;
+  labelEn: string;
+  hintPhrase: string;
+  isOptional: boolean;
+  xpBonus: number;
+  isCompleted: boolean;
+}
+
 export interface MissionDto {
   id: number;
   title: string;
@@ -51,6 +63,7 @@ export interface MissionDto {
   minAverageScore: number;
   initialChoices: string[];
   syntaxPuzzles: string;
+  subTasks: SubTaskDto[];
 }
 
 export interface DialogueRequestDto {
@@ -69,6 +82,7 @@ export interface DialogueResponseDto {
   completionToken?: string;
   updatedEnergy?: number;
   updatedMaxEnergy?: number;
+  updatedSubTasks?: SubTaskDto[];
 }
 
 export interface WritingScoreDto {
@@ -288,6 +302,7 @@ export interface GameSessionDto {
   turnCount: number;
   xpEarned: number;
   history: DialogueMessageHistoryDto[];
+  subTasks: SubTaskDto[];
 }
 
 export const sendGameMessage = async (request: DialogueRequestDto): Promise<DialogueResponseDto> => {

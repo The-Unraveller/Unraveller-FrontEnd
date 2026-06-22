@@ -8,6 +8,8 @@ import { useGameStore } from '../../store/useGameStore';
 import { getShopItems, buyItem } from '../../services/api';
 import type { ShopItemDto } from '../../services/api';
 
+import { PageLoader } from '../../components/common/PageLoader';
+
 const Market = () => {
   const { user, updateUser } = useGameStore();
   const [items, setItems] = useState<ShopItemDto[]>([]);
@@ -63,6 +65,10 @@ const Market = () => {
     }
   };
 
+  if (loading) {
+    return <PageLoader message="Đang tải danh mục cửa hàng..." />;
+  }
+
   return (
     <Layout isLoggedIn username={user?.username || 'User'} showBottomNav>
     <Seo title="Cua Hang Vat Pham" description="Mua sam vat pham ho tro trong The Unraveller bang XP. Su dung goi y va cac cong cu hoc tap." keywords="cua hang vat pham, shop, mua vat pham, XP, game store" canonical="/market" noIndex />
@@ -90,12 +96,7 @@ const Market = () => {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <Loader2 className="w-10 h-10 text-cyan-brand animate-spin mb-4" />
-            <p className="text-white/45 text-sm font-mono uppercase tracking-widest animate-pulse">Đang tải danh mục cửa hàng...</p>
-          </div>
-        ) : items.length === 0 ? (
+        {items.length === 0 ? (
           <div className="ur-card p-12 text-center rounded-2xl border border-white/5 bg-navy-2">
             <ShoppingBag className="w-12 h-12 text-white/20 mx-auto mb-4" />
             <p className="text-white/50 text-base font-semibold">Cửa hàng hiện không hoạt động giao dịch.</p>
