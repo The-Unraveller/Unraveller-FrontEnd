@@ -10,19 +10,18 @@ interface WritingFeedbackPanelProps {
 const WritingFeedbackPanel: React.FC<WritingFeedbackPanelProps> = ({ feedback, missionTitle }) => {
   const { scores, corrections, rewriteSuggestion, summary } = feedback;
 
-  // Transform scores for radar chart
+  // Transform scores for radar chart (excluding Tone per design decision)
   const radarData = [
     { skill: 'Grammar', score: scores.grammar, fullMark: 100 },
     { skill: 'Vocabulary', score: scores.vocabulary, fullMark: 100 },
-    { skill: 'Tone', score: scores.tone, fullMark: 100 },
     { skill: 'Naturalness', score: scores.naturalness, fullMark: 100 },
     { skill: 'Clarity', score: scores.clarity, fullMark: 100 },
     { skill: 'Structure', score: scores.structure, fullMark: 100 },
   ];
 
-  // Overall average
+  // Overall average (5 dimensions, tone excluded)
   const overallAverage = Math.round(
-    (scores.grammar + scores.vocabulary + scores.tone + scores.naturalness + scores.clarity + scores.structure) / 6
+    (scores.grammar + scores.vocabulary + scores.naturalness + scores.clarity + scores.structure) / 5
   );
 
   // Color based on score
@@ -78,7 +77,9 @@ const WritingFeedbackPanel: React.FC<WritingFeedbackPanelProps> = ({ feedback, m
       <div className="ur-card bg-navy-3/45 border-purple-brand/20 p-4 shadow-sm">
         <h4 className="text-xs font-semibold text-cyan-brand uppercase tracking-wider mb-3 font-mono">Detailed Scores</h4>
         <div className="space-y-3">
-          {Object.entries(scores).map(([key, value]) => (
+          {Object.entries(scores)
+            .filter(([key]) => key !== 'tone')
+            .map(([key, value]) => (
             <div key={key} className="flex items-center gap-3">
               <div className="w-20 text-[10px] text-text-secondary capitalize font-mono">{key}</div>
               <div className="flex-1 bg-navy-3 border border-white/5 rounded-full h-2 overflow-hidden">

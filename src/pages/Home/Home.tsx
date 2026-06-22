@@ -122,7 +122,7 @@ const ScenarioCard: React.FC<{ s: MissionDisplay; featured?: boolean }> = ({ s, 
         <h3 className={`font-bold text-white leading-tight font-heading ${featured ? 'text-base' : 'text-sm'}`}>
           {s.title}
         </h3>
-        {featured && <p className="text-white/55 text-xs leading-relaxed flex-1">{s.desc}</p>}
+        {s.desc && <p className="text-white/55 text-xs leading-relaxed flex-1 line-clamp-3">{s.desc}</p>}
         {!s.locked && (
           <div className="flex items-center gap-1 text-purple-soft text-xs font-semibold mt-auto pt-1">
             {s.completed ? 'Chơi lại' : 'Bắt đầu ngay'} <ChevronRight size={12} />

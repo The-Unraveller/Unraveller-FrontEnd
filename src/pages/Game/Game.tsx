@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Zap, Send, HelpCircle, Lightbulb, Sparkles } from 'lucide-react';
+import { ChevronLeft, Zap, Send, HelpCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../../components/layout/Navbar';
 import Seo from '../../components/seo/Seo';
@@ -85,8 +85,7 @@ const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [writingFeedback, setWritingFeedback] = useState<WritingFeedbackDto | null>(null);
   const [currentTurnScores, setCurrentTurnScores] = useState<WritingFeedbackDto['scores'] | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [isWin, setIsWin] = useState(false);
   const [isLose, setIsLose] = useState(false);
   const [completionToken, setCompletionToken] = useState<string | null>(null);
@@ -297,8 +296,6 @@ const Game = () => {
       setCurrentTurnScores(null);
       setShowResumeModal(false);
       setActiveHint(null);
-      setShowSuggestions(false);
-      setSuggestions([]);
       toast.success("Đã khởi động lại nhiệm vụ!");
     } catch (err) {
       toast.error("Không thể khởi động lại nhiệm vụ.");
@@ -319,8 +316,6 @@ const Game = () => {
       setActiveHint(null);
       setWritingFeedback(null);
       setCurrentTurnScores(null);
-      setSuggestions([]);
-      setShowSuggestions(false);
       setShowResumeModal(false);
       setSessionData(null);
 
@@ -458,26 +453,15 @@ const Game = () => {
 
   const handleChoice = async (choice: string) => { await processMessage(choice); };
 
-  const suggestionMap: Record<number, string[]> = {
-    1: ["I would like to order a cup of coffee, please.", "Could I see the menu, please?", "Do you recommend any house blends today?", "What kind of hot pastries do you have?"],
-    2: ["Understood. What is the first task I need to do?", "I'm ready. Please give me the instructions.", "Can you guide me on what to do first?", "I will do my best to follow the guidelines."],
-    3: ["I'm ready. Let's start the negotiation.", "Can you explain the main points of the agreement?", "I'd like to discuss the terms of this deal.", "Let's look at the topic from both sides."],
-    4: ["Good morning. Thank you for having me today.", "I'm excited to share my experience with you.", "I'm ready for the interview questions.", "Thank you. I'm glad to have this opportunity."],
-    5: ["I'm on the case. What details do we have?", "Let's start by examining the evidence.", "Where was the victim last seen?", "I'll solve this. What's our first clue."]
-  };
-
-  const toggleSuggestions = () => {
-    if (!showSuggestions && suggestions.length === 0) {
-      setSuggestions(suggestionMap[missionId] || suggestionMap[1]);
-    }
-    setShowSuggestions(prev => !prev);
-  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     await processMessage(inputValue.trim());
     setInputValue('');
   };
+
+  // Effective turns: scale up if there are many subtasks so players have enough turns
+  const effectiveTurns = Math.max(scenario.minTurns, subTasks.length > 0 ? subTasks.length + 2 : scenario.minTurns);
 
   const susColor = suspicion > 70 ? '#ef4444' : suspicion > 45 ? '#f59e0b' : '#10b981';
 
@@ -601,24 +585,7 @@ const Game = () => {
                     </div>
                   )}
 
-                  {/* Input Form & Suggestions */}
-                  {showSuggestions && suggestions.length > 0 && (
-                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-navy-3/60 border border-white/5 max-h-24 overflow-y-auto">
-                      <span className="w-full text-[10px] font-semibold text-indigo-400/70 uppercase tracking-wider mb-1">Gợi ý trả lời:</span>
-                      {suggestions.map((s, i) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setInputValue(s);
-                            setShowSuggestions(false);
-                          }}
-                          className="px-3 py-1.5 text-xs bg-white/[0.04] border border-white/[0.08] text-white/80 rounded-lg hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all text-left"
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  {/* Input Form */}
                   <form onSubmit={handleSend} className="flex gap-2">
                     <input
                       type="text"
@@ -638,24 +605,32 @@ const Game = () => {
                     </button>
                   </form>
 
-                  {/* Action Button - Gợi ý trả lời với pulse */}
-                  {!isTyping && !gameOver && turnCount === 0 && (
-                    <div className="flex justify-center">
-                      <button
-                        onClick={toggleSuggestions}
-                        className="group flex items-center gap-2 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] text-text-secondary hover:text-indigo-300 hover:border-indigo-400/30 hover:bg-indigo-500/5 transition-all text-xs font-medium animate-pulse-slow"
-                      >
-                        <Lightbulb size={13} className="text-amber-400/70 group-hover:text-amber-300 transition-colors" />
-                        <span>Gợi ý trả lời</span>
-                        <Sparkles size={11} className="text-indigo-400/50 group-hover:text-indigo-300 transition-colors" />
-                      </button>
-                    </div>
-                  )}
-
                   {/* Turn Progress & Actions */}
                   <div className="flex items-center justify-between text-xs">
-                    <div className="text-xs text-text-secondary font-mono">
-                      Lượt đối thoại: <span className="text-white font-bold">{turnCount}/{scenario.minTurns}</span>
+                    <div className="flex items-center gap-2 text-xs text-text-secondary font-mono">
+                      {/* NPC Status Indicator */}
+                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-all duration-300 ${
+                        isTyping
+                          ? 'bg-cyan-brand/10 border-cyan-brand/40 text-cyan-brand'
+                          : gameOver
+                            ? 'bg-white/5 border-white/10 text-text-muted'
+                            : 'bg-purple-brand/10 border-purple-brand/30 text-purple-soft'
+                      }`}>
+                        <span className="text-sm leading-none">
+                          {isTyping ? '💬' : gameOver ? '🔚' : scenario.npcEmoji || '🤖'}
+                        </span>
+                        <span className="text-[10px] font-semibold">
+                          {isTyping ? 'Đang nhập...' : gameOver ? 'Kết thúc' : scenario.npcName || 'NPC'}
+                        </span>
+                        {isTyping && (
+                          <span className="flex gap-0.5">
+                            {[0,1,2].map(i => (
+                              <span key={i} className="w-1 h-1 bg-cyan-brand rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms`, animationDuration: '700ms' }} />
+                            ))}
+                          </span>
+                        )}
+                      </div>
+                      Lượt: <span className="text-white font-bold">{turnCount}/{effectiveTurns}</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -686,11 +661,10 @@ const Game = () => {
                     </div>
                   </div>
 
-                  {/* Dialogue Turn progress bar */}
                   <div className="w-full bg-navy-3 border border-white/10 rounded-full h-1 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-indigo-500 transition-all duration-300 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
-                      style={{ width: `${Math.min(100, (turnCount / scenario.minTurns) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (turnCount / effectiveTurns) * 100)}%` }}
                     />
                   </div>
 
