@@ -184,22 +184,24 @@ const Missions = () => {
 
                       <div className="p-5 flex flex-col flex-1">
                         <div className="flex-1">
-                          <h3 className="text-lg font-bold text-white mb-2 font-heading">{course.title}</h3>
-                          <p className="text-xs text-text-secondary mb-4 leading-relaxed font-body">{course.desc}</p>
+                          <h3 className="text-lg font-bold text-white mb-3 font-heading">{course.title}</h3>
 
                           {course.grammarTarget && !course.locked && (
-                            <div className="bg-purple-brand/10 border border-purple-brand/35 rounded-xl p-3.5 mb-4 shadow-[inset_0_0_10px_rgba(124,58,237,0.1)]">
-                              <div className="text-[10px] font-bold text-cyan-brand mb-1.5 uppercase tracking-wider font-mono">
-                                Mục tiêu ngữ pháp
+                            <div className="bg-gradient-to-br from-purple-brand/15 to-cyan-brand/10 border border-purple-brand/50 rounded-xl p-4 mb-4 shadow-[inset_0_0_15px_rgba(124,58,237,0.15)]">
+                              <div className="text-[11px] font-bold text-cyan-brand mb-2 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                                <span>🎯</span> Mục tiêu ngữ pháp
                               </div>
-                              <p className="text-xs text-text-secondary font-body leading-relaxed">{course.grammarTarget}</p>
+                              <p className="text-sm text-white/85 font-body leading-relaxed font-medium">{course.grammarTarget}</p>
                             </div>
                           )}
 
                           {course.subTasks && course.subTasks.length > 0 && !course.locked && (
                             <div className="mb-4">
-                              <div className="text-[10px] font-bold text-cyan-brand mb-1.5 uppercase tracking-wider font-mono">
-                                Nhiệm vụ con ({course.subTasks.filter(st => st.isCompleted).length}/{course.subTasks.length})
+                              <div className="text-[11px] font-bold text-cyan-brand mb-2 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                                <span>📝</span> Nhiệm vụ con
+                                <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-purple-brand/20 border border-purple-brand/30 text-purple-soft font-mono">
+                                  {course.subTasks.filter(st => st.isCompleted).length}/{course.subTasks.length}
+                                </span>
                               </div>
                               <SubTaskChecklist subTasks={course.subTasks} compact />
                             </div>
