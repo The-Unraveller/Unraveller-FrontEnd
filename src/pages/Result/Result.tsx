@@ -107,7 +107,7 @@ const Result = () => {
     return (
       <Layout isLoggedIn username={username}>
         <Seo title="Ket Qua Nhiem Vu" description="Nhiem vu cua ban da khong hoan thanh tot. Hay thu lai voi chien thuat giao tiep moi." keywords="that bai, lam lai, thu lai" canonical={`/result/${id}`} noIndex />
-        <div className="max-w-screen-sm mx-auto px-4 py-10">
+        <div className="max-w-3xl mx-auto px-4 py-10">
           <div className="ur-card rounded-3xl p-8 text-center">
             <div className="w-20 h-20 rounded-full bg-danger/15 border border-danger/30 flex items-center justify-center mx-auto mb-5 text-4xl">
               😰
@@ -136,7 +136,7 @@ const Result = () => {
   return (
     <Layout isLoggedIn username={username}>
       <Seo title="Ket Qua Nhiem Vu" description="Chuc mung ban da hoan thanh xuat sac nhiem vu. Nhan XP va Huy chuong chien thang." keywords="thanh cong, hoan thanh, phan thuong, dac vu" canonical={`/result/${id}`} noIndex />
-      <div className="max-w-screen-sm mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-6">
         <div className="ur-card rounded-3xl p-6 md:p-8 animate-fade-in">
           {/* Title */}
           <h1 className="font-heading font-black text-3xl text-white text-center mb-5">

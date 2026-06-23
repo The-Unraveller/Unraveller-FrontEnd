@@ -30,7 +30,7 @@ const About = () => {
   return (
     <Layout isLoggedIn={false}>
       <Seo title="Gioi Thieu The Unraveller" description="The Unraveller la ung dung hoc tieng Anh qua mo phong thuc te danh cho Gen Z Viet Nam. Tim hieu ve doi ngu phat trien, gia tri cot loi va cach thuc hoat dong." keywords="gioi thieu, doi ngu phat trien, FPT University, gia tri cot loi" canonical="/about" />
-      <div className="max-w-screen-lg mx-auto px-6 py-8">
+      <div className="max-w-screen-xl mx-auto px-6 py-8">
         {/* Logo */}
         <div className="flex justify-center mb-4">
           <img src="/logo.png" alt="Unraveller" className="h-36 md:h-44 object-contain drop-shadow-2xl" />
@@ -41,7 +41,7 @@ const About = () => {
         {/* What is The Unraveller */}
         <section className="mb-10 text-center">
           <h2 className="text-white text-2xl font-bold mb-5">The Unraveller là gì?</h2>
-          <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
+          <div className="ur-card p-6 rounded-2xl max-w-4xl mx-auto">
             <p className="text-white/70 text-sm leading-relaxed">
               The Unraveller là ứng dụng học tiếng Anh được xây dựng trên phương pháp <strong className="text-white">học qua các tình huống mô phỏng</strong> —
               thiết kế dành riêng cho thế hệ Gen Z tại Việt Nam. Thay vì tiếp cận ngôn ngữ thông qua
@@ -74,7 +74,7 @@ const About = () => {
         {/* How to use */}
         <section className="mb-10">
           <h2 className="text-white text-2xl font-bold text-center mb-5">Cách Thức Hoạt Động</h2>
-          <div className="ur-card p-6 rounded-2xl max-w-2xl mx-auto">
+          <div className="ur-card p-6 rounded-2xl max-w-4xl mx-auto">
             <p className="text-white/68 text-sm leading-relaxed">
               Nền tảng được thiết kế như một thế giới giả lập, nơi bạn nhập vai vào một nhân vật để khám phá cuộc sống bằng tiếng Anh.
               Sau khi đăng nhập, một người cố vấn ảo sẽ hướng dẫn bạn thực hiện các nhiệm vụ hàng ngày.

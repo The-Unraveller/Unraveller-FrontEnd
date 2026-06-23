@@ -176,7 +176,7 @@ const Badges = () => {
         canonical="/badges" 
         noIndex 
       />
-      <div className="max-w-screen-sm mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="ur-card rounded-2xl p-6 md:p-8">
           <h1 className="text-white text-2xl font-bold text-center mb-1">Bộ Sưu Tập Của Bạn</h1>
           <p className="text-white/45 text-sm text-center mb-7">
@@ -184,7 +184,7 @@ const Badges = () => {
           </p>
 
           {/* Badge grid */}
-          <div className="grid grid-cols-3 gap-3.5 mb-8">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-8">
             {badges.map(badge => (
               <BadgeCell 
                 key={badge.id} 

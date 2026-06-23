@@ -123,7 +123,7 @@ const Missions = () => {
   return (
     <Layout isLoggedIn username={user?.username || 'User'}>
       <Seo title="Chọn kịch bản học tập" description="Chọn từ 5+ kịch bản học tập thực tế" canonical="/courses" noIndex />
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-screen-xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-text-primary mb-2">Chọn kịch bản học tập</h1>
           <p className="text-text-secondary">Chọn một tình huống thực tế để luyện tập tiếng Anh qua chat với NPC.</p>
@@ -150,7 +150,7 @@ const Missions = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                   {domainMissions.map((course) => (
                     <div
                       key={course.id}
