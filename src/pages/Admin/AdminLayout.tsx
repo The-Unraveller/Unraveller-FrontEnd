@@ -61,7 +61,7 @@ const AdminLayout: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-navy-3 via-navy-3 to-navy-2">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>

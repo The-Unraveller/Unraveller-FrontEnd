@@ -12,6 +12,12 @@ const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   /* Edit Modal state variables */
   const [editingUser, setEditingUser] = useState<any | null>(null);
@@ -63,6 +69,16 @@ const AdminUsers: React.FC = () => {
     }
   };
 
+  const filteredUsers = users.filter(u => 
+    u.username.toLowerCase().includes(search.toLowerCase()) || 
+    (u.email && u.email.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div className="space-y-6 animate-fade-in">
       <Seo title="Quan Ly Nguoi Dung" description="Quan ly tai khoan nguoi dung trong he thong." keywords="admin, quan ly, nguoi dung" canonical="/admin/users" noIndex />
@@ -98,7 +114,9 @@ const AdminUsers: React.FC = () => {
           <tbody className="divide-y divide-white/5">
             {loading ? (
               <tr><td colSpan={6} className="px-6 py-10 text-center text-white/30">Loading users...</td></tr>
-            ) : users.filter(u => u.username.toLowerCase().includes(search.toLowerCase())).map(u => (
+            ) : currentItems.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-10 text-center text-white/30">No users found.</td></tr>
+            ) : currentItems.map(u => (
               <tr key={u.id} className="hover:bg-white/5 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -158,6 +176,34 @@ const AdminUsers: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 pb-2 text-sm text-white/60 font-mono">
+          <div>
+            Hiển thị <span className="text-white font-bold">{indexOfFirstItem + 1}</span> - <span className="text-white font-bold">{Math.min(indexOfLastItem, filteredUsers.length)}</span> trong tổng số <span className="text-white font-bold">{filteredUsers.length}</span> người dùng
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold uppercase transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 hover:text-white"
+            >
+              Trước
+            </button>
+            <span className="text-xs">
+              Trang <span className="text-white font-bold">{currentPage}</span> / {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold uppercase transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 hover:text-white"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Edit User Modal Overlay */}
       {editingUser && (

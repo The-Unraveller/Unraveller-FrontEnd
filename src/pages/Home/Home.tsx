@@ -193,7 +193,7 @@ const Home = () => {
       canonical="/"
     />
       {/* ══════ HERO ══════ */}
-      <section className="max-w-screen-lg mx-auto px-5 pt-10 pb-6 text-center">
+      <section className="max-w-screen-xl mx-auto px-5 pt-10 pb-6 text-center">
         <div className="flex justify-center mb-5">
           <img
             src="/logo.png"
@@ -247,7 +247,7 @@ const Home = () => {
       </section>
 
       {/* ══════ SCENARIO JOURNEY ══════ */}
-      <section className="max-w-screen-lg mx-auto px-5 py-8">
+      <section className="max-w-screen-xl mx-auto px-5 py-8">
         <div className="flex items-center justify-between mb-7">
           <div>
             <h2 className="font-heading font-bold text-2xl text-white">
@@ -279,7 +279,7 @@ const Home = () => {
                     {domainMissions.length} tình huống
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {domainMissions.map((s) => (
                     <ScenarioCard key={s.id} s={s} featured={domainMissions[0].id === s.id} />
                   ))}
@@ -292,7 +292,7 @@ const Home = () => {
 
       {/* ══════ STATS STRIP (Marketing for guests) ══════ */}
       {!isLoggedIn && (
-        <section className="max-w-screen-lg mx-auto px-5 pb-8">
+        <section className="max-w-screen-xl mx-auto px-5 pb-8">
           <div className="gradient-card p-6 rounded-3xl border border-purple-brand/30">
             <div className="grid grid-cols-3 gap-4 text-center">
               {[
@@ -333,7 +333,7 @@ const Home = () => {
       )}
 
       {/* ══════ FAQs ══════ */}
-      <section className="max-w-screen-md mx-auto px-5 pb-14">
+      <section className="max-w-5xl mx-auto px-5 pb-14">
         <h2 className="font-heading font-bold text-2xl text-white mb-5">FAQs - Câu Hỏi Thường Gặp</h2>
         <div className="space-y-3">
           {faqs.map((faq, i) => (

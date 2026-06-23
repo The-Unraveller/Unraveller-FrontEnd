@@ -57,7 +57,7 @@ const UserHeader: React.FC<{
       transition={{ duration: 0.4 }}
       className="sticky top-0 z-30 bg-navy/95 backdrop-blur-xl border-b border-purple-500/20 px-4 py-4"
     >
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-screen-xl mx-auto">
         {/* Profile Row */}
         <div className="flex items-center gap-3 mb-4">
           {/* Avatar */}
@@ -286,7 +286,7 @@ const DashboardScreen: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto px-4 py-6 pb-24">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-screen-xl mx-auto">
           {/* Section Header */}
           <div className="flex items-center justify-between mb-5">
             <div>
@@ -301,7 +301,7 @@ const DashboardScreen: React.FC = () => {
           </div>
 
           {/* Scenarios Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {scenarios.map((scenario, index) => (
               <motion.div
                 key={scenario.id}
