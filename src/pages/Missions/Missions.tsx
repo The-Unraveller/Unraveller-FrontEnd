@@ -4,6 +4,7 @@ import { Lock, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Seo from '../../components/seo/Seo';
 import { getMissions, checkMissionAccess, getUserProfile } from '../../services/api';
+import { getOptimizedImageUrl } from '../../utils/image';
 import type { SubTaskDto, MissionDto } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useGameStore } from '../../store/useGameStore';
@@ -52,7 +53,7 @@ const Missions = () => {
       stage: m.stage.toUpperCase(),
       title: m.title,
       desc: (m.description || m.goal || '').replace(/\*/g, ''),
-      img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
+      img: getOptimizedImageUrl(m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : '')),
       locked: getMissionLockStatus(m.id, user),
       stars: getMissionStars(m.id, user),
       completed: isMissionCompleted(m.id, user),
@@ -161,9 +162,11 @@ const Missions = () => {
                       <div className="h-40 bg-navy-3/80 relative overflow-hidden border-b border-purple-brand/20">
                         {course.img ? (
                           <img 
-                            src={course.img} 
+                            src={getOptimizedImageUrl(course.img)} 
                             alt={course.title} 
                             className={`w-full h-full object-cover ${course.locked ? 'blur-[3px] opacity-25 grayscale' : 'transition-transform duration-500 hover:scale-105'}`} 
+                            width={320}
+                            height={160}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-navy-3/90">

@@ -20,6 +20,7 @@ import {
 } from '../../utils/missionUtils';
 import type { MissionDisplay } from '../../utils/missionUtils';
 import Seo from '../../components/seo/Seo';
+import { getOptimizedImageUrl } from '../../utils/image';
 
 // Thay đổi link tải bộ cài .exe của bạn tại đây sau khi upload lên Google Drive/GitHub
 const DESKTOP_DOWNLOAD_URL = 'https://drive.google.com/file/d/17gb41rM8Sdb4Hf7xcapjNOSif47gHo36/view?usp=sharing';
@@ -74,7 +75,13 @@ const ScenarioCard: React.FC<{ s: MissionDisplay; featured?: boolean }> = ({ s, 
       <div className={`relative overflow-hidden flex-shrink-0 ${featured ? 'h-52' : 'h-36'}`}>
         {s.img && !s.locked ? (
           <>
-            <img src={s.img} alt={s.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img 
+              src={getOptimizedImageUrl(s.img)} 
+              alt={s.title} 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              width={400}
+              height={featured ? 208 : 144}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
           </>
         ) : (
@@ -166,7 +173,7 @@ const Home = () => {
             stage: m.stage.toUpperCase(),
             title: m.title,
             desc: (m.description || m.goal || '').replace(/\*/g, ''),
-            img: m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : ''),
+            img: getOptimizedImageUrl(m.imageUrl || (m.id === 1 ? '/scenario_coffee.png' : m.id === 2 ? '/scenario_classroom.png' : m.id === 5 ? '/scenario_detective.png' : '')),
             difficulty: m.difficulty,
             diffColor: getDifficultyColor(m.difficulty),
             xpReward: m.xpReward,
@@ -196,9 +203,11 @@ const Home = () => {
       <section className="max-w-screen-xl mx-auto px-5 pt-10 pb-6 text-center">
         <div className="flex justify-center mb-5">
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="The Unraveller"
             className="h-40 md:h-52 object-contain drop-shadow-2xl animate-float"
+            width={208}
+            height={208}
           />
         </div>
 

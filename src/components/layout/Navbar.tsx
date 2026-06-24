@@ -36,9 +36,11 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, username }) => {
         {/* Logo */}
         <Link to="/" className="flex-shrink-0 flex items-center gap-2.5 group">
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="The Unraveller"
             className="h-10 w-auto object-contain"
+            width={40}
+            height={40}
           />
         </Link>
 

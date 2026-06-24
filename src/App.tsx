@@ -1,39 +1,41 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { HelmetProvider } from 'react-helmet-async';
-import Home from './pages/Home/Home';
-import Auth from './pages/Auth/Auth';
-import Missions from './pages/Missions/Missions';
-import Game from './pages/Game/Game';
-import Result from './pages/Result/Result';
-import About from './pages/About/About';
-import Premium from './pages/Premium/Premium';
-import Badges from './pages/Badges/Badges';
-import ProgressPage from './pages/Progress/ProgressPage';
-import DashboardScreen from './pages/Dashboard/DashboardScreen';
-import UserProfile from './pages/Profile/UserProfile';
-import CourseCertificate from './pages/Certificate/CourseCertificate';
-import Market from './pages/Market/Market';
-import Report from './pages/Report/Report';
-import Score from './pages/Score/Score';
-import Streak from './pages/Streak/Streak';
-import Guide from './pages/Guide/Guide';
-import Friends from './pages/Friends/Friends';
-import NotFound from './pages/NotFound/NotFound';
-import ProtectedRoute from './components/common/ProtectedRoute';
-import AdminProtectedRoute from './components/common/AdminProtectedRoute';
-import AdminLayout from './pages/Admin/AdminLayout';
-import AdminUsers from './pages/Admin/AdminUsers';
-import AdminMissions from './pages/Admin/AdminMissions';
-import AdminNpcs from './pages/Admin/AdminNpcs';
-import AdminShopItems from './pages/Admin/AdminShopItems';
 import { useGameStore } from './store/useGameStore';
 import { getUserProfile } from './services/api';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { PageTransitionLoader } from './components/common/PageTransitionLoader';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminProtectedRoute from './components/common/AdminProtectedRoute';
+
+// Lazy load page components
+const Home = lazy(() => import('./pages/Home/Home'));
+const Auth = lazy(() => import('./pages/Auth/Auth'));
+const Missions = lazy(() => import('./pages/Missions/Missions'));
+const Game = lazy(() => import('./pages/Game/Game'));
+const Result = lazy(() => import('./pages/Result/Result'));
+const About = lazy(() => import('./pages/About/About'));
+const Premium = lazy(() => import('./pages/Premium/Premium'));
+const Badges = lazy(() => import('./pages/Badges/Badges'));
+const ProgressPage = lazy(() => import('./pages/Progress/ProgressPage'));
+const DashboardScreen = lazy(() => import('./pages/Dashboard/DashboardScreen'));
+const UserProfile = lazy(() => import('./pages/Profile/UserProfile'));
+const CourseCertificate = lazy(() => import('./pages/Certificate/CourseCertificate'));
+const Market = lazy(() => import('./pages/Market/Market'));
+const Report = lazy(() => import('./pages/Report/Report'));
+const Score = lazy(() => import('./pages/Score/Score'));
+const Streak = lazy(() => import('./pages/Streak/Streak'));
+const Guide = lazy(() => import('./pages/Guide/Guide'));
+const Friends = lazy(() => import('./pages/Friends/Friends'));
+const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
+const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
+const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers'));
+const AdminMissions = lazy(() => import('./pages/Admin/AdminMissions'));
+const AdminNpcs = lazy(() => import('./pages/Admin/AdminNpcs'));
+const AdminShopItems = lazy(() => import('./pages/Admin/AdminShopItems'));
 
 // Role-aware redirect for /admin index — Admin → users, Moderator → missions
 const AdminIndexRedirect = () => {
@@ -72,45 +74,47 @@ const AppRoutes = () => {
   return (
     <div className="min-h-screen bg-spy-black text-white font-body">
       <PageTransitionLoader />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/certificate/:token" element={<CourseCertificate />} />
+      <Suspense fallback={<PageTransitionLoader />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/certificate/:token" element={<CourseCertificate />} />
 
-        {/* Protected Routes */}
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
-        <Route path="/courses" element={<ProtectedRoute><Missions /></ProtectedRoute>} />
-        <Route path="/game/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
-        <Route path="/result/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
-        <Route path="/result-screen/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
-        <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
-        <Route path="/badges" element={<ProtectedRoute><Badges /></ProtectedRoute>} />
-        <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-        <Route path="/scenario/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-        <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
-        <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
-        <Route path="/score" element={<ProtectedRoute><Score /></ProtectedRoute>} />
-        <Route path="/streak" element={<ProtectedRoute><Streak /></ProtectedRoute>} />
-        <Route path="/guide" element={<ProtectedRoute><Guide /></ProtectedRoute>} />
-        <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
+          <Route path="/courses" element={<ProtectedRoute><Missions /></ProtectedRoute>} />
+          <Route path="/game/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
+          <Route path="/result/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
+          <Route path="/result-screen/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
+          <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
+          <Route path="/badges" element={<ProtectedRoute><Badges /></ProtectedRoute>} />
+          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+          <Route path="/scenario/:id" element={<ProtectedRoute><Game /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+          <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+          <Route path="/score" element={<ProtectedRoute><Score /></ProtectedRoute>} />
+          <Route path="/streak" element={<ProtectedRoute><Streak /></ProtectedRoute>} />
+          <Route path="/guide" element={<ProtectedRoute><Guide /></ProtectedRoute>} />
+          <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="missions" element={<AdminMissions />} />
-          <Route path="npcs" element={<AdminNpcs />} />
-          <Route path="shop-items" element={<AdminShopItems />} />
-          <Route index element={<AdminIndexRedirect />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="missions" element={<AdminMissions />} />
+            <Route path="npcs" element={<AdminNpcs />} />
+            <Route path="shop-items" element={<AdminShopItems />} />
+            <Route index element={<AdminIndexRedirect />} />
+          </Route>
 
-        <Route path="/missions" element={<Navigate to="/courses" replace />} />
+          <Route path="/missions" element={<Navigate to="/courses" replace />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 };

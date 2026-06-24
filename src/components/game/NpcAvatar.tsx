@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { getOptimizedImageUrl } from '../../utils/image';
 
 interface NpcAvatarProps {
   name: string;
@@ -25,6 +26,14 @@ export const NpcAvatar: React.FC<NpcAvatarProps> = ({
     lg: 'w-20 h-20 rounded-2xl',
   }[size];
 
+  const dimension = {
+    sm: 40,
+    md: 56,
+    lg: 80,
+  }[size];
+
+  const optimizedUrl = getOptimizedImageUrl(imageUrl);
+
   return (
     <div className="relative flex-shrink-0">
       {/* Avatar container */}
@@ -35,11 +44,13 @@ export const NpcAvatar: React.FC<NpcAvatarProps> = ({
             : 'border-purple-brand/40 shadow-none scale-100'
         }`}
       >
-        {imageUrl ? (
+        {optimizedUrl ? (
           <img
-            src={imageUrl}
+            src={optimizedUrl}
             alt={name}
             className="w-full h-full object-cover"
+            width={dimension}
+            height={dimension}
             onError={(e) => {
               // Fallback to emoji if image fails to load
               (e.target as HTMLImageElement).style.display = 'none';

@@ -17,6 +17,7 @@ import { NpcAvatar } from '../../components/game/NpcAvatar';
 import { ConfettiEffect } from '../../components/game/ConfettiEffect';
 import { SubTaskChecklist } from '../../components/game/SubTaskChecklist';
 import { PageLoader } from '../../components/common/PageLoader';
+import { getOptimizedImageUrl } from '../../utils/image';
 
 /* ─── Types ─── */
 interface Message {
@@ -31,7 +32,7 @@ const defaultScenario = {
   title: 'Loading…',
   stage: 'STAGE',
   topic: 'Hội thoại',
-  bg: '/scenario_coffee.png',
+  bg: getOptimizedImageUrl('/scenario_coffee.png'),
   npcName: 'NPC',
   npcEmoji: '🤖',
   difficulty: 'Beginner',
@@ -329,7 +330,7 @@ const Game = () => {
             title: found.title,
             stage: stageKey,
             topic,
-            bg: found.imageUrl || '/default-bg.png',
+            bg: getOptimizedImageUrl(found.imageUrl || '/default-bg.png'),
             npcName: found.npcName || 'NPC',
             npcEmoji: found.npcName?.toLowerCase().includes('barista') ? '☕'
               : found.npcName?.toLowerCase().includes('supervisor') ? '📋'
