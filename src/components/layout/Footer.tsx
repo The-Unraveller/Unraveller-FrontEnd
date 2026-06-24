@@ -10,9 +10,11 @@ const Footer: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <img 
-              src="/logo.png" 
+              src="/logo.webp" 
               alt="The Unraveller" 
               className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105 drop-shadow-[0_0_8px_rgba(124,58,237,0.4)]" 
+              width={64}
+              height={64}
             />
           </Link>
 

@@ -33,7 +33,13 @@ const About = () => {
       <div className="max-w-screen-xl mx-auto px-6 py-8">
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <img src="/logo.png" alt="Unraveller" className="h-36 md:h-44 object-contain drop-shadow-2xl" />
+          <img 
+            src="/logo.webp" 
+            alt="Unraveller" 
+            className="h-36 md:h-44 object-contain drop-shadow-2xl" 
+            width={176}
+            height={176}
+          />
         </div>
 
         <div className="ur-divider mb-8" />

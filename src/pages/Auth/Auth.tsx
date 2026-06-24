@@ -115,15 +115,23 @@ const Auth = () => {
           {/* ── Left: Image panel ── */}
           <div className="w-full lg:w-[52%] relative rounded-2xl overflow-hidden shadow-2xl min-h-80 lg:min-h-[500px] flex-shrink-0">
             <img
-              src="/london_bg.png"
+              src="/london_bg.webp"
               alt="English environment"
               className="w-full h-full object-cover absolute inset-0"
+              width={640}
+              height={500}
             />
             {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#12003a]/70 via-[#12003a]/30 to-transparent" />
             {/* Logo */}
             <div className="absolute top-6 left-6">
-              <img src="/logo.png" alt="Unraveller" className="h-20 object-contain drop-shadow-xl" />
+              <img 
+                src="/logo.webp" 
+                alt="Unraveller" 
+                className="h-20 object-contain drop-shadow-xl" 
+                width={80}
+                height={80}
+              />
             </div>
             {/* Bottom text */}
             <div className="absolute bottom-0 left-0 right-0 p-7">
