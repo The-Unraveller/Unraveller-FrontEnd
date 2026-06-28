@@ -720,12 +720,21 @@ const Game = () => {
                     <h4 className="text-xs font-semibold text-cyan-brand uppercase tracking-wider mb-3 font-mono">Điểm Số Lượt Này</h4>
                     <div className="grid grid-cols-3 gap-3">
                       {Object.entries(currentTurnScores).map(([key, value]) => {
+                        const skillTranslation: Record<string, string> = {
+                          grammar: 'Ngữ pháp',
+                          vocabulary: 'Từ vựng',
+                          naturalness: 'Tự nhiên',
+                          clarity: 'Rõ ràng',
+                          structure: 'Cấu trúc',
+                          tone: 'Sắc thái'
+                        };
+                        const label = skillTranslation[key.toLowerCase()] || key;
                         const scoreVal = value as number;
                         const scoreColor = scoreVal >= 80 ? 'text-success' : scoreVal >= 60 ? 'text-warning' : 'text-danger';
                         const glowStyle = scoreVal >= 80 ? 'drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]' : scoreVal >= 60 ? 'drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]' : 'drop-shadow-[0_0_4px_rgba(239,68,68,0.4)]';
                         return (
                           <div key={key} className="bg-navy-3/50 border border-white/5 rounded-xl p-2.5 text-center">
-                            <div className="text-[10px] text-text-secondary capitalize mb-1 font-mono">{key}</div>
+                            <div className="text-[10px] text-text-secondary mb-1 font-mono">{label}</div>
                             <div className={`text-base font-black font-mono ${scoreColor} ${glowStyle}`}>
                               {scoreVal}
                             </div>
