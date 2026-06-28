@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -121,7 +121,7 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId="857953455071-06bni6pvv29qabiot2kqt7b8segm5pda.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <HelmetProvider>
         <Router>
           <AppRoutes />
@@ -144,3 +144,4 @@ function App() {
 }
 
 export default App;
+

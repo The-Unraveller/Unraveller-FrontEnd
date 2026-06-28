@@ -4,10 +4,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Check, Shield, AlertCircle, CheckCircle, Zap, Loader2, ExternalLink, Clock } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Seo from '../../components/seo/Seo';
-import { createPayOSLink } from '../../services/api';
+import { createPayOSLink, getSubscriptionPlans } from '../../services/api';
+import type { SubscriptionPlanDto } from '../../services/api';
 
 interface Plan {
-  id: string;
+  id: number;
   name: string;
   price: string;
   priceValue: number;
@@ -17,52 +18,97 @@ interface Plan {
   badge?: string;
 }
 
-const plans: Plan[] = [
-  {
-    id: 'free',
-    name: 'Explorer',
-    price: '0₫',
-    priceValue: 0,
-    priceLabel: 'Không cần thẻ tín dụng',
-    features: [
-      '5 kịch bản giao tiếp đầy đủ tính năng',
-      '100 năng lượng mỗi ngày (tự hồi phục)',
-      'AI Feedback sau mỗi lượt chat',
-      'Bài luyện cú pháp Terminal Hack',
-      'Bảng xếp hạng cộng đồng',
-      'Huy chương & thành tích cơ bản',
-    ],
-    highlighted: false,
-    badge: '🎒 MIỄN PHÍ MÃI MÃI',
-  },
-  {
-    id: 'premium',
-    name: 'Premium VIP',
-    price: '199,000₫',
-    priceValue: 199000,
-    priceLabel: 'Mỗi tháng · Hủy bất kỳ lúc nào',
-    features: [
-      'Năng lượng vô hạn — không giới hạn lượt học',
-      'Gấp đôi XP trên mỗi cuộc hội thoại (2×)',
-      'Mở khóa tất cả 15+ kịch bản độc quyền',
-      'AI Coach phân tích chuyên sâu ngữ pháp',
-      'Tắt toàn bộ quảng cáo',
-      'Giảm 20% khi mua vật phẩm Cửa Hàng',
-      'Hồi năng lượng nhanh gấp đôi',
-      'Badge VIP + Khung avatar đặc biệt ✨',
-    ],
-    highlighted: true,
-    badge: '⚡ PHỔ BIẾN NHẤT',
-  },
-];
+// Free plan is static — never fetched from API (id = 0, not a real DB plan)
+const FREE_PLAN: Plan = {
+  id: 0,
+  name: 'Explorer',
+  price: '0₫',
+  priceValue: 0,
+  priceLabel: 'Không cần thẻ tín dụng',
+  features: [
+    '5 kịch bản giao tiếp đầy đủ tính năng',
+    '100 năng lượng mỗi ngày (tự hồi phục)',
+    'AI Feedback sau mỗi lượt chat',
+    'Bài luyện cú pháp Terminal Hack',
+    'Bảng xếp hạng cộng đồng',
+    'Huy chương & thành tích cơ bản',
+  ],
+  highlighted: false,
+  badge: '🎒 MIỄN PHÍ MÃI MÃI',
+};
+
+// Fallback plan if API is unavailable
+const FALLBACK_PREMIUM_PLAN: Plan = {
+  id: 1,
+  name: 'Premium VIP',
+  price: '199,000₫',
+  priceValue: 199000,
+  priceLabel: 'Mỗi tháng · Hủy bất kỳ lúc nào',
+  features: [
+    'Năng lượng vô hạn — không giới hạn lượt học',
+    'Gấp đôi XP trên mỗi cuộc hội thoại (2×)',
+    'Mở khóa tất cả 15+ kịch bản độc quyền',
+    'AI Coach phân tích chuyên sâu ngữ pháp',
+    'Tắt toàn bộ quảng cáo',
+    'Giảm 20% khi mua vật phẩm Cửa Hàng',
+    'Hồi năng lượng nhanh gấp đôi',
+    'Badge VIP + Khung avatar đặc biệt ✨',
+  ],
+  highlighted: true,
+  badge: '⚡ PHỔ BIẾN NHẤT',
+};
 
 const Premium = () => {
-  const [selected, setSelected] = useState('premium');
+  const [selected, setSelected] = useState<number>(1);
+  const [plans, setPlans] = useState<Plan[]>([FREE_PLAN, FALLBACK_PREMIUM_PLAN]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
   const [searchParams] = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [paymentResult, setPaymentResult] = useState<{type: 'success' | 'failed' | 'error'; orderId?: string} | null>(null);
+  const [paymentResult, setPaymentResult] = useState<{ type: 'success' | 'failed' | 'error'; orderId?: string } | null>(null);
+
+  // Fetch subscription plans from API
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const apiPlans: SubscriptionPlanDto[] = await getSubscriptionPlans();
+
+        // Map API plans to UI Plan format — no isActive filter (backend has no isActive field)
+        const mappedPlans: Plan[] = apiPlans
+          .map((p): Plan => ({
+            id: p.id,
+            name: p.name,
+            price: new Intl.NumberFormat('vi-VN').format(p.price) + '₫',
+            priceValue: p.price,
+            priceLabel: p.durationDays > 0
+              ? `${p.durationDays} ngày · Hủy bất kỳ lúc nào`
+              : 'Vĩnh viễn',
+            // Use features array from backend, fallback to description
+            features: p.features.length > 0
+              ? p.features
+              : p.description.split('\n').filter((f) => f.trim()),
+            highlighted: p.price > 0 && p.id !== 1, // highlight non-default paid plans
+            badge: p.price > 0 && p.id !== 1 ? '⚡ PHỔ BIẾN NHẤT' : undefined,
+          }));
+
+        // Build final list: free plan + API plans (replace fallback with real data)
+        const finalPlans: Plan[] = [FREE_PLAN, ...mappedPlans];
+        setPlans(finalPlans);
+
+        // Auto-select first paid plan from API
+        const paidPlan = mappedPlans.find((p) => p.priceValue > 0);
+        if (paidPlan) setSelected(paidPlan.id);
+      } catch (err) {
+        console.error('Failed to fetch plans, using fallback defaults:', err);
+        // Keep the default state [FREE_PLAN, FALLBACK_PREMIUM_PLAN]
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   // Handle payOS return redirect
   useEffect(() => {
@@ -84,9 +130,9 @@ const Premium = () => {
   }, [searchParams]);
 
   const handleUpgrade = async () => {
-    if (selected === 'free') return;
+    if (selected === 0) return; // free plan selected
 
-    const selectedPlan = plans.find(p => p.id === selected);
+    const selectedPlan = plans.find((p) => p.id === selected);
     if (!selectedPlan) return;
 
     setIsProcessing(true);
@@ -95,7 +141,7 @@ const Premium = () => {
 
     try {
       const response = await createPayOSLink({
-        planId: selected,
+        planId: selected, // number — matches backend int
         amount: selectedPlan.priceValue,
       });
 
@@ -115,11 +161,17 @@ const Premium = () => {
     }
   };
 
-  const selectedPlan = plans.find(p => p.id === selected);
+  const selectedPlan = plans.find((p) => p.id === selected);
 
   return (
     <Layout isLoggedIn={true}>
-      <Seo title="Goi Dich Vu Premium" description="Nâng cấp lên gói Premium để không giới hạn quyền truy cập vào tất cả kịch bản học tiếng Anh. Chỉ từ 199.000đ/tháng." keywords="premium, gia dich vu, nang cap, thanh toan, goi Plus, goi Premium" canonical="/premium" noIndex />
+      <Seo
+        title="Goi Dich Vu Premium"
+        description="Nâng cấp lên gói Premium để không giới hạn quyền truy cập vào tất cả kịch bản học tiếng Anh. Chỉ từ 199.000đ/tháng."
+        keywords="premium, gia dich vu, nang cap, thanh toan, goi Plus, goi Premium"
+        canonical="/premium"
+        noIndex
+      />
       <div className="max-w-screen-xl mx-auto px-6 py-12 app-bg min-h-screen">
         {/* Header Block with Cyberpunk Glow */}
         <div className="text-center mb-12 animate-fade-in">
@@ -135,57 +187,60 @@ const Premium = () => {
         <div className="flex flex-col lg:flex-row gap-10 items-stretch">
           {/* ── Pricing Cards Grid ── */}
           <div className="flex-1 flex flex-col justify-between">
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch mb-8">
-              {plans.map((plan) => {
-                const isSelected = selected === plan.id;
-                return (
-                  <div
-                    key={plan.id}
-                    id={`plan-${plan.id}`}
-                    onClick={() => setSelected(plan.id)}
-                    className={`cursor-pointer rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 w-full md:w-[320px] relative backdrop-blur-md hover:-translate-y-2 hover:scale-[1.02] hover:opacity-100 ${
-                      isSelected
-                        ? plan.id === 'free'
+            {loadingPlans ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 size={32} className="animate-spin text-purple-brand" />
+              </div>
+            ) : (
+              <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch mb-8">
+                {plans.map((plan) => {
+                  const isSelected = selected === plan.id;
+                  return (
+                    <div
+                      key={plan.id}
+                      id={`plan-${plan.id}`}
+                      onClick={() => setSelected(plan.id)}
+                      className={`cursor-pointer rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 w-full md:w-[320px] relative backdrop-blur-md hover:-translate-y-2 hover:scale-[1.02] hover:opacity-100 ${isSelected
+                        ? plan.id === 0
                           ? 'border-2 border-slate-400 bg-slate-400/10 shadow-[0_0_25px_rgba(148,163,184,0.2)] opacity-100 z-10'
                           : 'border-2 border-purple-brand bg-purple-brand/10 shadow-glow-purple opacity-100 z-10'
                         : 'border-2 border-purple-brand/20 bg-card/45 opacity-70 hover:border-purple-brand/40 hover:shadow-glow-purple/10'
-                    }`}
-                  >
-                    {plan.badge && (
-                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-brand text-white text-xs font-black px-4 py-1.5 rounded-full whitespace-nowrap shadow-glow-purple animate-pulse-slow">
-                        {plan.badge}
-                      </span>
-                    )}
-                    <div>
-                      <h3 className="text-white text-2xl font-black mb-6 flex items-center justify-between">
-                        {plan.name}
-                        {isSelected && (
-                          <span className={`w-2.5 h-2.5 rounded-full ${
-                            plan.id === 'free' ? 'bg-slate-400' : 'bg-purple-brand'
-                          } animate-ping`} />
-                        )}
-                      </h3>
-                      
-                      <ul className="space-y-4 mb-8">
-                        {plan.features.map((f, i) => (
-                          <li key={i} className="text-white/80 text-sm flex items-start gap-3">
-                            <Check size={16} className={`mt-0.5 flex-shrink-0 ${
-                              plan.id === 'free' ? 'text-slate-400' : 'text-purple-brand'
-                            }`} />
-                            <span className="leading-snug">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                        }`}
+                    >
+                      {plan.badge && (
+                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-brand text-white text-xs font-black px-4 py-1.5 rounded-full whitespace-nowrap shadow-glow-purple animate-pulse-slow">
+                          {plan.badge}
+                        </span>
+                      )}
+                      <div>
+                        <h3 className="text-white text-2xl font-black mb-6 flex items-center justify-between">
+                          {plan.name}
+                          {isSelected && (
+                            <span className={`w-2.5 h-2.5 rounded-full ${plan.id === 0 ? 'bg-slate-400' : 'bg-purple-brand'
+                              } animate-ping`} />
+                          )}
+                        </h3>
 
-                    <div className="pt-6 border-t border-white/5 mt-auto">
-                      <p className="text-white text-3xl font-black tracking-tight">{plan.price}</p>
-                      <p className="text-white/40 text-xs mt-1 font-mono uppercase tracking-wider">{plan.priceLabel}</p>
+                        <ul className="space-y-4 mb-8">
+                          {plan.features.map((f, i) => (
+                            <li key={i} className="text-white/80 text-sm flex items-start gap-3">
+                              <Check size={16} className={`mt-0.5 flex-shrink-0 ${plan.id === 0 ? 'text-slate-400' : 'text-purple-brand'
+                                }`} />
+                              <span className="leading-snug">{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="pt-6 border-t border-white/5 mt-auto">
+                        <p className="text-white text-3xl font-black tracking-tight">{plan.price}</p>
+                        <p className="text-white/40 text-xs mt-1 font-mono uppercase tracking-wider">{plan.priceLabel}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Visual Decorative Action Block */}
             <div className="flex justify-center gap-6 mt-4 flex-wrap">
@@ -215,11 +270,10 @@ const Premium = () => {
 
               {/* Payment result banner */}
               {paymentResult && (
-                <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 animate-slide-up ${
-                  paymentResult.type === 'success'
-                    ? 'bg-success/15 border border-success/40 text-success'
-                    : 'bg-danger/15 border border-danger/40 text-danger'
-                }`}>
+                <div className={`mb-6 p-4 rounded-2xl flex items-start gap-3 animate-slide-up ${paymentResult.type === 'success'
+                  ? 'bg-success/15 border border-success/40 text-success'
+                  : 'bg-danger/15 border border-danger/40 text-danger'
+                  }`}>
                   {paymentResult.type === 'success' ? (
                     <CheckCircle size={22} className="text-success mt-0.5 flex-shrink-0" />
                   ) : (
@@ -255,7 +309,7 @@ const Premium = () => {
                 </p>
 
                 {/* Dynamic Selected Plan Summary Card */}
-                {selectedPlan && selectedPlan.id !== 'free' && (
+                {selectedPlan && selectedPlan.id !== 0 && (
                   <div className="mb-6 p-5 rounded-2xl transition-all duration-300 border bg-purple-brand/15 border-purple-brand/35 shadow-[0_0_20px_rgba(124,58,237,0.08)]">
                     <p className="text-white/45 text-xs uppercase tracking-wider mb-2 font-mono">Gói đang chọn</p>
                     <div className="flex items-center justify-between">
@@ -271,7 +325,7 @@ const Premium = () => {
                   </div>
                 )}
 
-                {selected === 'free' && (
+                {selected === 0 && (
                   <div className="mb-6 p-6 rounded-2xl bg-white/5 border border-white/10 text-center animate-slide-up">
                     <p className="text-white/60 text-sm">Gói Free không cần giao dịch thanh toán.</p>
                     <Link to="/auth?mode=register">
@@ -291,13 +345,13 @@ const Premium = () => {
                 )}
 
                 {/* Payment checklist steps */}
-                {selected !== 'free' && paymentStatus !== 'success' && (
+                {selected !== 0 && paymentStatus !== 'success' && (
                   <div className="mb-6 space-y-3">
                     {[
                       { icon: '1', text: 'Chọn gói hội viên bạn mong muốn đăng ký' },
                       { icon: '2', text: 'Bấm nút thanh toán để chuyển tiếp sang cổng payOS' },
                       { icon: '3', text: 'Quét mã VietQR bằng bất kỳ App Ngân hàng hoặc ví điện tử' },
-                    ].map(step => (
+                    ].map((step) => (
                       <div key={step.icon} className="flex items-start gap-3.5 text-white/50 text-xs">
                         <span className="w-5.5 h-5.5 rounded-full bg-cyan-brand/10 border border-cyan-brand/30 text-cyan-brand text-xs flex items-center justify-center font-black flex-shrink-0">
                           {step.icon}
@@ -310,13 +364,12 @@ const Premium = () => {
               </div>
 
               <div>
-                {/* Main pay button with neon color gradients based on selection */}
-                {selected !== 'free' && (
+                {/* Main pay button */}
+                {selected !== 0 && (
                   <button
                     type="button"
-                    className={`w-full py-4 text-base font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] ${
-                      isProcessing ? 'cursor-wait' : ''
-                    } bg-gradient-purple text-white shadow-glow-purple hover:shadow-[0_0_30px_rgba(124,58,237,0.55)]`}
+                    className={`w-full py-4 text-base font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] ${isProcessing ? 'cursor-wait' : ''
+                      } bg-gradient-purple text-white shadow-glow-purple hover:shadow-[0_0_30px_rgba(124,58,237,0.55)]`}
                     id="payment-pay-btn"
                     disabled={isProcessing || paymentStatus === 'success'}
                     onClick={handleUpgrade}
