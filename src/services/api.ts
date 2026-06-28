@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 // Dynamic API URL: 
 // 1. Uses VITE_API_URL env variable if defined.
 // 2. In local development (DEV mode), falls back to localhost:5251.
@@ -147,6 +147,11 @@ export interface UserProfileDto {
   isPremium: boolean;
   englishLevel: string;
   createdAt: string;
+  // Subscription fields
+  subscriptionPlanName?: string;
+  subscriptionEndDate?: string;
+  subscriptionDaysRemaining?: number;
+  subscriptionExpiringSoon?: boolean;
   missionProgresses?: {
     missionId: number;
     currentSuspicion: number;
@@ -193,7 +198,7 @@ export interface UseItemResponseDto {
 }
 
 export interface CreatePaymentRequestDto {
-  planId: string;
+  planId: number;
   amount: number;
 }
 
@@ -213,7 +218,7 @@ export interface CreatePayOSLinkResponseDto {
 
 export interface PaymentHistoryDto {
   id: number;
-  planId: string;
+  planId: number;
   amount: number;
   status: string;
   createdAt: string;
@@ -350,13 +355,8 @@ export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
     const res = await apiClient.get<LeaderboardEntry[]>(`/Leaderboard`, { headers });
     return res.data;
   } catch (err) {
-    console.error("Failed to fetch leaderboard, returning mock data", err);
-    return [
-      { rank: 1, name: 'Minh Khôi', xp: 4800, badge: '👑', isYou: false },
-      { rank: 2, name: 'Lan Anh', xp: 3950, badge: '🥈', isYou: false },
-      { rank: 3, name: 'Tuấn Khoa', xp: 3200, badge: '🥉', isYou: false },
-      { rank: 4, name: 'KHOA_PRO', xp: 1250, badge: '⚡', isYou: true }
-    ];
+console.error("Failed to fetch leaderboard", err);
+return [];
   }
 };
 
@@ -389,6 +389,40 @@ export const createPayOSLink = async (request: CreatePaymentRequestDto): Promise
 
 export const getPaymentHistory = async (): Promise<PaymentHistoryDto[]> => {
   const response = await apiClient.get<PaymentHistoryDto[]>(`/Payment/history`);
+  return response.data;
+};
+
+// --- Subscription Plans ---
+export interface SubscriptionPlanDto {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  durationDays: number;
+  features: string[];
+}
+
+export const getSubscriptionPlans = async (): Promise<SubscriptionPlanDto[]> => {
+  const response = await apiClient.get<SubscriptionPlanDto[]>(`/Payment/plans`);
+  return response.data;
+};
+
+// Subscription status for the current user
+export interface SubscriptionStatusDto {
+  isActive: boolean;
+  planName: string;
+  daysRemaining: number;
+  expiresAt: string | null;
+  isExpiringSoon: boolean;
+}
+
+export const getUserSubscriptionStatus = async (): Promise<SubscriptionStatusDto> => {
+  const response = await apiClient.get<SubscriptionStatusDto>(`/Payment/subscription-status`);
+  return response.data;
+};
+
+export const cancelSubscription = async (): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(`/Payment/cancel-subscription`);
   return response.data;
 };
 
@@ -495,4 +529,6 @@ export const getCertificateByToken = async (token: string): Promise<CertificateD
   const response = await apiClient.get<CertificateDto>(`/Game/certificate/${token}`);
   return response.data;
 };
+
+
 
