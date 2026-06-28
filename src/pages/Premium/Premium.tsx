@@ -74,8 +74,9 @@ const Premium = () => {
       try {
         const apiPlans: SubscriptionPlanDto[] = await getSubscriptionPlans();
 
-        // Map API plans to UI Plan format — no isActive filter (backend has no isActive field)
+        // Map API plans to UI Plan format — skip free plans (covered by static FREE_PLAN)
         const mappedPlans: Plan[] = apiPlans
+          .filter(p => p.price > 0)
           .map((p): Plan => ({
             id: p.id,
             name: p.name,
@@ -88,12 +89,14 @@ const Premium = () => {
             features: p.features.length > 0
               ? p.features
               : p.description.split('\n').filter((f) => f.trim()),
-            highlighted: p.price > 0 && p.id !== 1, // highlight non-default paid plans
-            badge: p.price > 0 && p.id !== 1 ? '⚡ PHỔ BIẾN NHẤT' : undefined,
+            highlighted: true,
+            badge: '⚡ PHỔ BIẾN NHẤT',
           }));
 
-        // Build final list: free plan + API plans (replace fallback with real data)
-        const finalPlans: Plan[] = [FREE_PLAN, ...mappedPlans];
+        // Build final list: free plan + API paid plans (replace fallback with real data)
+        const finalPlans: Plan[] = mappedPlans.length > 0
+          ? [FREE_PLAN, ...mappedPlans]
+          : [FREE_PLAN, FALLBACK_PREMIUM_PLAN];
         setPlans(finalPlans);
 
         // Auto-select first paid plan from API
