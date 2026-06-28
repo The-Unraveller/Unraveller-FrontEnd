@@ -97,7 +97,7 @@ const Friends = () => {
   };
 
   return (
-    <Layout isLoggedIn={user?.username || 'User'} showBottomNav>
+    <Layout isLoggedIn={!!user} username={user?.username || 'User'} showBottomNav>
       <Seo
         title="Mạng Lưới Bạn Bè"
         description="Quản lý mạng lưới bạn bè trong The Unraveller."
