@@ -347,6 +347,7 @@ export const getWeeklyReport = async (): Promise<WeeklyReportDto> => {
 };
 
 // Leaderboard
+// Friends / Leaderboard
 export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
   try {
     const token = localStorage.getItem('token');
